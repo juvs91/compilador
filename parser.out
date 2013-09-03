@@ -1,0 +1,171 @@
+Created by PLY version 3.4 (http://www.dabeaz.com/ply)
+
+Unused terminals:
+
+    NOTEQUAL
+    LESS
+    EQUAL
+    PROGRAM
+    PRINT
+    FCONST
+    SCONST
+    RBRACE
+    PERIOD
+    ELSE
+    LBRACE
+    GREATER
+
+Grammar
+
+Rule 0     S' -> vars
+Rule 1     vars -> VAR var COLON type SEMI
+Rule 2     var -> ID COMMA var
+Rule 3     var -> ID
+Rule 4     type -> INT
+Rule 5     type -> FLOAT
+Rule 6     expression -> expression PLUS term
+Rule 7     expression -> expression MINUS term
+Rule 8     expression -> term
+Rule 9     term -> term TIMES factor
+Rule 10    term -> term DIVIDE factor
+Rule 11    term -> factor
+Rule 12    factor -> ICONST
+Rule 13    factor -> LPAREN expression RPAREN
+
+Terminals, with rules where they appear
+
+COLON                : 1
+COMMA                : 2
+DIVIDE               : 10
+ELSE                 : 
+EQUAL                : 
+FCONST               : 
+FLOAT                : 5
+GREATER              : 
+ICONST               : 12
+ID                   : 2 3
+INT                  : 4
+LBRACE               : 
+LESS                 : 
+LPAREN               : 13
+MINUS                : 7
+NOTEQUAL             : 
+PERIOD               : 
+PLUS                 : 6
+PRINT                : 
+PROGRAM              : 
+RBRACE               : 
+RPAREN               : 13
+SCONST               : 
+SEMI                 : 1
+TIMES                : 9
+VAR                  : 1
+error                : 
+
+Nonterminals, with rules where they appear
+
+expression           : 6 7 13
+factor               : 9 10 11
+term                 : 6 7 8 9 10
+type                 : 1
+var                  : 1 2
+vars                 : 0
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . vars
+    (1) vars -> . VAR var COLON type SEMI
+
+    VAR             shift and go to state 2
+
+    vars                           shift and go to state 1
+
+state 1
+
+    (0) S' -> vars .
+
+
+
+state 2
+
+    (1) vars -> VAR . var COLON type SEMI
+    (2) var -> . ID COMMA var
+    (3) var -> . ID
+
+    ID              shift and go to state 4
+
+    var                            shift and go to state 3
+
+state 3
+
+    (1) vars -> VAR var . COLON type SEMI
+
+    COLON           shift and go to state 5
+
+
+state 4
+
+    (2) var -> ID . COMMA var
+    (3) var -> ID .
+
+    COMMA           shift and go to state 6
+    COLON           reduce using rule 3 (var -> ID .)
+
+
+state 5
+
+    (1) vars -> VAR var COLON . type SEMI
+    (4) type -> . INT
+    (5) type -> . FLOAT
+
+    INT             shift and go to state 7
+    FLOAT           shift and go to state 8
+
+    type                           shift and go to state 9
+
+state 6
+
+    (2) var -> ID COMMA . var
+    (2) var -> . ID COMMA var
+    (3) var -> . ID
+
+    ID              shift and go to state 4
+
+    var                            shift and go to state 10
+
+state 7
+
+    (4) type -> INT .
+
+    SEMI            reduce using rule 4 (type -> INT .)
+
+
+state 8
+
+    (5) type -> FLOAT .
+
+    SEMI            reduce using rule 5 (type -> FLOAT .)
+
+
+state 9
+
+    (1) vars -> VAR var COLON type . SEMI
+
+    SEMI            shift and go to state 11
+
+
+state 10
+
+    (2) var -> ID COMMA var .
+
+    COLON           reduce using rule 2 (var -> ID COMMA var .)
+
+
+state 11
+
+    (1) vars -> VAR var COLON type SEMI .
+
+    $end            reduce using rule 1 (vars -> VAR var COLON type SEMI .)
+
