@@ -149,6 +149,5 @@ def p_error(p):
 parser = yacc.yacc()
 
 with open(raw_input('filename > '), 'r') as f:
-    for line in f:
-        result = parser.parse(line)
-        print result
+    result = parser.parse(f.read())
+    print result
