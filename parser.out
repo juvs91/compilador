@@ -2,170 +2,1262 @@ Created by PLY version 3.4 (http://www.dabeaz.com/ply)
 
 Unused terminals:
 
-    NOTEQUAL
-    LESS
-    EQUAL
-    PROGRAM
-    PRINT
-    FCONST
-    SCONST
-    RBRACE
     PERIOD
-    ELSE
-    LBRACE
-    GREATER
 
 Grammar
 
-Rule 0     S' -> vars
-Rule 1     vars -> VAR var COLON type SEMI
-Rule 2     var -> ID COMMA var
-Rule 3     var -> ID
-Rule 4     type -> INT
-Rule 5     type -> FLOAT
-Rule 6     expression -> expression PLUS term
-Rule 7     expression -> expression MINUS term
-Rule 8     expression -> term
-Rule 9     term -> term TIMES factor
-Rule 10    term -> term DIVIDE factor
-Rule 11    term -> factor
-Rule 12    factor -> ICONST
-Rule 13    factor -> LPAREN expression RPAREN
+Rule 0     S' -> main
+Rule 1     main -> PROGRAM ID SEMI vars block
+Rule 2     vars -> varlist
+Rule 3     vars -> empty
+Rule 4     varlist -> VAR idlist COLON type SEMI varlist1
+Rule 5     varlist1 -> idlist COLON type SEMI varlist1
+Rule 6     varlist1 -> empty
+Rule 7     idlist -> ID idlist1
+Rule 8     idlist1 -> COMMA idlist
+Rule 9     idlist1 -> empty
+Rule 10    type -> INT
+Rule 11    type -> FLOAT
+Rule 12    block -> LBRACE block1 RBRACE
+Rule 13    block1 -> instr
+Rule 14    block1 -> empty
+Rule 15    instr -> assign
+Rule 16    instr -> cond
+Rule 17    instr -> write
+Rule 18    assign -> ID EQUAL expr SEMI
+Rule 19    cond -> IF LPAREN expr RPAREN block cond1 SEMI
+Rule 20    write -> PRINT LPAREN write1 RPAREN SEMI
+Rule 21    write1 -> expr write2
+Rule 22    write1 -> SCONST write2
+Rule 23    write2 -> COMMA write1
+Rule 24    write2 -> empty
+Rule 25    cond1 -> ELSE block
+Rule 26    cond1 -> empty
+Rule 27    expr -> exp expr1
+Rule 28    expr1 -> GREATER exp
+Rule 29    expr1 -> LESS exp
+Rule 30    expr1 -> NOTEQUAL exp
+Rule 31    expr1 -> empty
+Rule 32    exp -> term exp1
+Rule 33    exp1 -> PLUS exp
+Rule 34    exp1 -> MINUS exp
+Rule 35    exp1 -> empty
+Rule 36    term -> factor term1
+Rule 37    factor -> LPAREN expr RPAREN
+Rule 38    factor -> factor1 const
+Rule 39    factor1 -> PLUS
+Rule 40    factor1 -> MINUS
+Rule 41    factor1 -> empty
+Rule 42    term1 -> TIMES term
+Rule 43    term1 -> DIVIDE term
+Rule 44    term1 -> empty
+Rule 45    const -> ID
+Rule 46    const -> ICONST
+Rule 47    const -> FCONST
+Rule 48    empty -> <empty>
 
 Terminals, with rules where they appear
 
-COLON                : 1
-COMMA                : 2
-DIVIDE               : 10
-ELSE                 : 
-EQUAL                : 
-FCONST               : 
-FLOAT                : 5
-GREATER              : 
-ICONST               : 12
-ID                   : 2 3
-INT                  : 4
-LBRACE               : 
-LESS                 : 
-LPAREN               : 13
-MINUS                : 7
-NOTEQUAL             : 
+COLON                : 4 5
+COMMA                : 8 23
+DIVIDE               : 43
+ELSE                 : 25
+EQUAL                : 18
+FCONST               : 47
+FLOAT                : 11
+GREATER              : 28
+ICONST               : 46
+ID                   : 1 7 18 45
+IF                   : 19
+INT                  : 10
+LBRACE               : 12
+LESS                 : 29
+LPAREN               : 19 20 37
+MINUS                : 34 40
+NOTEQUAL             : 30
 PERIOD               : 
-PLUS                 : 6
-PRINT                : 
-PROGRAM              : 
-RBRACE               : 
-RPAREN               : 13
-SCONST               : 
-SEMI                 : 1
-TIMES                : 9
-VAR                  : 1
+PLUS                 : 33 39
+PRINT                : 20
+PROGRAM              : 1
+RBRACE               : 12
+RPAREN               : 19 20 37
+SCONST               : 22
+SEMI                 : 1 4 5 18 19 20
+TIMES                : 42
+VAR                  : 4
 error                : 
 
 Nonterminals, with rules where they appear
 
-expression           : 6 7 13
-factor               : 9 10 11
-term                 : 6 7 8 9 10
-type                 : 1
-var                  : 1 2
-vars                 : 0
+assign               : 15
+block                : 1 19 25
+block1               : 12
+cond                 : 16
+cond1                : 19
+const                : 38
+empty                : 3 6 9 14 24 26 31 35 41 44
+exp                  : 27 28 29 30 33 34
+exp1                 : 32
+expr                 : 18 19 21 37
+expr1                : 27
+factor               : 36
+factor1              : 38
+idlist               : 4 5 8
+idlist1              : 7
+instr                : 13
+main                 : 0
+term                 : 32 42 43
+term1                : 36
+type                 : 4 5
+varlist              : 2
+varlist1             : 4 5
+vars                 : 1
+write                : 17
+write1               : 20 23
+write2               : 21 22
 
 Parsing method: LALR
 
 state 0
 
-    (0) S' -> . vars
-    (1) vars -> . VAR var COLON type SEMI
+    (0) S' -> . main
+    (1) main -> . PROGRAM ID SEMI vars block
 
-    VAR             shift and go to state 2
+    PROGRAM         shift and go to state 1
 
-    vars                           shift and go to state 1
+    main                           shift and go to state 2
 
 state 1
 
-    (0) S' -> vars .
+    (1) main -> PROGRAM . ID SEMI vars block
 
+    ID              shift and go to state 3
 
 
 state 2
 
-    (1) vars -> VAR . var COLON type SEMI
-    (2) var -> . ID COMMA var
-    (3) var -> . ID
+    (0) S' -> main .
 
-    ID              shift and go to state 4
 
-    var                            shift and go to state 3
 
 state 3
 
-    (1) vars -> VAR var . COLON type SEMI
+    (1) main -> PROGRAM ID . SEMI vars block
 
-    COLON           shift and go to state 5
+    SEMI            shift and go to state 4
 
 
 state 4
 
-    (2) var -> ID . COMMA var
-    (3) var -> ID .
+    (1) main -> PROGRAM ID SEMI . vars block
+    (2) vars -> . varlist
+    (3) vars -> . empty
+    (4) varlist -> . VAR idlist COLON type SEMI varlist1
+    (48) empty -> .
 
-    COMMA           shift and go to state 6
-    COLON           reduce using rule 3 (var -> ID .)
+    VAR             shift and go to state 8
+    LBRACE          reduce using rule 48 (empty -> .)
 
+    vars                           shift and go to state 5
+    varlist                        shift and go to state 6
+    empty                          shift and go to state 7
 
 state 5
 
-    (1) vars -> VAR var COLON . type SEMI
-    (4) type -> . INT
-    (5) type -> . FLOAT
+    (1) main -> PROGRAM ID SEMI vars . block
+    (12) block -> . LBRACE block1 RBRACE
 
-    INT             shift and go to state 7
-    FLOAT           shift and go to state 8
+    LBRACE          shift and go to state 9
 
-    type                           shift and go to state 9
+    block                          shift and go to state 10
 
 state 6
 
-    (2) var -> ID COMMA . var
-    (2) var -> . ID COMMA var
-    (3) var -> . ID
+    (2) vars -> varlist .
 
-    ID              shift and go to state 4
+    LBRACE          reduce using rule 2 (vars -> varlist .)
 
-    var                            shift and go to state 10
 
 state 7
 
-    (4) type -> INT .
+    (3) vars -> empty .
 
-    SEMI            reduce using rule 4 (type -> INT .)
+    LBRACE          reduce using rule 3 (vars -> empty .)
 
 
 state 8
 
-    (5) type -> FLOAT .
+    (4) varlist -> VAR . idlist COLON type SEMI varlist1
+    (7) idlist -> . ID idlist1
 
-    SEMI            reduce using rule 5 (type -> FLOAT .)
+    ID              shift and go to state 12
 
+    idlist                         shift and go to state 11
 
 state 9
 
-    (1) vars -> VAR var COLON type . SEMI
+    (12) block -> LBRACE . block1 RBRACE
+    (13) block1 -> . instr
+    (14) block1 -> . empty
+    (15) instr -> . assign
+    (16) instr -> . cond
+    (17) instr -> . write
+    (48) empty -> .
+    (18) assign -> . ID EQUAL expr SEMI
+    (19) cond -> . IF LPAREN expr RPAREN block cond1 SEMI
+    (20) write -> . PRINT LPAREN write1 RPAREN SEMI
 
-    SEMI            shift and go to state 11
+    RBRACE          reduce using rule 48 (empty -> .)
+    ID              shift and go to state 15
+    IF              shift and go to state 21
+    PRINT           shift and go to state 18
 
+    block1                         shift and go to state 13
+    instr                          shift and go to state 14
+    write                          shift and go to state 16
+    cond                           shift and go to state 17
+    assign                         shift and go to state 19
+    empty                          shift and go to state 20
 
 state 10
 
-    (2) var -> ID COMMA var .
+    (1) main -> PROGRAM ID SEMI vars block .
 
-    COLON           reduce using rule 2 (var -> ID COMMA var .)
+    $end            reduce using rule 1 (main -> PROGRAM ID SEMI vars block .)
 
 
 state 11
 
-    (1) vars -> VAR var COLON type SEMI .
+    (4) varlist -> VAR idlist . COLON type SEMI varlist1
 
-    $end            reduce using rule 1 (vars -> VAR var COLON type SEMI .)
+    COLON           shift and go to state 22
+
+
+state 12
+
+    (7) idlist -> ID . idlist1
+    (8) idlist1 -> . COMMA idlist
+    (9) idlist1 -> . empty
+    (48) empty -> .
+
+    COMMA           shift and go to state 23
+    COLON           reduce using rule 48 (empty -> .)
+
+    empty                          shift and go to state 24
+    idlist1                        shift and go to state 25
+
+state 13
+
+    (12) block -> LBRACE block1 . RBRACE
+
+    RBRACE          shift and go to state 26
+
+
+state 14
+
+    (13) block1 -> instr .
+
+    RBRACE          reduce using rule 13 (block1 -> instr .)
+
+
+state 15
+
+    (18) assign -> ID . EQUAL expr SEMI
+
+    EQUAL           shift and go to state 27
+
+
+state 16
+
+    (17) instr -> write .
+
+    RBRACE          reduce using rule 17 (instr -> write .)
+
+
+state 17
+
+    (16) instr -> cond .
+
+    RBRACE          reduce using rule 16 (instr -> cond .)
+
+
+state 18
+
+    (20) write -> PRINT . LPAREN write1 RPAREN SEMI
+
+    LPAREN          shift and go to state 28
+
+
+state 19
+
+    (15) instr -> assign .
+
+    RBRACE          reduce using rule 15 (instr -> assign .)
+
+
+state 20
+
+    (14) block1 -> empty .
+
+    RBRACE          reduce using rule 14 (block1 -> empty .)
+
+
+state 21
+
+    (19) cond -> IF . LPAREN expr RPAREN block cond1 SEMI
+
+    LPAREN          shift and go to state 29
+
+
+state 22
+
+    (4) varlist -> VAR idlist COLON . type SEMI varlist1
+    (10) type -> . INT
+    (11) type -> . FLOAT
+
+    INT             shift and go to state 30
+    FLOAT           shift and go to state 31
+
+    type                           shift and go to state 32
+
+state 23
+
+    (8) idlist1 -> COMMA . idlist
+    (7) idlist -> . ID idlist1
+
+    ID              shift and go to state 12
+
+    idlist                         shift and go to state 33
+
+state 24
+
+    (9) idlist1 -> empty .
+
+    COLON           reduce using rule 9 (idlist1 -> empty .)
+
+
+state 25
+
+    (7) idlist -> ID idlist1 .
+
+    COLON           reduce using rule 7 (idlist -> ID idlist1 .)
+
+
+state 26
+
+    (12) block -> LBRACE block1 RBRACE .
+
+    SEMI            reduce using rule 12 (block -> LBRACE block1 RBRACE .)
+    ELSE            reduce using rule 12 (block -> LBRACE block1 RBRACE .)
+    $end            reduce using rule 12 (block -> LBRACE block1 RBRACE .)
+
+
+state 27
+
+    (18) assign -> ID EQUAL . expr SEMI
+    (27) expr -> . exp expr1
+    (32) exp -> . term exp1
+    (36) term -> . factor term1
+    (37) factor -> . LPAREN expr RPAREN
+    (38) factor -> . factor1 const
+    (39) factor1 -> . PLUS
+    (40) factor1 -> . MINUS
+    (41) factor1 -> . empty
+    (48) empty -> .
+
+    LPAREN          shift and go to state 40
+    PLUS            shift and go to state 37
+    MINUS           shift and go to state 36
+    ID              reduce using rule 48 (empty -> .)
+    ICONST          reduce using rule 48 (empty -> .)
+    FCONST          reduce using rule 48 (empty -> .)
+
+    term                           shift and go to state 34
+    factor1                        shift and go to state 42
+    expr                           shift and go to state 35
+    exp                            shift and go to state 38
+    factor                         shift and go to state 39
+    empty                          shift and go to state 41
+
+state 28
+
+    (20) write -> PRINT LPAREN . write1 RPAREN SEMI
+    (21) write1 -> . expr write2
+    (22) write1 -> . SCONST write2
+    (27) expr -> . exp expr1
+    (32) exp -> . term exp1
+    (36) term -> . factor term1
+    (37) factor -> . LPAREN expr RPAREN
+    (38) factor -> . factor1 const
+    (39) factor1 -> . PLUS
+    (40) factor1 -> . MINUS
+    (41) factor1 -> . empty
+    (48) empty -> .
+
+    SCONST          shift and go to state 45
+    LPAREN          shift and go to state 40
+    PLUS            shift and go to state 37
+    MINUS           shift and go to state 36
+    ID              reduce using rule 48 (empty -> .)
+    ICONST          reduce using rule 48 (empty -> .)
+    FCONST          reduce using rule 48 (empty -> .)
+
+    term                           shift and go to state 34
+    factor1                        shift and go to state 42
+    write1                         shift and go to state 43
+    expr                           shift and go to state 44
+    exp                            shift and go to state 38
+    factor                         shift and go to state 39
+    empty                          shift and go to state 41
+
+state 29
+
+    (19) cond -> IF LPAREN . expr RPAREN block cond1 SEMI
+    (27) expr -> . exp expr1
+    (32) exp -> . term exp1
+    (36) term -> . factor term1
+    (37) factor -> . LPAREN expr RPAREN
+    (38) factor -> . factor1 const
+    (39) factor1 -> . PLUS
+    (40) factor1 -> . MINUS
+    (41) factor1 -> . empty
+    (48) empty -> .
+
+    LPAREN          shift and go to state 40
+    PLUS            shift and go to state 37
+    MINUS           shift and go to state 36
+    ID              reduce using rule 48 (empty -> .)
+    ICONST          reduce using rule 48 (empty -> .)
+    FCONST          reduce using rule 48 (empty -> .)
+
+    term                           shift and go to state 34
+    factor1                        shift and go to state 42
+    expr                           shift and go to state 46
+    empty                          shift and go to state 41
+    exp                            shift and go to state 38
+    factor                         shift and go to state 39
+
+state 30
+
+    (10) type -> INT .
+
+    SEMI            reduce using rule 10 (type -> INT .)
+
+
+state 31
+
+    (11) type -> FLOAT .
+
+    SEMI            reduce using rule 11 (type -> FLOAT .)
+
+
+state 32
+
+    (4) varlist -> VAR idlist COLON type . SEMI varlist1
+
+    SEMI            shift and go to state 47
+
+
+state 33
+
+    (8) idlist1 -> COMMA idlist .
+
+    COLON           reduce using rule 8 (idlist1 -> COMMA idlist .)
+
+
+state 34
+
+    (32) exp -> term . exp1
+    (33) exp1 -> . PLUS exp
+    (34) exp1 -> . MINUS exp
+    (35) exp1 -> . empty
+    (48) empty -> .
+
+    PLUS            shift and go to state 49
+    MINUS           shift and go to state 50
+    GREATER         reduce using rule 48 (empty -> .)
+    LESS            reduce using rule 48 (empty -> .)
+    NOTEQUAL        reduce using rule 48 (empty -> .)
+    SEMI            reduce using rule 48 (empty -> .)
+    COMMA           reduce using rule 48 (empty -> .)
+    RPAREN          reduce using rule 48 (empty -> .)
+
+    empty                          shift and go to state 51
+    exp1                           shift and go to state 48
+
+state 35
+
+    (18) assign -> ID EQUAL expr . SEMI
+
+    SEMI            shift and go to state 52
+
+
+state 36
+
+    (40) factor1 -> MINUS .
+
+    ID              reduce using rule 40 (factor1 -> MINUS .)
+    ICONST          reduce using rule 40 (factor1 -> MINUS .)
+    FCONST          reduce using rule 40 (factor1 -> MINUS .)
+
+
+state 37
+
+    (39) factor1 -> PLUS .
+
+    ID              reduce using rule 39 (factor1 -> PLUS .)
+    ICONST          reduce using rule 39 (factor1 -> PLUS .)
+    FCONST          reduce using rule 39 (factor1 -> PLUS .)
+
+
+state 38
+
+    (27) expr -> exp . expr1
+    (28) expr1 -> . GREATER exp
+    (29) expr1 -> . LESS exp
+    (30) expr1 -> . NOTEQUAL exp
+    (31) expr1 -> . empty
+    (48) empty -> .
+
+    GREATER         shift and go to state 54
+    LESS            shift and go to state 55
+    NOTEQUAL        shift and go to state 53
+    SEMI            reduce using rule 48 (empty -> .)
+    COMMA           reduce using rule 48 (empty -> .)
+    RPAREN          reduce using rule 48 (empty -> .)
+
+    expr1                          shift and go to state 56
+    empty                          shift and go to state 57
+
+state 39
+
+    (36) term -> factor . term1
+    (42) term1 -> . TIMES term
+    (43) term1 -> . DIVIDE term
+    (44) term1 -> . empty
+    (48) empty -> .
+
+    TIMES           shift and go to state 60
+    DIVIDE          shift and go to state 58
+    PLUS            reduce using rule 48 (empty -> .)
+    MINUS           reduce using rule 48 (empty -> .)
+    GREATER         reduce using rule 48 (empty -> .)
+    LESS            reduce using rule 48 (empty -> .)
+    NOTEQUAL        reduce using rule 48 (empty -> .)
+    SEMI            reduce using rule 48 (empty -> .)
+    COMMA           reduce using rule 48 (empty -> .)
+    RPAREN          reduce using rule 48 (empty -> .)
+
+    empty                          shift and go to state 61
+    term1                          shift and go to state 59
+
+state 40
+
+    (37) factor -> LPAREN . expr RPAREN
+    (27) expr -> . exp expr1
+    (32) exp -> . term exp1
+    (36) term -> . factor term1
+    (37) factor -> . LPAREN expr RPAREN
+    (38) factor -> . factor1 const
+    (39) factor1 -> . PLUS
+    (40) factor1 -> . MINUS
+    (41) factor1 -> . empty
+    (48) empty -> .
+
+    LPAREN          shift and go to state 40
+    PLUS            shift and go to state 37
+    MINUS           shift and go to state 36
+    ID              reduce using rule 48 (empty -> .)
+    ICONST          reduce using rule 48 (empty -> .)
+    FCONST          reduce using rule 48 (empty -> .)
+
+    term                           shift and go to state 34
+    factor1                        shift and go to state 42
+    expr                           shift and go to state 62
+    exp                            shift and go to state 38
+    factor                         shift and go to state 39
+    empty                          shift and go to state 41
+
+state 41
+
+    (41) factor1 -> empty .
+
+    ID              reduce using rule 41 (factor1 -> empty .)
+    ICONST          reduce using rule 41 (factor1 -> empty .)
+    FCONST          reduce using rule 41 (factor1 -> empty .)
+
+
+state 42
+
+    (38) factor -> factor1 . const
+    (45) const -> . ID
+    (46) const -> . ICONST
+    (47) const -> . FCONST
+
+    ID              shift and go to state 66
+    ICONST          shift and go to state 63
+    FCONST          shift and go to state 64
+
+    const                          shift and go to state 65
+
+state 43
+
+    (20) write -> PRINT LPAREN write1 . RPAREN SEMI
+
+    RPAREN          shift and go to state 67
+
+
+state 44
+
+    (21) write1 -> expr . write2
+    (23) write2 -> . COMMA write1
+    (24) write2 -> . empty
+    (48) empty -> .
+
+    COMMA           shift and go to state 69
+    RPAREN          reduce using rule 48 (empty -> .)
+
+    write2                         shift and go to state 68
+    empty                          shift and go to state 70
+
+state 45
+
+    (22) write1 -> SCONST . write2
+    (23) write2 -> . COMMA write1
+    (24) write2 -> . empty
+    (48) empty -> .
+
+    COMMA           shift and go to state 69
+    RPAREN          reduce using rule 48 (empty -> .)
+
+    write2                         shift and go to state 71
+    empty                          shift and go to state 70
+
+state 46
+
+    (19) cond -> IF LPAREN expr . RPAREN block cond1 SEMI
+
+    RPAREN          shift and go to state 72
+
+
+state 47
+
+    (4) varlist -> VAR idlist COLON type SEMI . varlist1
+    (5) varlist1 -> . idlist COLON type SEMI varlist1
+    (6) varlist1 -> . empty
+    (7) idlist -> . ID idlist1
+    (48) empty -> .
+
+    ID              shift and go to state 12
+    LBRACE          reduce using rule 48 (empty -> .)
+
+    varlist1                       shift and go to state 74
+    idlist                         shift and go to state 73
+    empty                          shift and go to state 75
+
+state 48
+
+    (32) exp -> term exp1 .
+
+    GREATER         reduce using rule 32 (exp -> term exp1 .)
+    LESS            reduce using rule 32 (exp -> term exp1 .)
+    NOTEQUAL        reduce using rule 32 (exp -> term exp1 .)
+    SEMI            reduce using rule 32 (exp -> term exp1 .)
+    COMMA           reduce using rule 32 (exp -> term exp1 .)
+    RPAREN          reduce using rule 32 (exp -> term exp1 .)
+
+
+state 49
+
+    (33) exp1 -> PLUS . exp
+    (32) exp -> . term exp1
+    (36) term -> . factor term1
+    (37) factor -> . LPAREN expr RPAREN
+    (38) factor -> . factor1 const
+    (39) factor1 -> . PLUS
+    (40) factor1 -> . MINUS
+    (41) factor1 -> . empty
+    (48) empty -> .
+
+    LPAREN          shift and go to state 40
+    PLUS            shift and go to state 37
+    MINUS           shift and go to state 36
+    ID              reduce using rule 48 (empty -> .)
+    ICONST          reduce using rule 48 (empty -> .)
+    FCONST          reduce using rule 48 (empty -> .)
+
+    term                           shift and go to state 34
+    factor1                        shift and go to state 42
+    exp                            shift and go to state 76
+    factor                         shift and go to state 39
+    empty                          shift and go to state 41
+
+state 50
+
+    (34) exp1 -> MINUS . exp
+    (32) exp -> . term exp1
+    (36) term -> . factor term1
+    (37) factor -> . LPAREN expr RPAREN
+    (38) factor -> . factor1 const
+    (39) factor1 -> . PLUS
+    (40) factor1 -> . MINUS
+    (41) factor1 -> . empty
+    (48) empty -> .
+
+    LPAREN          shift and go to state 40
+    PLUS            shift and go to state 37
+    MINUS           shift and go to state 36
+    ID              reduce using rule 48 (empty -> .)
+    ICONST          reduce using rule 48 (empty -> .)
+    FCONST          reduce using rule 48 (empty -> .)
+
+    term                           shift and go to state 34
+    factor1                        shift and go to state 42
+    exp                            shift and go to state 77
+    factor                         shift and go to state 39
+    empty                          shift and go to state 41
+
+state 51
+
+    (35) exp1 -> empty .
+
+    GREATER         reduce using rule 35 (exp1 -> empty .)
+    LESS            reduce using rule 35 (exp1 -> empty .)
+    NOTEQUAL        reduce using rule 35 (exp1 -> empty .)
+    SEMI            reduce using rule 35 (exp1 -> empty .)
+    COMMA           reduce using rule 35 (exp1 -> empty .)
+    RPAREN          reduce using rule 35 (exp1 -> empty .)
+
+
+state 52
+
+    (18) assign -> ID EQUAL expr SEMI .
+
+    RBRACE          reduce using rule 18 (assign -> ID EQUAL expr SEMI .)
+
+
+state 53
+
+    (30) expr1 -> NOTEQUAL . exp
+    (32) exp -> . term exp1
+    (36) term -> . factor term1
+    (37) factor -> . LPAREN expr RPAREN
+    (38) factor -> . factor1 const
+    (39) factor1 -> . PLUS
+    (40) factor1 -> . MINUS
+    (41) factor1 -> . empty
+    (48) empty -> .
+
+    LPAREN          shift and go to state 40
+    PLUS            shift and go to state 37
+    MINUS           shift and go to state 36
+    ID              reduce using rule 48 (empty -> .)
+    ICONST          reduce using rule 48 (empty -> .)
+    FCONST          reduce using rule 48 (empty -> .)
+
+    term                           shift and go to state 34
+    factor1                        shift and go to state 42
+    exp                            shift and go to state 78
+    factor                         shift and go to state 39
+    empty                          shift and go to state 41
+
+state 54
+
+    (28) expr1 -> GREATER . exp
+    (32) exp -> . term exp1
+    (36) term -> . factor term1
+    (37) factor -> . LPAREN expr RPAREN
+    (38) factor -> . factor1 const
+    (39) factor1 -> . PLUS
+    (40) factor1 -> . MINUS
+    (41) factor1 -> . empty
+    (48) empty -> .
+
+    LPAREN          shift and go to state 40
+    PLUS            shift and go to state 37
+    MINUS           shift and go to state 36
+    ID              reduce using rule 48 (empty -> .)
+    ICONST          reduce using rule 48 (empty -> .)
+    FCONST          reduce using rule 48 (empty -> .)
+
+    term                           shift and go to state 34
+    factor1                        shift and go to state 42
+    exp                            shift and go to state 79
+    factor                         shift and go to state 39
+    empty                          shift and go to state 41
+
+state 55
+
+    (29) expr1 -> LESS . exp
+    (32) exp -> . term exp1
+    (36) term -> . factor term1
+    (37) factor -> . LPAREN expr RPAREN
+    (38) factor -> . factor1 const
+    (39) factor1 -> . PLUS
+    (40) factor1 -> . MINUS
+    (41) factor1 -> . empty
+    (48) empty -> .
+
+    LPAREN          shift and go to state 40
+    PLUS            shift and go to state 37
+    MINUS           shift and go to state 36
+    ID              reduce using rule 48 (empty -> .)
+    ICONST          reduce using rule 48 (empty -> .)
+    FCONST          reduce using rule 48 (empty -> .)
+
+    term                           shift and go to state 34
+    factor1                        shift and go to state 42
+    exp                            shift and go to state 80
+    factor                         shift and go to state 39
+    empty                          shift and go to state 41
+
+state 56
+
+    (27) expr -> exp expr1 .
+
+    COMMA           reduce using rule 27 (expr -> exp expr1 .)
+    RPAREN          reduce using rule 27 (expr -> exp expr1 .)
+    SEMI            reduce using rule 27 (expr -> exp expr1 .)
+
+
+state 57
+
+    (31) expr1 -> empty .
+
+    SEMI            reduce using rule 31 (expr1 -> empty .)
+    COMMA           reduce using rule 31 (expr1 -> empty .)
+    RPAREN          reduce using rule 31 (expr1 -> empty .)
+
+
+state 58
+
+    (43) term1 -> DIVIDE . term
+    (36) term -> . factor term1
+    (37) factor -> . LPAREN expr RPAREN
+    (38) factor -> . factor1 const
+    (39) factor1 -> . PLUS
+    (40) factor1 -> . MINUS
+    (41) factor1 -> . empty
+    (48) empty -> .
+
+    LPAREN          shift and go to state 40
+    PLUS            shift and go to state 37
+    MINUS           shift and go to state 36
+    ID              reduce using rule 48 (empty -> .)
+    ICONST          reduce using rule 48 (empty -> .)
+    FCONST          reduce using rule 48 (empty -> .)
+
+    term                           shift and go to state 81
+    factor1                        shift and go to state 42
+    factor                         shift and go to state 39
+    empty                          shift and go to state 41
+
+state 59
+
+    (36) term -> factor term1 .
+
+    PLUS            reduce using rule 36 (term -> factor term1 .)
+    MINUS           reduce using rule 36 (term -> factor term1 .)
+    GREATER         reduce using rule 36 (term -> factor term1 .)
+    LESS            reduce using rule 36 (term -> factor term1 .)
+    NOTEQUAL        reduce using rule 36 (term -> factor term1 .)
+    SEMI            reduce using rule 36 (term -> factor term1 .)
+    COMMA           reduce using rule 36 (term -> factor term1 .)
+    RPAREN          reduce using rule 36 (term -> factor term1 .)
+
+
+state 60
+
+    (42) term1 -> TIMES . term
+    (36) term -> . factor term1
+    (37) factor -> . LPAREN expr RPAREN
+    (38) factor -> . factor1 const
+    (39) factor1 -> . PLUS
+    (40) factor1 -> . MINUS
+    (41) factor1 -> . empty
+    (48) empty -> .
+
+    LPAREN          shift and go to state 40
+    PLUS            shift and go to state 37
+    MINUS           shift and go to state 36
+    ID              reduce using rule 48 (empty -> .)
+    ICONST          reduce using rule 48 (empty -> .)
+    FCONST          reduce using rule 48 (empty -> .)
+
+    term                           shift and go to state 82
+    factor1                        shift and go to state 42
+    factor                         shift and go to state 39
+    empty                          shift and go to state 41
+
+state 61
+
+    (44) term1 -> empty .
+
+    PLUS            reduce using rule 44 (term1 -> empty .)
+    MINUS           reduce using rule 44 (term1 -> empty .)
+    GREATER         reduce using rule 44 (term1 -> empty .)
+    LESS            reduce using rule 44 (term1 -> empty .)
+    NOTEQUAL        reduce using rule 44 (term1 -> empty .)
+    SEMI            reduce using rule 44 (term1 -> empty .)
+    COMMA           reduce using rule 44 (term1 -> empty .)
+    RPAREN          reduce using rule 44 (term1 -> empty .)
+
+
+state 62
+
+    (37) factor -> LPAREN expr . RPAREN
+
+    RPAREN          shift and go to state 83
+
+
+state 63
+
+    (46) const -> ICONST .
+
+    TIMES           reduce using rule 46 (const -> ICONST .)
+    DIVIDE          reduce using rule 46 (const -> ICONST .)
+    PLUS            reduce using rule 46 (const -> ICONST .)
+    MINUS           reduce using rule 46 (const -> ICONST .)
+    GREATER         reduce using rule 46 (const -> ICONST .)
+    LESS            reduce using rule 46 (const -> ICONST .)
+    NOTEQUAL        reduce using rule 46 (const -> ICONST .)
+    SEMI            reduce using rule 46 (const -> ICONST .)
+    COMMA           reduce using rule 46 (const -> ICONST .)
+    RPAREN          reduce using rule 46 (const -> ICONST .)
+
+
+state 64
+
+    (47) const -> FCONST .
+
+    TIMES           reduce using rule 47 (const -> FCONST .)
+    DIVIDE          reduce using rule 47 (const -> FCONST .)
+    PLUS            reduce using rule 47 (const -> FCONST .)
+    MINUS           reduce using rule 47 (const -> FCONST .)
+    GREATER         reduce using rule 47 (const -> FCONST .)
+    LESS            reduce using rule 47 (const -> FCONST .)
+    NOTEQUAL        reduce using rule 47 (const -> FCONST .)
+    SEMI            reduce using rule 47 (const -> FCONST .)
+    COMMA           reduce using rule 47 (const -> FCONST .)
+    RPAREN          reduce using rule 47 (const -> FCONST .)
+
+
+state 65
+
+    (38) factor -> factor1 const .
+
+    TIMES           reduce using rule 38 (factor -> factor1 const .)
+    DIVIDE          reduce using rule 38 (factor -> factor1 const .)
+    PLUS            reduce using rule 38 (factor -> factor1 const .)
+    MINUS           reduce using rule 38 (factor -> factor1 const .)
+    SEMI            reduce using rule 38 (factor -> factor1 const .)
+    COMMA           reduce using rule 38 (factor -> factor1 const .)
+    RPAREN          reduce using rule 38 (factor -> factor1 const .)
+    GREATER         reduce using rule 38 (factor -> factor1 const .)
+    LESS            reduce using rule 38 (factor -> factor1 const .)
+    NOTEQUAL        reduce using rule 38 (factor -> factor1 const .)
+
+
+state 66
+
+    (45) const -> ID .
+
+    TIMES           reduce using rule 45 (const -> ID .)
+    DIVIDE          reduce using rule 45 (const -> ID .)
+    PLUS            reduce using rule 45 (const -> ID .)
+    MINUS           reduce using rule 45 (const -> ID .)
+    GREATER         reduce using rule 45 (const -> ID .)
+    LESS            reduce using rule 45 (const -> ID .)
+    NOTEQUAL        reduce using rule 45 (const -> ID .)
+    SEMI            reduce using rule 45 (const -> ID .)
+    COMMA           reduce using rule 45 (const -> ID .)
+    RPAREN          reduce using rule 45 (const -> ID .)
+
+
+state 67
+
+    (20) write -> PRINT LPAREN write1 RPAREN . SEMI
+
+    SEMI            shift and go to state 84
+
+
+state 68
+
+    (21) write1 -> expr write2 .
+
+    RPAREN          reduce using rule 21 (write1 -> expr write2 .)
+
+
+state 69
+
+    (23) write2 -> COMMA . write1
+    (21) write1 -> . expr write2
+    (22) write1 -> . SCONST write2
+    (27) expr -> . exp expr1
+    (32) exp -> . term exp1
+    (36) term -> . factor term1
+    (37) factor -> . LPAREN expr RPAREN
+    (38) factor -> . factor1 const
+    (39) factor1 -> . PLUS
+    (40) factor1 -> . MINUS
+    (41) factor1 -> . empty
+    (48) empty -> .
+
+    SCONST          shift and go to state 45
+    LPAREN          shift and go to state 40
+    PLUS            shift and go to state 37
+    MINUS           shift and go to state 36
+    ID              reduce using rule 48 (empty -> .)
+    ICONST          reduce using rule 48 (empty -> .)
+    FCONST          reduce using rule 48 (empty -> .)
+
+    term                           shift and go to state 34
+    factor1                        shift and go to state 42
+    write1                         shift and go to state 85
+    expr                           shift and go to state 44
+    exp                            shift and go to state 38
+    factor                         shift and go to state 39
+    empty                          shift and go to state 41
+
+state 70
+
+    (24) write2 -> empty .
+
+    RPAREN          reduce using rule 24 (write2 -> empty .)
+
+
+state 71
+
+    (22) write1 -> SCONST write2 .
+
+    RPAREN          reduce using rule 22 (write1 -> SCONST write2 .)
+
+
+state 72
+
+    (19) cond -> IF LPAREN expr RPAREN . block cond1 SEMI
+    (12) block -> . LBRACE block1 RBRACE
+
+    LBRACE          shift and go to state 9
+
+    block                          shift and go to state 86
+
+state 73
+
+    (5) varlist1 -> idlist . COLON type SEMI varlist1
+
+    COLON           shift and go to state 87
+
+
+state 74
+
+    (4) varlist -> VAR idlist COLON type SEMI varlist1 .
+
+    LBRACE          reduce using rule 4 (varlist -> VAR idlist COLON type SEMI varlist1 .)
+
+
+state 75
+
+    (6) varlist1 -> empty .
+
+    LBRACE          reduce using rule 6 (varlist1 -> empty .)
+
+
+state 76
+
+    (33) exp1 -> PLUS exp .
+
+    GREATER         reduce using rule 33 (exp1 -> PLUS exp .)
+    LESS            reduce using rule 33 (exp1 -> PLUS exp .)
+    NOTEQUAL        reduce using rule 33 (exp1 -> PLUS exp .)
+    SEMI            reduce using rule 33 (exp1 -> PLUS exp .)
+    COMMA           reduce using rule 33 (exp1 -> PLUS exp .)
+    RPAREN          reduce using rule 33 (exp1 -> PLUS exp .)
+
+
+state 77
+
+    (34) exp1 -> MINUS exp .
+
+    GREATER         reduce using rule 34 (exp1 -> MINUS exp .)
+    LESS            reduce using rule 34 (exp1 -> MINUS exp .)
+    NOTEQUAL        reduce using rule 34 (exp1 -> MINUS exp .)
+    SEMI            reduce using rule 34 (exp1 -> MINUS exp .)
+    COMMA           reduce using rule 34 (exp1 -> MINUS exp .)
+    RPAREN          reduce using rule 34 (exp1 -> MINUS exp .)
+
+
+state 78
+
+    (30) expr1 -> NOTEQUAL exp .
+
+    SEMI            reduce using rule 30 (expr1 -> NOTEQUAL exp .)
+    COMMA           reduce using rule 30 (expr1 -> NOTEQUAL exp .)
+    RPAREN          reduce using rule 30 (expr1 -> NOTEQUAL exp .)
+
+
+state 79
+
+    (28) expr1 -> GREATER exp .
+
+    SEMI            reduce using rule 28 (expr1 -> GREATER exp .)
+    COMMA           reduce using rule 28 (expr1 -> GREATER exp .)
+    RPAREN          reduce using rule 28 (expr1 -> GREATER exp .)
+
+
+state 80
+
+    (29) expr1 -> LESS exp .
+
+    SEMI            reduce using rule 29 (expr1 -> LESS exp .)
+    COMMA           reduce using rule 29 (expr1 -> LESS exp .)
+    RPAREN          reduce using rule 29 (expr1 -> LESS exp .)
+
+
+state 81
+
+    (43) term1 -> DIVIDE term .
+
+    PLUS            reduce using rule 43 (term1 -> DIVIDE term .)
+    MINUS           reduce using rule 43 (term1 -> DIVIDE term .)
+    GREATER         reduce using rule 43 (term1 -> DIVIDE term .)
+    LESS            reduce using rule 43 (term1 -> DIVIDE term .)
+    NOTEQUAL        reduce using rule 43 (term1 -> DIVIDE term .)
+    SEMI            reduce using rule 43 (term1 -> DIVIDE term .)
+    COMMA           reduce using rule 43 (term1 -> DIVIDE term .)
+    RPAREN          reduce using rule 43 (term1 -> DIVIDE term .)
+
+
+state 82
+
+    (42) term1 -> TIMES term .
+
+    PLUS            reduce using rule 42 (term1 -> TIMES term .)
+    MINUS           reduce using rule 42 (term1 -> TIMES term .)
+    GREATER         reduce using rule 42 (term1 -> TIMES term .)
+    LESS            reduce using rule 42 (term1 -> TIMES term .)
+    NOTEQUAL        reduce using rule 42 (term1 -> TIMES term .)
+    SEMI            reduce using rule 42 (term1 -> TIMES term .)
+    COMMA           reduce using rule 42 (term1 -> TIMES term .)
+    RPAREN          reduce using rule 42 (term1 -> TIMES term .)
+
+
+state 83
+
+    (37) factor -> LPAREN expr RPAREN .
+
+    TIMES           reduce using rule 37 (factor -> LPAREN expr RPAREN .)
+    DIVIDE          reduce using rule 37 (factor -> LPAREN expr RPAREN .)
+    PLUS            reduce using rule 37 (factor -> LPAREN expr RPAREN .)
+    MINUS           reduce using rule 37 (factor -> LPAREN expr RPAREN .)
+    SEMI            reduce using rule 37 (factor -> LPAREN expr RPAREN .)
+    COMMA           reduce using rule 37 (factor -> LPAREN expr RPAREN .)
+    RPAREN          reduce using rule 37 (factor -> LPAREN expr RPAREN .)
+    GREATER         reduce using rule 37 (factor -> LPAREN expr RPAREN .)
+    LESS            reduce using rule 37 (factor -> LPAREN expr RPAREN .)
+    NOTEQUAL        reduce using rule 37 (factor -> LPAREN expr RPAREN .)
+
+
+state 84
+
+    (20) write -> PRINT LPAREN write1 RPAREN SEMI .
+
+    RBRACE          reduce using rule 20 (write -> PRINT LPAREN write1 RPAREN SEMI .)
+
+
+state 85
+
+    (23) write2 -> COMMA write1 .
+
+    RPAREN          reduce using rule 23 (write2 -> COMMA write1 .)
+
+
+state 86
+
+    (19) cond -> IF LPAREN expr RPAREN block . cond1 SEMI
+    (25) cond1 -> . ELSE block
+    (26) cond1 -> . empty
+    (48) empty -> .
+
+    ELSE            shift and go to state 89
+    SEMI            reduce using rule 48 (empty -> .)
+
+    cond1                          shift and go to state 88
+    empty                          shift and go to state 90
+
+state 87
+
+    (5) varlist1 -> idlist COLON . type SEMI varlist1
+    (10) type -> . INT
+    (11) type -> . FLOAT
+
+    INT             shift and go to state 30
+    FLOAT           shift and go to state 31
+
+    type                           shift and go to state 91
+
+state 88
+
+    (19) cond -> IF LPAREN expr RPAREN block cond1 . SEMI
+
+    SEMI            shift and go to state 92
+
+
+state 89
+
+    (25) cond1 -> ELSE . block
+    (12) block -> . LBRACE block1 RBRACE
+
+    LBRACE          shift and go to state 9
+
+    block                          shift and go to state 93
+
+state 90
+
+    (26) cond1 -> empty .
+
+    SEMI            reduce using rule 26 (cond1 -> empty .)
+
+
+state 91
+
+    (5) varlist1 -> idlist COLON type . SEMI varlist1
+
+    SEMI            shift and go to state 94
+
+
+state 92
+
+    (19) cond -> IF LPAREN expr RPAREN block cond1 SEMI .
+
+    RBRACE          reduce using rule 19 (cond -> IF LPAREN expr RPAREN block cond1 SEMI .)
+
+
+state 93
+
+    (25) cond1 -> ELSE block .
+
+    SEMI            reduce using rule 25 (cond1 -> ELSE block .)
+
+
+state 94
+
+    (5) varlist1 -> idlist COLON type SEMI . varlist1
+    (5) varlist1 -> . idlist COLON type SEMI varlist1
+    (6) varlist1 -> . empty
+    (7) idlist -> . ID idlist1
+    (48) empty -> .
+
+    ID              shift and go to state 12
+    LBRACE          reduce using rule 48 (empty -> .)
+
+    varlist1                       shift and go to state 95
+    idlist                         shift and go to state 73
+    empty                          shift and go to state 75
+
+state 95
+
+    (5) varlist1 -> idlist COLON type SEMI varlist1 .
+
+    LBRACE          reduce using rule 5 (varlist1 -> idlist COLON type SEMI varlist1 .)
 

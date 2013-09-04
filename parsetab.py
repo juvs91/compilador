@@ -5,9 +5,9 @@ _tabversion = '3.2'
 
 _lr_method = 'LALR'
 
-_lr_signature = '\xd9\xfe\x91\xc3<\xfd\xceTH\xad9\xd7\x01\x12\xca\x0f'
+_lr_signature = '\xb5^\xf5D*oC\x7f\x9dQ+J\x16\xe2\x9f+'
     
-_lr_action_items = {'SEMI':([7,8,9,],[-4,-5,11,]),'INT':([5,],[7,]),'FLOAT':([5,],[8,]),'COMMA':([4,],[6,]),'VAR':([0,],[2,]),'COLON':([3,4,10,],[5,-3,-2,]),'ID':([2,6,],[4,4,]),'$end':([1,11,],[0,-1,]),}
+_lr_action_items = {'NOTEQUAL':([34,38,39,48,51,59,61,63,64,65,66,76,77,81,82,83,],[-48,53,-48,-32,-35,-36,-44,-46,-47,-38,-45,-33,-34,-43,-42,-37,]),'LESS':([34,38,39,48,51,59,61,63,64,65,66,76,77,81,82,83,],[-48,55,-48,-32,-35,-36,-44,-46,-47,-38,-45,-33,-34,-43,-42,-37,]),'EQUAL':([15,],[27,]),'PROGRAM':([0,],[1,]),'PRINT':([9,],[18,]),'MINUS':([27,28,29,34,39,40,49,50,53,54,55,58,59,60,61,63,64,65,66,69,81,82,83,],[36,36,36,50,-48,36,36,36,36,36,36,36,-36,36,-44,-46,-47,-38,-45,36,-43,-42,-37,]),'DIVIDE':([39,63,64,65,66,83,],[58,-46,-47,-38,-45,-37,]),'RPAREN':([34,38,39,43,44,45,46,48,51,56,57,59,61,62,63,64,65,66,68,70,71,76,77,78,79,80,81,82,83,85,],[-48,-48,-48,67,-48,-48,72,-32,-35,-27,-31,-36,-44,83,-46,-47,-38,-45,-21,-24,-22,-33,-34,-30,-28,-29,-43,-42,-37,-23,]),'FCONST':([27,28,29,36,37,40,41,42,49,50,53,54,55,58,60,69,],[-48,-48,-48,-40,-39,-48,-41,64,-48,-48,-48,-48,-48,-48,-48,-48,]),'SEMI':([3,26,30,31,32,34,35,38,39,48,51,56,57,59,61,63,64,65,66,67,76,77,78,79,80,81,82,83,86,88,90,91,93,],[4,-12,-10,-11,47,-48,52,-48,-48,-32,-35,-27,-31,-36,-44,-46,-47,-38,-45,84,-33,-34,-30,-28,-29,-43,-42,-37,-48,92,-26,94,-25,]),'SCONST':([28,69,],[45,45,]),'PLUS':([27,28,29,34,39,40,49,50,53,54,55,58,59,60,61,63,64,65,66,69,81,82,83,],[37,37,37,49,-48,37,37,37,37,37,37,37,-36,37,-44,-46,-47,-38,-45,37,-43,-42,-37,]),'COLON':([11,12,24,25,33,73,],[22,-48,-9,-7,-8,87,]),'$end':([2,10,26,],[0,-1,-12,]),'RBRACE':([9,13,14,16,17,19,20,52,84,92,],[-48,26,-13,-17,-16,-15,-14,-18,-20,-19,]),'ELSE':([26,86,],[-12,89,]),'ICONST':([27,28,29,36,37,40,41,42,49,50,53,54,55,58,60,69,],[-48,-48,-48,-40,-39,-48,-41,63,-48,-48,-48,-48,-48,-48,-48,-48,]),'LPAREN':([18,21,27,28,29,40,49,50,53,54,55,58,60,69,],[28,29,40,40,40,40,40,40,40,40,40,40,40,40,]),'VAR':([4,],[8,]),'TIMES':([39,63,64,65,66,83,],[60,-46,-47,-38,-45,-37,]),'ID':([1,8,9,23,27,28,29,36,37,40,41,42,47,49,50,53,54,55,58,60,69,94,],[3,12,15,12,-48,-48,-48,-40,-39,-48,-41,66,12,-48,-48,-48,-48,-48,-48,-48,-48,12,]),'IF':([9,],[21,]),'LBRACE':([4,5,6,7,47,72,74,75,89,94,95,],[-48,9,-2,-3,-48,9,-4,-6,9,-48,-5,]),'GREATER':([34,38,39,48,51,59,61,63,64,65,66,76,77,81,82,83,],[-48,54,-48,-32,-35,-36,-44,-46,-47,-38,-45,-33,-34,-43,-42,-37,]),'INT':([22,87,],[30,30,]),'FLOAT':([22,87,],[31,31,]),'COMMA':([12,34,38,39,44,45,48,51,56,57,59,61,63,64,65,66,76,77,78,79,80,81,82,83,],[23,-48,-48,-48,69,69,-32,-35,-27,-31,-36,-44,-46,-47,-38,-45,-33,-34,-30,-28,-29,-43,-42,-37,]),}
 
 _lr_action = { }
 for _k, _v in _lr_action_items.items():
@@ -16,7 +16,7 @@ for _k, _v in _lr_action_items.items():
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
-_lr_goto_items = {'var':([2,6,],[3,10,]),'type':([5,],[9,]),'vars':([0,],[1,]),}
+_lr_goto_items = {'cond1':([86,],[88,]),'term1':([39,],[59,]),'instr':([9,],[14,]),'cond':([9,],[17,]),'const':([42,],[65,]),'block1':([9,],[13,]),'varlist':([4,],[6,]),'exp1':([34,],[48,]),'write':([9,],[16,]),'expr1':([38,],[56,]),'factor':([27,28,29,40,49,50,53,54,55,58,60,69,],[39,39,39,39,39,39,39,39,39,39,39,39,]),'main':([0,],[2,]),'type':([22,87,],[32,91,]),'empty':([4,9,12,27,28,29,34,38,39,40,44,45,47,49,50,53,54,55,58,60,69,86,94,],[7,20,24,41,41,41,51,57,61,41,70,70,75,41,41,41,41,41,41,41,41,90,75,]),'vars':([4,],[5,]),'idlist1':([12,],[25,]),'factor1':([27,28,29,40,49,50,53,54,55,58,60,69,],[42,42,42,42,42,42,42,42,42,42,42,42,]),'term':([27,28,29,40,49,50,53,54,55,58,60,69,],[34,34,34,34,34,34,34,34,34,81,82,34,]),'idlist':([8,23,47,94,],[11,33,73,73,]),'write1':([28,69,],[43,85,]),'expr':([27,28,29,40,69,],[35,44,46,62,44,]),'write2':([44,45,],[68,71,]),'varlist1':([47,94,],[74,95,]),'exp':([27,28,29,40,49,50,53,54,55,69,],[38,38,38,38,76,77,78,79,80,38,]),'assign':([9,],[19,]),'block':([5,72,89,],[10,86,93,]),}
 
 _lr_goto = { }
 for _k, _v in _lr_goto_items.items():
@@ -25,18 +25,53 @@ for _k, _v in _lr_goto_items.items():
        _lr_goto[_x][_k] = _y
 del _lr_goto_items
 _lr_productions = [
-  ("S' -> vars","S'",1,None,None,None),
-  ('vars -> VAR var COLON type SEMI','vars',5,'p_main','D:\\Projects\\Compiler\\ldy.py',7),
-  ('var -> ID COMMA var','var',3,'p_vars_2','D:\\Projects\\Compiler\\ldy.py',10),
-  ('var -> ID','var',1,'p_vars_2','D:\\Projects\\Compiler\\ldy.py',11),
-  ('type -> INT','type',1,'p_type','D:\\Projects\\Compiler\\ldy.py',14),
-  ('type -> FLOAT','type',1,'p_type','D:\\Projects\\Compiler\\ldy.py',15),
-  ('expression -> expression PLUS term','expression',3,'p_expression_plus','D:\\Projects\\Compiler\\ldy.py',18),
-  ('expression -> expression MINUS term','expression',3,'p_expression_minus','D:\\Projects\\Compiler\\ldy.py',22),
-  ('expression -> term','expression',1,'p_expression_term','D:\\Projects\\Compiler\\ldy.py',26),
-  ('term -> term TIMES factor','term',3,'p_term_times','D:\\Projects\\Compiler\\ldy.py',30),
-  ('term -> term DIVIDE factor','term',3,'p_term_div','D:\\Projects\\Compiler\\ldy.py',34),
-  ('term -> factor','term',1,'p_term_factor','D:\\Projects\\Compiler\\ldy.py',38),
-  ('factor -> ICONST','factor',1,'p_factor_num','D:\\Projects\\Compiler\\ldy.py',42),
-  ('factor -> LPAREN expression RPAREN','factor',3,'p_factor_expr','D:\\Projects\\Compiler\\ldy.py',46),
+  ("S' -> main","S'",1,None,None,None),
+  ('main -> PROGRAM ID SEMI vars block','main',5,'p_main','D:\\Projects\\Compiler\\ldy.py',7),
+  ('vars -> varlist','vars',1,'p_vars','D:\\Projects\\Compiler\\ldy.py',10),
+  ('vars -> empty','vars',1,'p_vars','D:\\Projects\\Compiler\\ldy.py',11),
+  ('varlist -> VAR idlist COLON type SEMI varlist1','varlist',6,'p_varlist','D:\\Projects\\Compiler\\ldy.py',14),
+  ('varlist1 -> idlist COLON type SEMI varlist1','varlist1',5,'p_varlist_1','D:\\Projects\\Compiler\\ldy.py',17),
+  ('varlist1 -> empty','varlist1',1,'p_varlist_1','D:\\Projects\\Compiler\\ldy.py',18),
+  ('idlist -> ID idlist1','idlist',2,'p_idlist','D:\\Projects\\Compiler\\ldy.py',21),
+  ('idlist1 -> COMMA idlist','idlist1',2,'p_idlist_1','D:\\Projects\\Compiler\\ldy.py',24),
+  ('idlist1 -> empty','idlist1',1,'p_idlist_1','D:\\Projects\\Compiler\\ldy.py',25),
+  ('type -> INT','type',1,'p_type','D:\\Projects\\Compiler\\ldy.py',28),
+  ('type -> FLOAT','type',1,'p_type','D:\\Projects\\Compiler\\ldy.py',29),
+  ('block -> LBRACE block1 RBRACE','block',3,'p_block','D:\\Projects\\Compiler\\ldy.py',32),
+  ('block1 -> instr','block1',1,'p_block_1','D:\\Projects\\Compiler\\ldy.py',35),
+  ('block1 -> empty','block1',1,'p_block_1','D:\\Projects\\Compiler\\ldy.py',36),
+  ('instr -> assign','instr',1,'p_instr','D:\\Projects\\Compiler\\ldy.py',39),
+  ('instr -> cond','instr',1,'p_instr','D:\\Projects\\Compiler\\ldy.py',40),
+  ('instr -> write','instr',1,'p_instr','D:\\Projects\\Compiler\\ldy.py',41),
+  ('assign -> ID EQUAL expr SEMI','assign',4,'p_assign','D:\\Projects\\Compiler\\ldy.py',44),
+  ('cond -> IF LPAREN expr RPAREN block cond1 SEMI','cond',7,'p_cond','D:\\Projects\\Compiler\\ldy.py',47),
+  ('write -> PRINT LPAREN write1 RPAREN SEMI','write',5,'p_write','D:\\Projects\\Compiler\\ldy.py',50),
+  ('write1 -> expr write2','write1',2,'p_write_1','D:\\Projects\\Compiler\\ldy.py',53),
+  ('write1 -> SCONST write2','write1',2,'p_write_1','D:\\Projects\\Compiler\\ldy.py',54),
+  ('write2 -> COMMA write1','write2',2,'p_write_2','D:\\Projects\\Compiler\\ldy.py',57),
+  ('write2 -> empty','write2',1,'p_write_2','D:\\Projects\\Compiler\\ldy.py',58),
+  ('cond1 -> ELSE block','cond1',2,'p_cond_1','D:\\Projects\\Compiler\\ldy.py',61),
+  ('cond1 -> empty','cond1',1,'p_cond_1','D:\\Projects\\Compiler\\ldy.py',62),
+  ('expr -> exp expr1','expr',2,'p_expr','D:\\Projects\\Compiler\\ldy.py',65),
+  ('expr1 -> GREATER exp','expr1',2,'p_expr_1','D:\\Projects\\Compiler\\ldy.py',68),
+  ('expr1 -> LESS exp','expr1',2,'p_expr_1','D:\\Projects\\Compiler\\ldy.py',69),
+  ('expr1 -> NOTEQUAL exp','expr1',2,'p_expr_1','D:\\Projects\\Compiler\\ldy.py',70),
+  ('expr1 -> empty','expr1',1,'p_expr_1','D:\\Projects\\Compiler\\ldy.py',71),
+  ('exp -> term exp1','exp',2,'p_exp','D:\\Projects\\Compiler\\ldy.py',74),
+  ('exp1 -> PLUS exp','exp1',2,'p_exp_1','D:\\Projects\\Compiler\\ldy.py',77),
+  ('exp1 -> MINUS exp','exp1',2,'p_exp_1','D:\\Projects\\Compiler\\ldy.py',78),
+  ('exp1 -> empty','exp1',1,'p_exp_1','D:\\Projects\\Compiler\\ldy.py',79),
+  ('term -> factor term1','term',2,'p_term','D:\\Projects\\Compiler\\ldy.py',82),
+  ('factor -> LPAREN expr RPAREN','factor',3,'p_factor','D:\\Projects\\Compiler\\ldy.py',85),
+  ('factor -> factor1 const','factor',2,'p_factor','D:\\Projects\\Compiler\\ldy.py',86),
+  ('factor1 -> PLUS','factor1',1,'p_factor_1','D:\\Projects\\Compiler\\ldy.py',89),
+  ('factor1 -> MINUS','factor1',1,'p_factor_1','D:\\Projects\\Compiler\\ldy.py',90),
+  ('factor1 -> empty','factor1',1,'p_factor_1','D:\\Projects\\Compiler\\ldy.py',91),
+  ('term1 -> TIMES term','term1',2,'p_term_1','D:\\Projects\\Compiler\\ldy.py',94),
+  ('term1 -> DIVIDE term','term1',2,'p_term_1','D:\\Projects\\Compiler\\ldy.py',95),
+  ('term1 -> empty','term1',1,'p_term_1','D:\\Projects\\Compiler\\ldy.py',96),
+  ('const -> ID','const',1,'p_const','D:\\Projects\\Compiler\\ldy.py',99),
+  ('const -> ICONST','const',1,'p_const','D:\\Projects\\Compiler\\ldy.py',100),
+  ('const -> FCONST','const',1,'p_const','D:\\Projects\\Compiler\\ldy.py',101),
+  ('empty -> <empty>','empty',0,'p_empty','D:\\Projects\\Compiler\\ldy.py',137),
 ]

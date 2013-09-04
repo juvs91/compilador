@@ -4,6 +4,7 @@ import ply.lex as lex
 reserved = {
     'else' : 'ELSE',
     'float' : 'FLOAT',
+	'if' : 'IF',
     'int' : 'INT',
     'print' : 'PRINT',
     'program' : 'PROGRAM',
@@ -77,18 +78,18 @@ def t_error(t):
 # Build the lexer
 lexer = lex.lex()
 
-# Test it out
-data = '''
-3 + 4 * 10
-  4.8 4. 0.0 .2
-  "" "hola"
-'''
+# # Test it out
+# data = '''
+# 3 + 4 * 10
+  # 4.8 4. 0.0 .2
+  # "" "hola"
+# '''
 
-# Give the lexer some input
-lexer.input(data)
+# # Give the lexer some input
+# lexer.input(data)
 
-# Tokenize
-while True:
-    tok = lexer.token()
-    if not tok: break      # No more input
-    print tok
+# # Tokenize
+# while True:
+    # tok = lexer.token()
+    # if not tok: break      # No more input
+    # print tok
