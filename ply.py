@@ -7,6 +7,10 @@
 import ply.lex as lex
 
 
+
+
+
+
 # Regular expression rules for simple tokens
 t_PLUS    = r'\+'
 t_MINUS   = r'-'
@@ -55,6 +59,7 @@ reserved = {
 
 tokens = ['NUMBER','PLUS','MINUS','TIMES','DIVIDE','LPAREN','RPAREN','LKEY','RKEY','LBRACKET','RBRACKET','TERMINAL','ID','COMMA','GREATHAN','LESSTHAN','DOT','TWODOTS','DIFERENT','EQUAL','TWOEQUAL'] +  list(reserved.values())
 
+
 #s reqgular exprsion that takes the fisrts leter then another letter or a number 
 def t_ID(t):
     r'[a-zA-Z_][a-zA-Z_0-9]*'
@@ -67,6 +72,11 @@ def t_COMMENT(t):
     r'\#.*'
     pass
     # No return value. Token discarded
+
+def t_FLOAT(t):
+    r'\d+\.\d+'
+    t.value=float(t.value)
+    return t
 
 # A regular expression rule with some action code
 def t_NUMBER(t):
@@ -97,7 +107,9 @@ t_ignore  = ' \t'
 def t_error(t):   
     column = find_column(t.value[0],t)
     print "Illegal character"+t.value[0] +" in column '%d' and on line " %column  
-    t.lexer.skip(1)
+    t.lexer.skip(1) 
+
+
 
 # Build the lexer
 lexer = lex.lex()
@@ -105,9 +117,13 @@ lexer = lex.lex()
 
 # Test it out
 data = '''
-3 + 4 * 10
-  + -20 *2
-  [ ] { } adfasd d33 if else @~> 333mil function loop int float double var  main , . < > <> :  = == print ;
+int main () {
+
+int a= 123.1234;
+
+int b =123412341;
+
+}
 '''
 
 # Give the lexer some input
