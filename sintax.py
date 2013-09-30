@@ -1,46 +1,128 @@
 import ply.yacc as yacc 
 
-from lexer import listOfTokens
+from lexer import MyLexer
 
 class Sintax():
 	def __init__(self):
 		l =[]
 	def p_program(self,p):
-		l =[]
+		'''Program : Declaration FunctionTotal Main '''
+	def p_functionTotal(self,p):
+		'''FunctionTotal : Function
+						 | RFunction'''
+	
 	def p_main(self,p):
-		l =[]
+		'''Main :  MAIN LPAREN RPAREN FBlock'''  
+		
 	def p_declaration(self,p):
-		l =[]
+		'''Declaration : Primitive Identifier List TERMINAL
+					   | empty'''
+	
+	def List(self,p):
+		'''List : Array Array2'''
+		
+	def p_array2(self,p):
+		'''Array2 : Array
+				  | empty'''
+	def Array(self,p):
+		'''Array : LBRACKET Integer RBRACKET'''
+	
 	def p_function(self,p):
-		l =[]
+		'''Function : VOID Identifier LPAREN ParamList RPAREN FBLock'''  
+		
 	def p_rFunction(self,p):
-		l =[]
+		'''RFunction : Primitive Identifier LPAREN ParamList RPAREN RFBLock'''  
+		
 	def p_block(self,p):
-		l =[]
+		'''Block : LBRACKET Instruction  RBRACKET''' 
+		
 	def p_fBlock(self,p):
-		l =[]
+		'''FBlock : LBRACKET Declaration Instruction  RBRACKET''' 
+		
 	def p_rFBlock(self,p):
-		l =[]
+		'''RFBlock : LBRACKET Declaration Instruction RETURN SuperExp TERMINAL RBRACKET'''  
+		
 	def p_loop(self,p):
-		l =[]
+		'''Loop : LOOP  LPAREN  SuperExp RPAREN Block'''
+		
 	def p_conditional(self,p):
-		l =[]
+		'''Conditional : IF LPAREN SuperExp RPAREN Block Else'''  
+		
+	def p_else(self,p):
+		'''Else : ELSE Block
+				| empty''' 
+				
 	def p_superExpr(self,p):
-		l =[]
+		'''SuperExp : Expression LogicalOp'''
+		
+	def p_logicalOp(self,p):
+		'''LogicalOp : OR  SuperExp
+					 |  AND SuperExp
+					 | empty'''
+
 	def p_expr(self,p):
-		l =[]
+		'''Expr : Term Op1'''
+		
+	def p_op1(self,p):
+		'''Op1 : PLUS  Expr
+			   | MINUS  Expr
+			   | empty'''    
+			
 	def p_expression(self,p):
-		l =[]
+		'''Expression : Expr Comparison''' 
+		
+	def p_comparison(self,p):
+		'''Comparison : GREATHAN Expr
+					  | LESSTHAN Expr
+					  | DIFERENT Expr
+					  | TWOEQUAL Expr
+					  | GREATHANOREQUAL Expr
+					  | LESSTHANOREQUAL Expr
+					  | empty
+					  '''
+		
 	def p_term(self,p):
-		l =[]
+		'''Term : Factor Op2'''  
+				            
+	def p_op2(self,p):
+		'''Op2 : TIMES  Term
+			   | DIVIDE Term
+			   | empty'''  
+			
 	def p_factor(self,p):
-		l =[]
+		'''Factor : LPAREN SuperExp RPAREN   
+				  | Op3 Constant'''
+	def p_op3(self,p):
+		'''Op3 : PLUS
+			   | MINUES
+			   | empty'''
 	def p_instruccion(self,p):
-		l =[]
+		'''Instruction : Loop TERMINAL
+					   | Assign TERMINAL
+					   | Call TERMINAL
+					   | Brush TERMINAL
+					   | Read TERMINAL
+					   | Print TERMINAL
+					   | PenDown TERMINAL
+					   | PenUp  TERMINAL
+					   | Home TERMINAL
+					   | Forward TERMINAL
+					   | Rotate TERMINAL
+					   | Color TERMINAL
+					   | Cirlce TERMINAL
+					   | Arc TERMINAL
+					   | Square TERMINAL '''   
+					
 	def p_assign(self,p):
-		l =[]
+		''' Assign : Identifier EQUAL Assignation '''   
+		
+	def p_assignation(self,p):
+		'''Assignation : SuperExp 
+					   | String 
+					   | Call'''
+					
 	def p_call(self,p):
-		l =[]
+		''''''
 	def p_read(self,p):
 		l =[]
 	def p_print(self,p):
@@ -90,5 +172,5 @@ class Sintax():
 	def p_digit(self,p):
 		l =[]
 	
-	
+print MyLexer.listOfTokens
 	
