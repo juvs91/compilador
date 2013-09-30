@@ -15,7 +15,7 @@ class Sintax():
 		'''Main :  MAIN LPAREN RPAREN FBlock'''  
 		
 	def p_declaration(self,p):
-		'''Declaration : Primitive Identifier List TERMINAL
+		'''Declaration : Primitive Identifier List SEMI
 					   | empty'''
 	
 	def List(self,p):
@@ -40,7 +40,7 @@ class Sintax():
 		'''FBlock : LBRACKET Declaration Instruction  RBRACKET''' 
 		
 	def p_rFBlock(self,p):
-		'''RFBlock : LBRACKET Declaration Instruction RETURN SuperExp TERMINAL RBRACKET'''  
+		'''RFBlock : LBRACKET Declaration Instruction RETURN SuperExp SEMI RBRACKET'''  
 		
 	def p_loop(self,p):
 		'''Loop : LOOP  LPAREN  SuperExp RPAREN Block'''
@@ -97,21 +97,21 @@ class Sintax():
 			   | MINUES
 			   | empty'''
 	def p_instruccion(self,p):
-		'''Instruction : Loop TERMINAL
-					   | Assign TERMINAL
-					   | Call TERMINAL
-					   | Brush TERMINAL
-					   | Read TERMINAL
-					   | Print TERMINAL
-					   | PenDown TERMINAL
-					   | PenUp  TERMINAL
-					   | Home TERMINAL
-					   | Forward TERMINAL
-					   | Rotate TERMINAL
-					   | Color TERMINAL
-					   | Cirlce TERMINAL
-					   | Arc TERMINAL
-					   | Square TERMINAL '''   
+		'''Instruction : Loop SEMI
+					   | Assign SEMI
+					   | Call SEMI
+					   | Brush SEMI
+					   | Read SEMI
+					   | Print SEMI
+					   | PenDown SEMI
+					   | PenUp  SEMI
+					   | Home SEMI
+					   | Forward SEMI
+					   | Rotate SEMI
+					   | Color SEMI
+					   | Cirlce SEMI
+					   | Arc SEMI
+					   | Square SEMI '''   
 					
 	def p_assign(self,p):
 		''' Assign : Identifier EQUAL Assignation '''   
