@@ -122,11 +122,23 @@ class Sintax():
 					   | Call'''
 					
 	def p_call(self,p):
-		''''''
+		'''Call : Identifier LPAREN Parameters RPAREN'''
+	def p_parameters(self,p):
+		'''Parameters : SuperExp Coma
+					  | String Coma
+					  | empty'''
+	def p_coma(self,p):
+		'''Coma : COMMA Parameters
+				| empty'''
+				
 	def p_read(self,p):
-		l =[]
+		'''Read : READ LPAREN Type COMMA Identifier RPAREN '''   
+		
+	def p_type(selfmp):
+		'''Type : Primitive
+				| String'''
 	def p_print(self,p):
-		l =[]
+		'''Print : PRINT '''
 	def p_brush(self,p):
 		l =[]
 	def p_color(self,p):
