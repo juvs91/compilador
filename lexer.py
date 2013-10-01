@@ -51,7 +51,8 @@ class MyLexer:
         'color' : 'COLOR',
         'true' : 'TRUE',
         'false' : 'FALSE',
-		'home' : 'HOME'
+        'home' : 'HOME',
+        'return' : 'RETURN'
     }
     # List of token names.   This is always required
 
@@ -129,7 +130,6 @@ class MyLexer:
 
 # Build the lexer and try it out
 m = MyLexer()
-m.build()           # Build the lexer
-m.test('''+ 234 oo   22.22 {} []  main == <> < > >= <= && || if  "   yolo   " ''')     # Test it
+#m.test('''+ 234 oo   22.22 {} []  main == <> < > >= <= && || if  " yolo" ''')     # Test it
 
-print m.getAllTokens()
+#print m.getAllTokens()
