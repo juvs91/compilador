@@ -201,17 +201,13 @@ class Sintax():
 					 | CHAR''' 
 					
 	def p_identifier(self,p):
-		'''Identifier : Lower NextChar''' 
+		'''Identifier : ID''' 
 		
-	def p_nextChar(self,p):
-		'''NextChar : Lower NextChar
-					| Upper NextChar
-					| Digit NextChar
-					| empty'''
 	def p_constant(self,p):
 		'''Constant : Integer
 					| Float
-					|Identifier'''
+					|Identifier'''  
+					
 	def p_integer(self,p):
 		'''Integer : INTEGER''' 
 		
@@ -219,16 +215,9 @@ class Sintax():
 		'''Float : FLOAT'''   
 		
 	def p_string(self,p):
-		'''String : COMMILLAS Printable COMMILLAS'''    
+		'''String : STRING '''    
 		
-	def p_printable(self,p):
-		l =[]
-	def p_lower(self,p):
-		l =[]
-	def p_upper(self,p):
-		l =[]
-	def p_digit(self,p):
-		l =[]
+
 	
 print MyLexer.listOfTokens
 	
