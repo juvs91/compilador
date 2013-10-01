@@ -1,223 +1,215 @@
-import ply.yacc as yacc 
+import ply.yacc as yacc
 
 from lexer import MyLexer
 
 class Sintax():
-	def __init__(self):
-		l =[]
-	def p_program(self,p):
-		'''Program : Declaration FunctionTotal Main '''
-	def p_functionTotal(self,p):
-		'''FunctionTotal : Function
-						 | RFunction'''
-	
-	def p_main(self,p):
-		'''Main :  MAIN LPAREN RPAREN FBlock'''  
-		
-	def p_declaration(self,p):
-		'''Declaration : Primitive Identifier List SEMI
-					   | empty'''
-	
-	def List(self,p):
-		'''List : Array Array
-				| empty'''
-		
-	def Array(self,p):
-		'''Array : LBRACKET Integer RBRACKET'''
-	
-	def p_function(self,p):
-		'''Function : VOID Identifier LPAREN ParamList RPAREN FBLock'''  
-		
-	def p_rFunction(self,p):
-		'''RFunction : Primitive Identifier LPAREN ParamList RPAREN RFBLock'''  
-		
-	def p_block(self,p):
-		'''Block : LBRACKET Instruction  RBRACKET''' 
-		
-	def p_fBlock(self,p):
-		'''FBlock : LBRACKET Declaration Instruction  RBRACKET''' 
-		
-	def p_rFBlock(self,p):
-		'''RFBlock : LBRACKET Declaration Instruction RETURN SuperExp SEMI RBRACKET'''  
-		
-	def p_loop(self,p):
-		'''Loop : LOOP  LPAREN  SuperExp RPAREN Block'''
-		
-	def p_conditional(self,p):
-		'''Conditional : IF LPAREN SuperExp RPAREN Block Else'''  
-		
-	def p_else(self,p):
-		'''Else : ELSE Block
-				| empty''' 
-				
-	def p_superExpr(self,p):
-		'''SuperExp : Expression LogicalOp'''
-		
-	def p_logicalOp(self,p):
-		'''LogicalOp : OR  SuperExp
-					 |  AND SuperExp
-					 | empty'''
+    def __init__(self):
+        l =[]
 
-	def p_expr(self,p):
-		'''Expr : Term Op1'''
-		
-	def p_op1(self,p):
-		'''Op1 : PLUS  Expr
-			   | MINUS  Expr
-			   | empty'''    
-			
-	def p_expression(self,p):
-		'''Expression : Expr Comparison''' 
-		
-	def p_comparison(self,p):
-		'''Comparison : GREATHAN Expr
-					  | LESSTHAN Expr
-					  | DIFERENT Expr
-					  | TWOEQUAL Expr
-					  | GREATHANOREQUAL Expr
-					  | LESSTHANOREQUAL Expr
-					  | empty
-					  '''
-		
-	def p_term(self,p):
-		'''Term : Factor Op2'''  
-				            
-	def p_op2(self,p):
-		'''Op2 : TIMES  Term
-			   | DIVIDE Term
-			   | empty'''  
-			
-	def p_factor(self,p):
-		'''Factor : LPAREN SuperExp RPAREN   
-				  | Op3 Constant'''
-	def p_op3(self,p):
-		'''Op3 : PLUS
-			   | MINUES
-			   | empty'''
-	def p_instruccion(self,p):
-		'''Instruction : Loop SEMI
-					   | Assign SEMI
-					   | Call SEMI
-					   | Brush SEMI
-					   | Read SEMI
-					   | Print SEMI
-					   | PenDown SEMI
-					   | PenUp  SEMI
-					   | Home SEMI
-					   | Forward SEMI
-					   | Rotate SEMI
-					   | Color SEMI
-					   | Cirlce SEMI
-					   | Arc SEMI
-					   | Square SEMI '''   
-					
-	def p_assign(self,p):
-		''' Assign : Identifier EQUAL Assignation '''   
-		
-	def p_assignation(self,p):
-		'''Assignation : SuperExp 
-					   | String 
-					   | Call'''
-					
-	def p_call(self,p):
-		'''Call : Identifier LPAREN Parameters RPAREN'''
-	def p_parameters(self,p):
-		'''Parameters : SuperExp Coma
-					  | String Coma
-					  | empty'''
-	def p_coma(self,p):
-		'''Coma : COMMA Parameters
-				| empty'''
-				
-	def p_read(self,p):
-		'''Read : READ LPAREN Type COMMA Identifier RPAREN '''   
-		
-	def p_type(selfmp):
-		'''Type : Primitive
-				| String'''   
-				
-	def p_print(self,p):
-		'''Print : PRINT LPAREN Printing RPAREN'''
-		
-	def p_printing(self,p):
-		'''Printing : SuperExp ComaP
-					| String ComaP''' 
-					
-	def p_comap(self):
-		'''ComaP : COMMA Printing
-				| empty'''
-	 
-	def p_brush(self,p):
-		'''Brush : BRUSH LPAREN Color COMMA SuperExp RPAREN'''   
-		
-	def p_color(self,p):
-		'''Color : COLOR LPAREN SuperExp COMMA SuperExp COMMA SuperExp RPAREN ''' 
-		
-	def p_penDown(self,p):
-		'''PendDown : pd LPAREN RPAREN'''      
-		
-	def p_penUp(self,p):
-		'''PenUp : pu LPAREN RPAREN''' 
-		   
-		
-	def p_home(self,p):
-		'''Home : HOME LPAREN RPAREN'''   
-		
-	def p_forward(self,p):
-	   '''ForWard : FD LPAREN RPAREN'''    
-	
-	def p_rotate(self,p):
-	   '''Rotate : RT LPAREN RPAREN'''   
-	
-	def p_circle(self,p):
-		'''Circle : CIRCLE LPAREN SuperExp RPAREN'''     
-		
-	def p_arc(self,p):
-		'''Arc : ARC LPAREN SuperExp COMMA SuperExp RPAREN ''' 
-		
-	def p_square(self,p):
-		'''Square : SQUARE LPAREN SuperExp RPAREN'''       
-		
-	def p_paramList(self,p):
-		'''ParamList : Param ComaParam'''
-		
-	def p_comaParam(self,p):
-		'''ComaParam : COMMA ParamList
-					 | empty'''
-					
-	def p_param(self,p):
-		'''Param : Primitive ListP Identifier'''
-	def p_ListP(self,p):
-		'''ListP : ArrayP ArrayP'''
-		
-	def p_arrayp(self,p):
-		'''ArrayP : LBRACE RBRACE
-				  | empty'''
-				
-	def p_primitive(self,p):
-		'''Primitive : INT
-					 | FLOAT
-					 | BOOL
-					 | CHAR''' 
-					
-	def p_identifier(self,p):
-		'''Identifier : ID''' 
-		
-	def p_constant(self,p):
-		'''Constant : Integer
-					| Float
-					|Identifier'''  
-					
-	def p_integer(self,p):
-		'''Integer : INTEGER''' 
-		
-	def p_float(self,p):
-		'''Float : FLOAT'''   
-		
-	def p_string(self,p):
-		'''String : STRING '''    
-		
+    def p_program(self,p):
+        '''Program : Declaration FunctionTotal Main'''
 
-	
+    def p_functionTotal(self,p):
+        '''FunctionTotal : Function
+                         | RFunction'''
+
+    def p_main(self,p):
+        '''Main : MAIN LPAREN RPAREN FBlock'''
+
+    def p_declaration(self,p):
+        '''Declaration : Primitive Identifier List SEMI
+                       | empty'''
+
+    def p_list(self,p):
+        '''List : Array
+                | empty'''
+
+    def p_array(self,p):
+        '''Array : LBRACKET INTEGER RBRACKET Matrix'''
+
+    def p_matrix(self, p):
+        '''Matrix : LBRACKET INTEGER RBRACKET
+                  | empty'''
+
+    def p_function(self,p):
+        '''Function : VOID Identifier LPAREN ParamList RPAREN FBLock'''
+
+    def p_rFunction(self,p):
+        '''RFunction : Primitive Identifier LPAREN ParamList RPAREN RFBLock'''
+
+    def p_block(self,p):
+        '''Block : LBRACE Instruction RBRACE'''
+
+    def p_fBlock(self,p):
+        '''FBlock : LBRACE Declaration Instruction  RBRACE'''
+
+    def p_rFBlock(self,p):
+        '''RFBlock : LBRACE Declaration Instruction RETURN SuperExpr SEMI RBRACE'''
+
+    def p_loop(self,p):
+        '''Loop : LOOP LPAREN SuperExpr RPAREN Block'''
+
+    def p_conditional(self,p):
+        '''Conditional : IF LPAREN SuperExpr RPAREN Block Else'''
+
+    def p_else(self,p):
+        '''Else : ELSE Block
+                | empty'''
+
+    def p_superExpr(self,p):
+        '''SuperExpr : Expression LogicalOp'''
+
+    def p_logicalOp(self,p):
+        '''LogicalOp : OR SuperExpr
+                     | AND SuperExpr
+                     | empty'''
+
+    def p_expression(self,p):
+        '''Expression : Expr Comparison'''
+
+    def p_comparison(self,p):
+        '''Comparison : GREATHAN Expr
+                      | LESSTHAN Expr
+                      | DIFFERENT Expr
+                      | TWOEQUAL Expr
+                      | GREATEQUAL Expr
+                      | LESSEQUAL Expr
+                      | empty'''
+
+    def p_expr(self,p):
+        '''Expr : Term Op1'''
+
+    def p_op1(self,p):
+        '''Op1 : PLUS Expr
+               | MINUS Expr
+               | empty'''
+
+    def p_term(self,p):
+        '''Term : Factor Op2'''
+
+    def p_op2(self,p):
+        '''Op2 : TIMES Term
+               | DIVIDE Term
+               | empty'''
+
+    def p_factor(self,p):
+        '''Factor : LPAREN SuperExpr RPAREN
+                  | Op3 Constant'''
+
+    def p_op3(self,p):
+        '''Op3 : PLUS
+               | MINUS
+               | empty'''
+
+    def p_instruccion(self,p):
+        '''Instruction : Loop SEMI
+                       | Assign SEMI
+                       | Call SEMI
+                       | Brush SEMI
+                       | Read SEMI
+                       | Print SEMI
+                       | PenDown SEMI
+                       | PenUp  SEMI
+                       | Home SEMI
+                       | Forward SEMI
+                       | Rotate SEMI
+                       | Color SEMI
+                       | Cirlce SEMI
+                       | Arc SEMI
+                       | Square SEMI'''
+
+    def p_assign(self,p):
+        '''Assign : Identifier EQUAL Assignation'''
+
+    def p_assignation(self,p):
+        '''Assignation : SuperExpr
+                       | STRING
+                       | Call'''
+
+    def p_call(self,p):
+        '''Call : Identifier LPAREN Parameters RPAREN'''
+
+    def p_read(self,p):
+        '''Read : READ LPAREN Type COMMA Identifier RPAREN'''
+
+    def p_type(selfmp):
+        '''Type : Primitive
+                | STRING'''
+
+    def p_print(self,p):
+        '''Print : PRINT LPAREN Parameters RPAREN'''
+
+    def p_parameters(self,p):
+        '''Parameters : Params
+                      | empty'''
+
+    def p_params(self, p):
+        '''Params : SuperExpr Params1
+                  | STRING Params1'''
+
+    def p_params_1(self, p):
+        '''Params1 : COMMA Params
+                   | empty'''
+
+    def p_brush(self,p):
+        '''Brush : BRUSH LPAREN Color COMMA SuperExpr RPAREN'''
+
+    def p_color(self,p):
+        '''Color : COLOR LPAREN SuperExpr COMMA SuperExpr COMMA SuperExpr RPAREN'''
+
+    def p_penDown(self,p):
+        '''PendDown : PD LPAREN RPAREN'''
+
+    def p_penUp(self,p):
+        '''PenUp : PU LPAREN RPAREN'''
+
+    def p_home(self,p):
+        '''Home : HOME LPAREN RPAREN'''
+
+    def p_forward(self,p):
+       '''ForWard : FD LPAREN SuperExpr RPAREN'''
+
+    def p_rotate(self,p):
+       '''Rotate : RT LPAREN SuperExpr RPAREN'''
+
+    def p_circle(self,p):
+        '''Circle : CIRCLE LPAREN SuperExpr RPAREN'''
+
+    def p_arc(self,p):
+        '''Arc : ARC LPAREN SuperExpr COMMA SuperExpr RPAREN'''
+
+    def p_square(self,p):
+        '''Square : SQUARE LPAREN SuperExpr RPAREN'''
+
+    def p_paramList(self,p):
+        '''ParamList : Param ParamList1'''
+
+    def p_paramList_1(self,p):
+        '''ParamList1 : COMMA ParamList
+                      | empty'''
+
+    def p_param(self,p):
+        '''Param : Primitive ListP Identifier'''
+
+    def p_ListP(self,p):
+        '''ListP : ArrayP ArrayP'''
+
+    def p_arrayp(self,p):
+        '''ArrayP : LBRACE RBRACE
+                  | empty'''
+
+    def p_primitive(self,p):
+        '''Primitive : INT
+                     | FLOAT
+                     | BOOL
+                     | CHAR'''
+
+    def p_identifier(self,p):
+        '''Identifier : ID'''
+
+    def p_constant(self,p):
+        '''Constant : INTEGER
+                    | FLOAT
+                    | Identifier'''
+
 print MyLexer.listOfTokens
-	
