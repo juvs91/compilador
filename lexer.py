@@ -23,7 +23,7 @@ class MyLexer:
     t_TWOEQUAL  = r'=='
     t_AND       = r'&&'
     t_OR        = r'\|\|'
-    #t_SCONST    = r'".*"'
+    t_STRING    = r'".*"'
 
 
     #all the reserved words
@@ -55,7 +55,7 @@ class MyLexer:
     }
     # List of token names.   This is always required
 
-    tokens = ['GREATEQUAL','LESSEQUAL','INTEGER','PLUS','MINUS','TIMES','DIVIDE','LPAREN','RPAREN','LBRACE','RBRACE','LBRACKET','RBRACKET','SEMI','ID','COMMA','GREATHAN','LESSTHAN','DIFFERENT','EQUAL','TWOEQUAL','AND','OR'] +  list(reserved.values())
+    tokens = ['GREATEQUAL','LESSEQUAL','INTEGER','PLUS','MINUS','TIMES','DIVIDE','LPAREN','RPAREN','LBRACE','RBRACE','LBRACKET','RBRACKET','SEMI','ID','COMMA','GREATHAN','LESSTHAN','DIFFERENT','EQUAL','TWOEQUAL','AND','OR','STRING'] +  list(reserved.values())
 
 
     listOfTokens = []
