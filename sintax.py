@@ -19,11 +19,9 @@ class Sintax():
 					   | empty'''
 	
 	def List(self,p):
-		'''List : Array Array2'''
+		'''List : Array Array
+				| empty'''
 		
-	def p_array2(self,p):
-		'''Array2 : Array
-				  | empty'''
 	def Array(self,p):
 		'''Array : LBRACKET Integer RBRACKET'''
 	
@@ -136,45 +134,93 @@ class Sintax():
 		
 	def p_type(selfmp):
 		'''Type : Primitive
-				| String'''
+				| String'''   
+				
 	def p_print(self,p):
-		'''Print : PRINT '''
+		'''Print : PRINT LPAREN Printing RPAREN'''
+		
+	def p_printing(self,p):
+		'''Printing : SuperExp ComaP
+					| String ComaP''' 
+					
+	def p_comap(self):
+		'''ComaP : COMMA Printing
+				| empty'''
+	 
 	def p_brush(self,p):
-		l =[]
+		'''Brush : BRUSH LPAREN Color COMMA SuperExp RPAREN'''   
+		
 	def p_color(self,p):
-		l =[]
+		'''Color : COLOR LPAREN SuperExp COMMA SuperExp COMMA SuperExp RPAREN ''' 
+		
 	def p_penDown(self,p):
-		l =[]
+		'''PendDown : pd LPAREN RPAREN'''      
+		
 	def p_penUp(self,p):
-		l =[]
+		'''PenUp : pu LPAREN RPAREN''' 
+		   
+		
 	def p_home(self,p):
-		l =[]
+		'''Home : HOME LPAREN RPAREN'''   
+		
 	def p_forward(self,p):
-		l =[]
+	   '''ForWard : FD LPAREN RPAREN'''    
+	
 	def p_rotate(self,p):
-		l =[]
+	   '''Rotate : RT LPAREN RPAREN'''   
+	
 	def p_circle(self,p):
-		l =[]
+		'''Circle : CIRCLE LPAREN SuperExp RPAREN'''     
+		
 	def p_arc(self,p):
-		l =[]
+		'''Arc : ARC LPAREN SuperExp COMMA SuperExp RPAREN ''' 
+		
 	def p_square(self,p):
-		l =[]
+		'''Square : SQUARE LPAREN SuperExp RPAREN'''       
+		
 	def p_paramList(self,p):
-		l =[]
+		'''ParamList : Param ComaParam'''
+		
+	def p_comaParam(self,p):
+		'''ComaParam : COMMA ParamList
+					 | empty'''
+					
 	def p_param(self,p):
-		l =[]
+		'''Param : Primitive ListP Identifier'''
+	def p_ListP(self,p):
+		'''ListP : ArrayP ArrayP'''
+		
+	def p_arrayp(self,p):
+		'''ArrayP : LBRACE RBRACE
+				  | empty'''
+				
 	def p_primitive(self,p):
-		l =[]
+		'''Primitive : INT
+					 | FLOAT
+					 | BOOL
+					 | CHAR''' 
+					
 	def p_identifier(self,p):
-		l =[]
+		'''Identifier : Lower NextChar''' 
+		
+	def p_nextChar(self,p):
+		'''NextChar : Lower NextChar
+					| Upper NextChar
+					| Digit NextChar
+					| empty'''
 	def p_constant(self,p):
-		l =[]
+		'''Constant : Integer
+					| Float
+					|Identifier'''
 	def p_integer(self,p):
-		l =[]
+		'''Integer : INTEGER''' 
+		
 	def p_float(self,p):
-		l =[]
+		'''Float : FLOAT'''   
+		
 	def p_string(self,p):
-		l =[]
+		'''String : COMMILLAS Printable COMMILLAS'''    
+		
 	def p_printable(self,p):
 		l =[]
 	def p_lower(self,p):

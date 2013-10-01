@@ -23,6 +23,8 @@ class MyLexer:
     t_TWOEQUAL  = r'=='
     t_AND       = r'&&'
     t_OR        = r'\|\|'
+    #t_SCONST    = r'".*"'
+
 
     #all the reserved words
     reserved = {
@@ -48,7 +50,8 @@ class MyLexer:
         'void' : 'VOID',
         'color' : 'COLOR',
         'true' : 'TRUE',
-        'false' : 'FALSE'
+        'false' : 'FALSE',
+		'home' : 'HOME'
     }
     # List of token names.   This is always required
 
@@ -76,7 +79,6 @@ class MyLexer:
         t.value=float(t.value)
         self.listOfTokens.append(t)
         return t
-
 
     # A regular expression rule with some action code
     def t_INTEGER(self,t):
@@ -128,6 +130,6 @@ class MyLexer:
 # Build the lexer and try it out
 m = MyLexer()
 m.build()           # Build the lexer
-m.test("+ 234 oo   22.22 {} []  main == <> < > >= <= && || if")     # Test it
+m.test('''+ 234 oo   22.22 {} []  main == <> < > >= <= && || if  " yolo" ''')     # Test it
 
 print m.getAllTokens()
