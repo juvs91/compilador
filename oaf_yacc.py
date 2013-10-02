@@ -5,15 +5,16 @@ from oaf_lex import tokens
 
 # Variables table
 var_table = {"global":{}}
+scope = "global"
 
 def p_program(p):
     '''Program : Declaration Function Main'''
     
 def p_main(p):
-    '''Main : MAIN LPAREN RPAREN FBlock'''
+    '''Main : MAIN Change_Scope LPAREN RPAREN FBlock'''
 
 def p_declaration(p):
-    '''Declaration : Primitive ID Array Array SEMI Declaration
+    '''Declaration : Primitive ID Array Array Seen_Variable SEMI Declaration
                    | empty'''
 
 def p_array(p):
@@ -26,10 +27,10 @@ def p_function(p):
                 | empty'''
 
 def p_function_1(p):
-    '''Function1 : VOID ID LPAREN ParamList RPAREN FBlock Function'''
+    '''Function1 : VOID ID Change_Scope LPAREN ParamList RPAREN FBlock Change_Scope Function'''
 
 def p_rfunction(p):
-    '''RFunction : Primitive ID LPAREN ParamList RPAREN RFBlock Function'''
+    '''RFunction : Primitive ID Change_Scope LPAREN ParamList RPAREN RFBlock Change_Scope Function'''
 
 def p_block(p):
     '''Block : LBRACE Instruction RBRACE'''
@@ -174,12 +175,17 @@ def p_primitive(p):
                  | FLOAT
                  | BOOL
                  | CHAR'''
+    p[0] = p[1]
 
 def p_paramlist(p):
-    '''ParamList : Param ParamList1'''
+    '''ParamList : ParamList1
+                 | empty'''
 
 def p_paramlist_1(p):
-    '''ParamList1 : COMMA ParamList
+    '''ParamList1 : Param ParamList2'''
+                  
+def p_paramlist_2(p):
+    '''ParamList2 : COMMA ParamList1
                   | empty'''
 
 def p_instruccion(p):
@@ -208,6 +214,22 @@ def p_constant(p):
                 | FALSE
                 | TRUE'''
 
+# Update variable table
+def p_seen_variable(p):
+    '''Seen_Variable : '''
+    global var_table
+    global scope
+    if(var_table.get(scope) == None):
+        var_table[scope] = {}
+    var_table[scope][p[-3]] = [p[-4]]
+    #print("{0} {1} {2} {3} {4}".format(p[-4], p[-3], p[-2], p[-1], p[0]))
+    
+def p_change_scope(p):
+    '''Change_Scope : '''
+    global scope
+    scope = p[-1]
+    
+                
 # Empty production
 def p_empty(p):
     '''empty : '''
@@ -226,3 +248,9 @@ parser = yacc.yacc()
 with open(raw_input('filename > '), 'r') as f:
     result = parser.parse(f.read())
     print result
+    print "Scope\tId\tType"
+    for k in var_table:
+        print(k + "\t")
+        for k1 in var_table[k]:
+            print("\t" + k1 + "\t" + var_table[k][k1][0])
+    #print var_table
