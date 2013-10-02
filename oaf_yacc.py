@@ -1,15 +1,17 @@
 import ply.yacc as yacc
 
+# debug
+import sys
+
+# Get semantic variables
+import oaf_sem as sem
+
 # Get tokens from the lexer
 from oaf_lex import tokens
 
-# Variables table
-var_table = {"global":{}}
-scope = "global"
-
 def p_program(p):
     '''Program : Declaration Function Main'''
-    
+
 def p_main(p):
     '''Main : MAIN Change_Scope LPAREN RPAREN FBlock'''
 
@@ -164,7 +166,7 @@ def p_square(p):
     '''Square : SQUARE LPAREN SuperExpr RPAREN'''
 
 def p_param(p):
-    '''Param : Primitive Array1 Array1 ID'''
+    '''Param : Primitive ID Array1 Array1 Seen_Variable'''
 
 def p_array_1(p):
     '''Array1 : LBRACKET RBRACKET
@@ -183,7 +185,7 @@ def p_paramlist(p):
 
 def p_paramlist_1(p):
     '''ParamList1 : Param ParamList2'''
-                  
+
 def p_paramlist_2(p):
     '''ParamList2 : COMMA ParamList1
                   | empty'''
@@ -217,44 +219,52 @@ def p_constant(p):
 # Update variable table
 def p_seen_variable(p):
     '''Seen_Variable : '''
-    global var_table
-    global scope
+    var_table = sem.var_table
+    scope = sem.scope
     if(var_table.get(scope) == None):
         var_table[scope] = {}
-    var_table[scope][p[-3]] = [p[-4]]
+    if(p[-3] == scope or var_table[scope].get(p[-3]) != None):
+        print("{0} already exists".format(p[-3]))
+        #raise SyntaxError
+    else:
+        var_table[scope][p[-3]] = [p[-4]]
     #print("{0} {1} {2} {3} {4}".format(p[-4], p[-3], p[-2], p[-1], p[0]))
-    
+
 def p_change_scope(p):
     '''Change_Scope : '''
-    global scope
-    scope = p[-1]
-    
+    sem.scope = p[-1]
+
 def p_restore_scope(p):
     '''Restore_Scope : '''
-    global scope
-    scope = 'global'
-                
+    sem.scope = 'global'
+
 # Empty production
 def p_empty(p):
     '''empty : '''
     pass
+
+# Error rules for productions
     
 # Error rule for syntax errors
 def p_error(p):
     try:
-        print "Syntax error at line {0} col {1}, unexpected '{2}'".format(p.lineno, p.lexpos, p.value)
+        print("Syntax error at line {0} col {1}, unexpected '{2}'".format(p.lineno, p.lexpos, p.value))
     except:
+        print("Syntax error")
         pass
-        
+
 # Build the parser
 parser = yacc.yacc()
 
 with open(raw_input('filename > '), 'r') as f:
-    result = parser.parse(f.read())
+    result = parser.parse(f.read(),0,0)
+    var_table = sem.var_table
     print result
-    print "Scope\tId\tType"
+    print "Scope\t|Id\t|Type"
+    print "--------|-------|----"
     for k in var_table:
-        print(k + "\t")
+        sys.stdout.write(k)
         for k1 in var_table[k]:
-            print("\t" + k1 + "\t" + var_table[k][k1][0])
+            print("\t|" + k1 + "\t|" + var_table[k][k1][0])
+        print "--------|-------|----"
     #print var_table
