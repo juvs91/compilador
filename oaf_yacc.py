@@ -27,10 +27,10 @@ def p_function(p):
                 | empty'''
 
 def p_function_1(p):
-    '''Function1 : VOID ID Change_Scope LPAREN ParamList RPAREN FBlock Change_Scope Function'''
+    '''Function1 : VOID ID Change_Scope LPAREN ParamList RPAREN FBlock Restore_Scope Function'''
 
 def p_rfunction(p):
-    '''RFunction : Primitive ID Change_Scope LPAREN ParamList RPAREN RFBlock Change_Scope Function'''
+    '''RFunction : Primitive ID Change_Scope LPAREN ParamList RPAREN RFBlock Restore_Scope Function'''
 
 def p_block(p):
     '''Block : LBRACE Instruction RBRACE'''
@@ -229,6 +229,10 @@ def p_change_scope(p):
     global scope
     scope = p[-1]
     
+def p_restore_scope(p):
+    '''Restore_Scope : '''
+    global scope
+    scope = 'global'
                 
 # Empty production
 def p_empty(p):
