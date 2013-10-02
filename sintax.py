@@ -1,7 +1,7 @@
 import ply.yacc as yacc
 
 from lexer import MyLexer
-
+ 
 class Sintax():
 
     tokens = MyLexer.tokens
