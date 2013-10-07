@@ -2,6 +2,7 @@ int hurr;
 
 void yeah(float f) {
     b = quack;
+    circle(center);
 }
 
 main(){
