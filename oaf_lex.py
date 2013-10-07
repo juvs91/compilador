@@ -1,5 +1,10 @@
 import ply.lex as lex
 
+# Lexer states
+states = (
+   ('err','inclusive'),
+)
+
 # Reserved words
 reserved = {
     'arc' : 'ARC',
@@ -41,11 +46,12 @@ tokens = [
     # Logical
     'AND', 'OR',
     # Assignment
-    'EQUAL'
+    'EQUAL',
+    # Error state tokens
+    'ASCII',
 ] + list(reserved.values())
 
 # Regular expression rules
-
 # Identifiers
 def t_ID(t):
     r'[a-z][a-zA-Z0-9]*'
@@ -101,6 +107,9 @@ t_OR        = r'\|\|'
 # Assignment
 t_EQUAL     = r'='
     
+# Error state tokens
+t_err_ASCII = r'[a-zA-Z0-9]'
+
 # Define a rule so we can track line numbers
 def t_newline(t):
     r'\n+'
@@ -108,10 +117,11 @@ def t_newline(t):
     
 # A string containing ignored characters (spaces and tabs)
 t_ignore  = ' \t'
+t_err_ignore = ' \t\n\r'
 
 # Compute column.
-#     input is the input text string
-#     token is a token instance
+# input is the input text string
+# token is a token instance
 def find_column(input, token):
     last_cr = input.rfind('\n', 0, token.lexpos)
     if last_cr < 0:

@@ -1,7 +1,11 @@
-int derp;
-bool yes;
-void holi (){
-    float hurr;
-    char ch;
+int hurr;
+
+void yeah(float f) {
+    b = quack;
 }
-main(){}
+
+main(){
+    char ch;
+    ch = 'g';
+    hurr = a + b * c;
+}

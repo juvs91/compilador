@@ -8,6 +8,9 @@ import oaf_sem as sem
 
 # Get tokens from the lexer
 from oaf_lex import tokens
+# Get the lexer
+from oaf_lex import lexer
+from oaf_lex import find_column
 
 def p_program(p):
     '''Program : Declaration Function Main'''
@@ -242,29 +245,49 @@ def p_restore_scope(p):
 def p_empty(p):
     '''empty : '''
     pass
-
+    
 # Error rules for productions
+def p_program_err(p):
+    '''Program : ASCII Program'''
+def p_superexpr_error(p):
+    '''SuperExpr : Expression error SuperExpr1'''
+    print("Malformed expression")
+    
+def p_term_error(p):
+    '''Term1 : DIVIDE error Term
+             | TIMES error Term'''    
     
 # Error rule for syntax errors
 def p_error(p):
     try:
-        print("Syntax error at line {0} col {1}, unexpected '{2}'".format(p.lineno, p.lexpos, p.value))
+        print("Syntax error at line {0} col {1}, unexpected '{2}'".format(p.lineno, find_column(input, p), p.value))
     except:
         print("Syntax error")
-        pass
+    lexer.push_state("err")
+    while(True):
+        tok = lexer.token()
+        if(tok):
+            if(tok.type != 'ASCII'):
+                lexer.pop_state()
+                yacc.errok()
+                return(tok)
+        else:
+            print("Abrupt file termination")
+            break    
 
 # Build the parser
 parser = yacc.yacc()
 
 with open(raw_input('filename > '), 'r') as f:
-    result = parser.parse(f.read(),0,0)
+    input = f.read()
+    result = parser.parse(input,0,0)
     var_table = sem.var_table
     print result
     print "Scope\t|Id\t|Type"
-    print "--------|-------|----"
+    print "--------|-------|--------"
     for k in var_table:
         sys.stdout.write(k)
         for k1 in var_table[k]:
             print("\t|" + k1 + "\t|" + var_table[k][k1][0])
-        print "--------|-------|----"
+        print "--------|-------|--------"
     #print var_table
