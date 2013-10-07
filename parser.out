@@ -2,1262 +2,3215 @@ Created by PLY version 3.4 (http://www.dabeaz.com/ply)
 
 Unused terminals:
 
-    PERIOD
+    TRUE
+    FALSE
 
 Grammar
 
-Rule 0     S' -> main
-Rule 1     main -> PROGRAM ID SEMI vars block
-Rule 2     vars -> varlist
-Rule 3     vars -> empty
-Rule 4     varlist -> VAR idlist COLON type SEMI varlist1
-Rule 5     varlist1 -> idlist COLON type SEMI varlist1
-Rule 6     varlist1 -> empty
-Rule 7     idlist -> ID idlist1
-Rule 8     idlist1 -> COMMA idlist
-Rule 9     idlist1 -> empty
-Rule 10    type -> INT
-Rule 11    type -> FLOAT
-Rule 12    block -> LBRACE block1 RBRACE
-Rule 13    block1 -> instr
-Rule 14    block1 -> empty
-Rule 15    instr -> assign
-Rule 16    instr -> cond
-Rule 17    instr -> write
-Rule 18    assign -> ID EQUAL expr SEMI
-Rule 19    cond -> IF LPAREN expr RPAREN block cond1 SEMI
-Rule 20    write -> PRINT LPAREN write1 RPAREN SEMI
-Rule 21    write1 -> expr write2
-Rule 22    write1 -> SCONST write2
-Rule 23    write2 -> COMMA write1
-Rule 24    write2 -> empty
-Rule 25    cond1 -> ELSE block
-Rule 26    cond1 -> empty
-Rule 27    expr -> exp expr1
-Rule 28    expr1 -> GREATER exp
-Rule 29    expr1 -> LESS exp
-Rule 30    expr1 -> NOTEQUAL exp
-Rule 31    expr1 -> empty
-Rule 32    exp -> term exp1
-Rule 33    exp1 -> PLUS exp
-Rule 34    exp1 -> MINUS exp
-Rule 35    exp1 -> empty
-Rule 36    term -> factor term1
-Rule 37    factor -> LPAREN expr RPAREN
-Rule 38    factor -> factor1 const
-Rule 39    factor1 -> PLUS
-Rule 40    factor1 -> MINUS
-Rule 41    factor1 -> empty
-Rule 42    term1 -> TIMES term
-Rule 43    term1 -> DIVIDE term
-Rule 44    term1 -> empty
-Rule 45    const -> ID
-Rule 46    const -> ICONST
-Rule 47    const -> FCONST
-Rule 48    empty -> <empty>
+Rule 0     S' -> Program
+Rule 1     Program -> Declaration FunctionTotal Main
+Rule 2     FunctionTotal -> Function
+Rule 3     FunctionTotal -> RFunction
+Rule 4     Main -> MAIN LPAREN RPAREN FBlock
+Rule 5     Declaration -> Primitive Identifier List SEMI
+Rule 6     Declaration -> empty
+Rule 7     List -> Array
+Rule 8     List -> empty
+Rule 9     Array -> LBRACKET INTEGER RBRACKET Matrix
+Rule 10    Matrix -> LBRACKET INTEGER RBRACKET
+Rule 11    Matrix -> empty
+Rule 12    Function -> VOID Identifier LPAREN ParamList RPAREN FBlock
+Rule 13    RFunction -> Primitive Identifier LPAREN ParamList RPAREN RFBlock
+Rule 14    Block -> LBRACE Instruction RBRACE
+Rule 15    FBlock -> LBRACE Declaration Instruction RBRACE
+Rule 16    RFBlock -> LBRACE Declaration Instruction RETURN SuperExpr SEMI RBRACE
+Rule 17    Loop -> LOOP LPAREN SuperExpr RPAREN Block
+Rule 18    Conditional -> IF LPAREN SuperExpr RPAREN Block Else
+Rule 19    Else -> ELSE Block
+Rule 20    Else -> empty
+Rule 21    SuperExpr -> Expression LogicalOp
+Rule 22    LogicalOp -> OR SuperExpr
+Rule 23    LogicalOp -> AND SuperExpr
+Rule 24    LogicalOp -> empty
+Rule 25    Expression -> Expr Comparison
+Rule 26    Comparison -> GREATHAN Expr
+Rule 27    Comparison -> LESSTHAN Expr
+Rule 28    Comparison -> DIFFERENT Expr
+Rule 29    Comparison -> TWOEQUAL Expr
+Rule 30    Comparison -> GREATEQUAL Expr
+Rule 31    Comparison -> LESSEQUAL Expr
+Rule 32    Comparison -> empty
+Rule 33    Expr -> Term Op1
+Rule 34    Op1 -> PLUS Expr
+Rule 35    Op1 -> MINUS Expr
+Rule 36    Op1 -> empty
+Rule 37    Term -> Factor Op2
+Rule 38    Op2 -> TIMES Term
+Rule 39    Op2 -> DIVIDE Term
+Rule 40    Op2 -> empty
+Rule 41    Factor -> LPAREN SuperExpr RPAREN
+Rule 42    Factor -> Op3 Constant
+Rule 43    Op3 -> PLUS
+Rule 44    Op3 -> MINUS
+Rule 45    Op3 -> empty
+Rule 46    Instruction -> Loop SEMI
+Rule 47    Instruction -> Assign SEMI
+Rule 48    Instruction -> Call SEMI
+Rule 49    Instruction -> Brush SEMI
+Rule 50    Instruction -> Read SEMI
+Rule 51    Instruction -> Print SEMI
+Rule 52    Instruction -> PenDown SEMI
+Rule 53    Instruction -> PenUp SEMI
+Rule 54    Instruction -> Home SEMI
+Rule 55    Instruction -> Forward SEMI
+Rule 56    Instruction -> Rotate SEMI
+Rule 57    Instruction -> Color SEMI
+Rule 58    Instruction -> Circle SEMI
+Rule 59    Instruction -> Arc SEMI
+Rule 60    Instruction -> Square SEMI
+Rule 61    Assign -> Identifier EQUAL Assignation
+Rule 62    Assignation -> SuperExpr
+Rule 63    Assignation -> STRING
+Rule 64    Assignation -> Call
+Rule 65    Call -> Identifier LPAREN Parameters RPAREN
+Rule 66    Read -> READ LPAREN Type COMMA Identifier RPAREN
+Rule 67    Type -> Primitive
+Rule 68    Type -> STRING
+Rule 69    Print -> PRINT LPAREN Parameters RPAREN
+Rule 70    Parameters -> Params
+Rule 71    Parameters -> empty
+Rule 72    Params -> SuperExpr Params1
+Rule 73    Params -> STRING Params1
+Rule 74    Params1 -> COMMA Params
+Rule 75    Params1 -> empty
+Rule 76    Brush -> BRUSH LPAREN Color COMMA SuperExpr RPAREN
+Rule 77    Color -> COLOR LPAREN SuperExpr COMMA SuperExpr COMMA SuperExpr RPAREN
+Rule 78    PenDown -> PD LPAREN RPAREN
+Rule 79    PenUp -> PU LPAREN RPAREN
+Rule 80    Home -> HOME LPAREN RPAREN
+Rule 81    Forward -> FD LPAREN SuperExpr RPAREN
+Rule 82    Rotate -> RT LPAREN SuperExpr RPAREN
+Rule 83    Circle -> CIRCLE LPAREN SuperExpr RPAREN
+Rule 84    Arc -> ARC LPAREN SuperExpr COMMA SuperExpr RPAREN
+Rule 85    Square -> SQUARE LPAREN SuperExpr RPAREN
+Rule 86    ParamList -> Param ParamList1
+Rule 87    ParamList1 -> COMMA ParamList
+Rule 88    ParamList1 -> empty
+Rule 89    Param -> Primitive ListP Identifier
+Rule 90    ListP -> ArrayP ArrayP
+Rule 91    ArrayP -> LBRACE RBRACE
+Rule 92    ArrayP -> empty
+Rule 93    Primitive -> INT
+Rule 94    Primitive -> FLOAT
+Rule 95    Primitive -> BOOL
+Rule 96    Primitive -> CHAR
+Rule 97    Identifier -> ID
+Rule 98    Constant -> INTEGER
+Rule 99    Constant -> FLOAT
+Rule 100   Constant -> Identifier
+Rule 101   empty -> <empty>
 
 Terminals, with rules where they appear
 
-COLON                : 4 5
-COMMA                : 8 23
-DIVIDE               : 43
-ELSE                 : 25
-EQUAL                : 18
-FCONST               : 47
-FLOAT                : 11
-GREATER              : 28
-ICONST               : 46
-ID                   : 1 7 18 45
-IF                   : 19
-INT                  : 10
-LBRACE               : 12
-LESS                 : 29
-LPAREN               : 19 20 37
-MINUS                : 34 40
-NOTEQUAL             : 30
-PERIOD               : 
-PLUS                 : 33 39
-PRINT                : 20
-PROGRAM              : 1
-RBRACE               : 12
-RPAREN               : 19 20 37
-SCONST               : 22
-SEMI                 : 1 4 5 18 19 20
-TIMES                : 42
-VAR                  : 4
+AND                  : 23
+ARC                  : 84
+BOOL                 : 95
+BRUSH                : 76
+CHAR                 : 96
+CIRCLE               : 83
+COLOR                : 77
+COMMA                : 66 74 76 77 77 84 87
+DIFFERENT            : 28
+DIVIDE               : 39
+ELSE                 : 19
+EQUAL                : 61
+FALSE                : 
+FD                   : 81
+FLOAT                : 94 99
+GREATEQUAL           : 30
+GREATHAN             : 26
+HOME                 : 80
+ID                   : 97
+IF                   : 18
+INT                  : 93
+INTEGER              : 9 10 98
+LBRACE               : 14 15 16 91
+LBRACKET             : 9 10
+LESSEQUAL            : 31
+LESSTHAN             : 27
+LOOP                 : 17
+LPAREN               : 4 12 13 17 18 41 65 66 69 76 77 78 79 80 81 82 83 84 85
+MAIN                 : 4
+MINUS                : 35 44
+OR                   : 22
+PD                   : 78
+PLUS                 : 34 43
+PRINT                : 69
+PU                   : 79
+RBRACE               : 14 15 16 91
+RBRACKET             : 9 10
+READ                 : 66
+RETURN               : 16
+RPAREN               : 4 12 13 17 18 41 65 66 69 76 77 78 79 80 81 82 83 84 85
+RT                   : 82
+SEMI                 : 5 16 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60
+SQUARE               : 85
+STRING               : 63 68 73
+TIMES                : 38
+TRUE                 : 
+TWOEQUAL             : 29
+VOID                 : 12
 error                : 
 
 Nonterminals, with rules where they appear
 
-assign               : 15
-block                : 1 19 25
-block1               : 12
-cond                 : 16
-cond1                : 19
-const                : 38
-empty                : 3 6 9 14 24 26 31 35 41 44
-exp                  : 27 28 29 30 33 34
-exp1                 : 32
-expr                 : 18 19 21 37
-expr1                : 27
-factor               : 36
-factor1              : 38
-idlist               : 4 5 8
-idlist1              : 7
-instr                : 13
-main                 : 0
-term                 : 32 42 43
-term1                : 36
-type                 : 4 5
-varlist              : 2
-varlist1             : 4 5
-vars                 : 1
-write                : 17
-write1               : 20 23
-write2               : 21 22
+Arc                  : 59
+Array                : 7
+ArrayP               : 90 90
+Assign               : 47
+Assignation          : 61
+Block                : 17 18 19
+Brush                : 49
+Call                 : 48 64
+Circle               : 58
+Color                : 57 76
+Comparison           : 25
+Conditional          : 
+Constant             : 42
+Declaration          : 1 15 16
+Else                 : 18
+Expr                 : 25 26 27 28 29 30 31 34 35
+Expression           : 21
+FBlock               : 4 12
+Factor               : 37
+Forward              : 55
+Function             : 2
+FunctionTotal        : 1
+Home                 : 54
+Identifier           : 5 12 13 61 65 66 89 100
+Instruction          : 14 15 16
+List                 : 5
+ListP                : 89
+LogicalOp            : 21
+Loop                 : 46
+Main                 : 1
+Matrix               : 9
+Op1                  : 33
+Op2                  : 37
+Op3                  : 42
+Param                : 86
+ParamList            : 12 13 87
+ParamList1           : 86
+Parameters           : 65 69
+Params               : 70 74
+Params1              : 72 73
+PenDown              : 52
+PenUp                : 53
+Primitive            : 5 13 67 89
+Print                : 51
+Program              : 0
+RFBlock              : 13
+RFunction            : 3
+Read                 : 50
+Rotate               : 56
+Square               : 60
+SuperExpr            : 16 17 18 22 23 41 62 72 76 77 77 77 81 82 83 84 84 85
+Term                 : 33 38 39
+Type                 : 66
+empty                : 6 8 11 20 24 32 36 40 45 71 75 88 92
 
 Parsing method: LALR
 
 state 0
 
-    (0) S' -> . main
-    (1) main -> . PROGRAM ID SEMI vars block
+    (0) S' -> . Program
+    (1) Program -> . Declaration FunctionTotal Main
+    (5) Declaration -> . Primitive Identifier List SEMI
+    (6) Declaration -> . empty
+    (93) Primitive -> . INT
+    (94) Primitive -> . FLOAT
+    (95) Primitive -> . BOOL
+    (96) Primitive -> . CHAR
+    (101) empty -> .
 
-    PROGRAM         shift and go to state 1
+  ! shift/reduce conflict for INT resolved as shift
+  ! shift/reduce conflict for FLOAT resolved as shift
+  ! shift/reduce conflict for BOOL resolved as shift
+  ! shift/reduce conflict for CHAR resolved as shift
+    INT             shift and go to state 2
+    FLOAT           shift and go to state 3
+    BOOL            shift and go to state 6
+    CHAR            shift and go to state 4
+    VOID            reduce using rule 101 (empty -> .)
 
-    main                           shift and go to state 2
+  ! INT             [ reduce using rule 101 (empty -> .) ]
+  ! FLOAT           [ reduce using rule 101 (empty -> .) ]
+  ! BOOL            [ reduce using rule 101 (empty -> .) ]
+  ! CHAR            [ reduce using rule 101 (empty -> .) ]
+
+    Primitive                      shift and go to state 1
+    Program                        shift and go to state 5
+    Declaration                    shift and go to state 7
+    empty                          shift and go to state 8
 
 state 1
 
-    (1) main -> PROGRAM . ID SEMI vars block
+    (5) Declaration -> Primitive . Identifier List SEMI
+    (97) Identifier -> . ID
 
-    ID              shift and go to state 3
+    ID              shift and go to state 10
 
+    Identifier                     shift and go to state 9
 
 state 2
 
-    (0) S' -> main .
+    (93) Primitive -> INT .
 
+    COMMA           reduce using rule 93 (Primitive -> INT .)
+    LBRACE          reduce using rule 93 (Primitive -> INT .)
+    ID              reduce using rule 93 (Primitive -> INT .)
 
 
 state 3
 
-    (1) main -> PROGRAM ID . SEMI vars block
+    (94) Primitive -> FLOAT .
 
-    SEMI            shift and go to state 4
+    COMMA           reduce using rule 94 (Primitive -> FLOAT .)
+    LBRACE          reduce using rule 94 (Primitive -> FLOAT .)
+    ID              reduce using rule 94 (Primitive -> FLOAT .)
 
 
 state 4
 
-    (1) main -> PROGRAM ID SEMI . vars block
-    (2) vars -> . varlist
-    (3) vars -> . empty
-    (4) varlist -> . VAR idlist COLON type SEMI varlist1
-    (48) empty -> .
+    (96) Primitive -> CHAR .
 
-    VAR             shift and go to state 8
-    LBRACE          reduce using rule 48 (empty -> .)
+    COMMA           reduce using rule 96 (Primitive -> CHAR .)
+    LBRACE          reduce using rule 96 (Primitive -> CHAR .)
+    ID              reduce using rule 96 (Primitive -> CHAR .)
 
-    vars                           shift and go to state 5
-    varlist                        shift and go to state 6
-    empty                          shift and go to state 7
 
 state 5
 
-    (1) main -> PROGRAM ID SEMI vars . block
-    (12) block -> . LBRACE block1 RBRACE
+    (0) S' -> Program .
 
-    LBRACE          shift and go to state 9
 
-    block                          shift and go to state 10
 
 state 6
 
-    (2) vars -> varlist .
+    (95) Primitive -> BOOL .
 
-    LBRACE          reduce using rule 2 (vars -> varlist .)
+    COMMA           reduce using rule 95 (Primitive -> BOOL .)
+    LBRACE          reduce using rule 95 (Primitive -> BOOL .)
+    ID              reduce using rule 95 (Primitive -> BOOL .)
 
 
 state 7
 
-    (3) vars -> empty .
+    (1) Program -> Declaration . FunctionTotal Main
+    (2) FunctionTotal -> . Function
+    (3) FunctionTotal -> . RFunction
+    (12) Function -> . VOID Identifier LPAREN ParamList RPAREN FBlock
+    (13) RFunction -> . Primitive Identifier LPAREN ParamList RPAREN RFBlock
+    (93) Primitive -> . INT
+    (94) Primitive -> . FLOAT
+    (95) Primitive -> . BOOL
+    (96) Primitive -> . CHAR
 
-    LBRACE          reduce using rule 3 (vars -> empty .)
+    VOID            shift and go to state 13
+    INT             shift and go to state 2
+    FLOAT           shift and go to state 3
+    BOOL            shift and go to state 6
+    CHAR            shift and go to state 4
 
+    Function                       shift and go to state 11
+    Primitive                      shift and go to state 12
+    FunctionTotal                  shift and go to state 15
+    RFunction                      shift and go to state 14
 
 state 8
 
-    (4) varlist -> VAR . idlist COLON type SEMI varlist1
-    (7) idlist -> . ID idlist1
+    (6) Declaration -> empty .
 
-    ID              shift and go to state 12
+    LOOP            reduce using rule 6 (Declaration -> empty .)
+    BRUSH           reduce using rule 6 (Declaration -> empty .)
+    READ            reduce using rule 6 (Declaration -> empty .)
+    PRINT           reduce using rule 6 (Declaration -> empty .)
+    PD              reduce using rule 6 (Declaration -> empty .)
+    PU              reduce using rule 6 (Declaration -> empty .)
+    HOME            reduce using rule 6 (Declaration -> empty .)
+    FD              reduce using rule 6 (Declaration -> empty .)
+    RT              reduce using rule 6 (Declaration -> empty .)
+    COLOR           reduce using rule 6 (Declaration -> empty .)
+    CIRCLE          reduce using rule 6 (Declaration -> empty .)
+    ARC             reduce using rule 6 (Declaration -> empty .)
+    SQUARE          reduce using rule 6 (Declaration -> empty .)
+    ID              reduce using rule 6 (Declaration -> empty .)
+    VOID            reduce using rule 6 (Declaration -> empty .)
+    INT             reduce using rule 6 (Declaration -> empty .)
+    FLOAT           reduce using rule 6 (Declaration -> empty .)
+    BOOL            reduce using rule 6 (Declaration -> empty .)
+    CHAR            reduce using rule 6 (Declaration -> empty .)
 
-    idlist                         shift and go to state 11
 
 state 9
 
-    (12) block -> LBRACE . block1 RBRACE
-    (13) block1 -> . instr
-    (14) block1 -> . empty
-    (15) instr -> . assign
-    (16) instr -> . cond
-    (17) instr -> . write
-    (48) empty -> .
-    (18) assign -> . ID EQUAL expr SEMI
-    (19) cond -> . IF LPAREN expr RPAREN block cond1 SEMI
-    (20) write -> . PRINT LPAREN write1 RPAREN SEMI
+    (5) Declaration -> Primitive Identifier . List SEMI
+    (7) List -> . Array
+    (8) List -> . empty
+    (9) Array -> . LBRACKET INTEGER RBRACKET Matrix
+    (101) empty -> .
 
-    RBRACE          reduce using rule 48 (empty -> .)
-    ID              shift and go to state 15
-    IF              shift and go to state 21
-    PRINT           shift and go to state 18
+    LBRACKET        shift and go to state 17
+    SEMI            reduce using rule 101 (empty -> .)
 
-    block1                         shift and go to state 13
-    instr                          shift and go to state 14
-    write                          shift and go to state 16
-    cond                           shift and go to state 17
-    assign                         shift and go to state 19
-    empty                          shift and go to state 20
+    List                           shift and go to state 16
+    Array                          shift and go to state 18
+    empty                          shift and go to state 19
 
 state 10
 
-    (1) main -> PROGRAM ID SEMI vars block .
+    (97) Identifier -> ID .
 
-    $end            reduce using rule 1 (main -> PROGRAM ID SEMI vars block .)
+    EQUAL           reduce using rule 97 (Identifier -> ID .)
+    LPAREN          reduce using rule 97 (Identifier -> ID .)
+    LBRACKET        reduce using rule 97 (Identifier -> ID .)
+    SEMI            reduce using rule 97 (Identifier -> ID .)
+    TIMES           reduce using rule 97 (Identifier -> ID .)
+    DIVIDE          reduce using rule 97 (Identifier -> ID .)
+    PLUS            reduce using rule 97 (Identifier -> ID .)
+    MINUS           reduce using rule 97 (Identifier -> ID .)
+    GREATHAN        reduce using rule 97 (Identifier -> ID .)
+    LESSTHAN        reduce using rule 97 (Identifier -> ID .)
+    DIFFERENT       reduce using rule 97 (Identifier -> ID .)
+    TWOEQUAL        reduce using rule 97 (Identifier -> ID .)
+    GREATEQUAL      reduce using rule 97 (Identifier -> ID .)
+    LESSEQUAL       reduce using rule 97 (Identifier -> ID .)
+    OR              reduce using rule 97 (Identifier -> ID .)
+    AND             reduce using rule 97 (Identifier -> ID .)
+    COMMA           reduce using rule 97 (Identifier -> ID .)
+    RPAREN          reduce using rule 97 (Identifier -> ID .)
 
 
 state 11
 
-    (4) varlist -> VAR idlist . COLON type SEMI varlist1
+    (2) FunctionTotal -> Function .
 
-    COLON           shift and go to state 22
+    MAIN            reduce using rule 2 (FunctionTotal -> Function .)
 
 
 state 12
 
-    (7) idlist -> ID . idlist1
-    (8) idlist1 -> . COMMA idlist
-    (9) idlist1 -> . empty
-    (48) empty -> .
+    (13) RFunction -> Primitive . Identifier LPAREN ParamList RPAREN RFBlock
+    (97) Identifier -> . ID
 
-    COMMA           shift and go to state 23
-    COLON           reduce using rule 48 (empty -> .)
+    ID              shift and go to state 10
 
-    empty                          shift and go to state 24
-    idlist1                        shift and go to state 25
+    Identifier                     shift and go to state 20
 
 state 13
 
-    (12) block -> LBRACE block1 . RBRACE
+    (12) Function -> VOID . Identifier LPAREN ParamList RPAREN FBlock
+    (97) Identifier -> . ID
 
-    RBRACE          shift and go to state 26
+    ID              shift and go to state 10
 
+    Identifier                     shift and go to state 21
 
 state 14
 
-    (13) block1 -> instr .
+    (3) FunctionTotal -> RFunction .
 
-    RBRACE          reduce using rule 13 (block1 -> instr .)
+    MAIN            reduce using rule 3 (FunctionTotal -> RFunction .)
 
 
 state 15
 
-    (18) assign -> ID . EQUAL expr SEMI
+    (1) Program -> Declaration FunctionTotal . Main
+    (4) Main -> . MAIN LPAREN RPAREN FBlock
 
-    EQUAL           shift and go to state 27
+    MAIN            shift and go to state 23
 
+    Main                           shift and go to state 22
 
 state 16
 
-    (17) instr -> write .
+    (5) Declaration -> Primitive Identifier List . SEMI
 
-    RBRACE          reduce using rule 17 (instr -> write .)
+    SEMI            shift and go to state 24
 
 
 state 17
 
-    (16) instr -> cond .
+    (9) Array -> LBRACKET . INTEGER RBRACKET Matrix
 
-    RBRACE          reduce using rule 16 (instr -> cond .)
+    INTEGER         shift and go to state 25
 
 
 state 18
 
-    (20) write -> PRINT . LPAREN write1 RPAREN SEMI
+    (7) List -> Array .
 
-    LPAREN          shift and go to state 28
+    SEMI            reduce using rule 7 (List -> Array .)
 
 
 state 19
 
-    (15) instr -> assign .
+    (8) List -> empty .
 
-    RBRACE          reduce using rule 15 (instr -> assign .)
+    SEMI            reduce using rule 8 (List -> empty .)
 
 
 state 20
 
-    (14) block1 -> empty .
+    (13) RFunction -> Primitive Identifier . LPAREN ParamList RPAREN RFBlock
 
-    RBRACE          reduce using rule 14 (block1 -> empty .)
+    LPAREN          shift and go to state 26
 
 
 state 21
 
-    (19) cond -> IF . LPAREN expr RPAREN block cond1 SEMI
+    (12) Function -> VOID Identifier . LPAREN ParamList RPAREN FBlock
 
-    LPAREN          shift and go to state 29
+    LPAREN          shift and go to state 27
 
 
 state 22
 
-    (4) varlist -> VAR idlist COLON . type SEMI varlist1
-    (10) type -> . INT
-    (11) type -> . FLOAT
+    (1) Program -> Declaration FunctionTotal Main .
 
-    INT             shift and go to state 30
-    FLOAT           shift and go to state 31
+    $end            reduce using rule 1 (Program -> Declaration FunctionTotal Main .)
 
-    type                           shift and go to state 32
 
 state 23
 
-    (8) idlist1 -> COMMA . idlist
-    (7) idlist -> . ID idlist1
+    (4) Main -> MAIN . LPAREN RPAREN FBlock
 
-    ID              shift and go to state 12
+    LPAREN          shift and go to state 28
 
-    idlist                         shift and go to state 33
 
 state 24
 
-    (9) idlist1 -> empty .
+    (5) Declaration -> Primitive Identifier List SEMI .
 
-    COLON           reduce using rule 9 (idlist1 -> empty .)
+    LOOP            reduce using rule 5 (Declaration -> Primitive Identifier List SEMI .)
+    BRUSH           reduce using rule 5 (Declaration -> Primitive Identifier List SEMI .)
+    READ            reduce using rule 5 (Declaration -> Primitive Identifier List SEMI .)
+    PRINT           reduce using rule 5 (Declaration -> Primitive Identifier List SEMI .)
+    PD              reduce using rule 5 (Declaration -> Primitive Identifier List SEMI .)
+    PU              reduce using rule 5 (Declaration -> Primitive Identifier List SEMI .)
+    HOME            reduce using rule 5 (Declaration -> Primitive Identifier List SEMI .)
+    FD              reduce using rule 5 (Declaration -> Primitive Identifier List SEMI .)
+    RT              reduce using rule 5 (Declaration -> Primitive Identifier List SEMI .)
+    COLOR           reduce using rule 5 (Declaration -> Primitive Identifier List SEMI .)
+    CIRCLE          reduce using rule 5 (Declaration -> Primitive Identifier List SEMI .)
+    ARC             reduce using rule 5 (Declaration -> Primitive Identifier List SEMI .)
+    SQUARE          reduce using rule 5 (Declaration -> Primitive Identifier List SEMI .)
+    ID              reduce using rule 5 (Declaration -> Primitive Identifier List SEMI .)
+    VOID            reduce using rule 5 (Declaration -> Primitive Identifier List SEMI .)
+    INT             reduce using rule 5 (Declaration -> Primitive Identifier List SEMI .)
+    FLOAT           reduce using rule 5 (Declaration -> Primitive Identifier List SEMI .)
+    BOOL            reduce using rule 5 (Declaration -> Primitive Identifier List SEMI .)
+    CHAR            reduce using rule 5 (Declaration -> Primitive Identifier List SEMI .)
 
 
 state 25
 
-    (7) idlist -> ID idlist1 .
+    (9) Array -> LBRACKET INTEGER . RBRACKET Matrix
 
-    COLON           reduce using rule 7 (idlist -> ID idlist1 .)
+    RBRACKET        shift and go to state 29
 
 
 state 26
 
-    (12) block -> LBRACE block1 RBRACE .
+    (13) RFunction -> Primitive Identifier LPAREN . ParamList RPAREN RFBlock
+    (86) ParamList -> . Param ParamList1
+    (89) Param -> . Primitive ListP Identifier
+    (93) Primitive -> . INT
+    (94) Primitive -> . FLOAT
+    (95) Primitive -> . BOOL
+    (96) Primitive -> . CHAR
 
-    SEMI            reduce using rule 12 (block -> LBRACE block1 RBRACE .)
-    ELSE            reduce using rule 12 (block -> LBRACE block1 RBRACE .)
-    $end            reduce using rule 12 (block -> LBRACE block1 RBRACE .)
+    INT             shift and go to state 2
+    FLOAT           shift and go to state 3
+    BOOL            shift and go to state 6
+    CHAR            shift and go to state 4
 
+    Primitive                      shift and go to state 30
+    Param                          shift and go to state 31
+    ParamList                      shift and go to state 32
 
 state 27
 
-    (18) assign -> ID EQUAL . expr SEMI
-    (27) expr -> . exp expr1
-    (32) exp -> . term exp1
-    (36) term -> . factor term1
-    (37) factor -> . LPAREN expr RPAREN
-    (38) factor -> . factor1 const
-    (39) factor1 -> . PLUS
-    (40) factor1 -> . MINUS
-    (41) factor1 -> . empty
-    (48) empty -> .
+    (12) Function -> VOID Identifier LPAREN . ParamList RPAREN FBlock
+    (86) ParamList -> . Param ParamList1
+    (89) Param -> . Primitive ListP Identifier
+    (93) Primitive -> . INT
+    (94) Primitive -> . FLOAT
+    (95) Primitive -> . BOOL
+    (96) Primitive -> . CHAR
 
-    LPAREN          shift and go to state 40
-    PLUS            shift and go to state 37
-    MINUS           shift and go to state 36
-    ID              reduce using rule 48 (empty -> .)
-    ICONST          reduce using rule 48 (empty -> .)
-    FCONST          reduce using rule 48 (empty -> .)
+    INT             shift and go to state 2
+    FLOAT           shift and go to state 3
+    BOOL            shift and go to state 6
+    CHAR            shift and go to state 4
 
-    term                           shift and go to state 34
-    factor1                        shift and go to state 42
-    expr                           shift and go to state 35
-    exp                            shift and go to state 38
-    factor                         shift and go to state 39
-    empty                          shift and go to state 41
+    Primitive                      shift and go to state 30
+    Param                          shift and go to state 31
+    ParamList                      shift and go to state 33
 
 state 28
 
-    (20) write -> PRINT LPAREN . write1 RPAREN SEMI
-    (21) write1 -> . expr write2
-    (22) write1 -> . SCONST write2
-    (27) expr -> . exp expr1
-    (32) exp -> . term exp1
-    (36) term -> . factor term1
-    (37) factor -> . LPAREN expr RPAREN
-    (38) factor -> . factor1 const
-    (39) factor1 -> . PLUS
-    (40) factor1 -> . MINUS
-    (41) factor1 -> . empty
-    (48) empty -> .
+    (4) Main -> MAIN LPAREN . RPAREN FBlock
 
-    SCONST          shift and go to state 45
-    LPAREN          shift and go to state 40
-    PLUS            shift and go to state 37
-    MINUS           shift and go to state 36
-    ID              reduce using rule 48 (empty -> .)
-    ICONST          reduce using rule 48 (empty -> .)
-    FCONST          reduce using rule 48 (empty -> .)
+    RPAREN          shift and go to state 34
 
-    term                           shift and go to state 34
-    factor1                        shift and go to state 42
-    write1                         shift and go to state 43
-    expr                           shift and go to state 44
-    exp                            shift and go to state 38
-    factor                         shift and go to state 39
-    empty                          shift and go to state 41
 
 state 29
 
-    (19) cond -> IF LPAREN . expr RPAREN block cond1 SEMI
-    (27) expr -> . exp expr1
-    (32) exp -> . term exp1
-    (36) term -> . factor term1
-    (37) factor -> . LPAREN expr RPAREN
-    (38) factor -> . factor1 const
-    (39) factor1 -> . PLUS
-    (40) factor1 -> . MINUS
-    (41) factor1 -> . empty
-    (48) empty -> .
+    (9) Array -> LBRACKET INTEGER RBRACKET . Matrix
+    (10) Matrix -> . LBRACKET INTEGER RBRACKET
+    (11) Matrix -> . empty
+    (101) empty -> .
 
-    LPAREN          shift and go to state 40
-    PLUS            shift and go to state 37
-    MINUS           shift and go to state 36
-    ID              reduce using rule 48 (empty -> .)
-    ICONST          reduce using rule 48 (empty -> .)
-    FCONST          reduce using rule 48 (empty -> .)
+    LBRACKET        shift and go to state 35
+    SEMI            reduce using rule 101 (empty -> .)
 
-    term                           shift and go to state 34
-    factor1                        shift and go to state 42
-    expr                           shift and go to state 46
-    empty                          shift and go to state 41
-    exp                            shift and go to state 38
-    factor                         shift and go to state 39
+    Matrix                         shift and go to state 36
+    empty                          shift and go to state 37
 
 state 30
 
-    (10) type -> INT .
+    (89) Param -> Primitive . ListP Identifier
+    (90) ListP -> . ArrayP ArrayP
+    (91) ArrayP -> . LBRACE RBRACE
+    (92) ArrayP -> . empty
+    (101) empty -> .
 
-    SEMI            reduce using rule 10 (type -> INT .)
+  ! shift/reduce conflict for LBRACE resolved as shift
+    LBRACE          shift and go to state 38
+    ID              reduce using rule 101 (empty -> .)
 
+  ! LBRACE          [ reduce using rule 101 (empty -> .) ]
+
+    ListP                          shift and go to state 40
+    empty                          shift and go to state 41
+    ArrayP                         shift and go to state 39
 
 state 31
 
-    (11) type -> FLOAT .
+    (86) ParamList -> Param . ParamList1
+    (87) ParamList1 -> . COMMA ParamList
+    (88) ParamList1 -> . empty
+    (101) empty -> .
 
-    SEMI            reduce using rule 11 (type -> FLOAT .)
+    COMMA           shift and go to state 43
+    RPAREN          reduce using rule 101 (empty -> .)
 
+    empty                          shift and go to state 42
+    ParamList1                     shift and go to state 44
 
 state 32
 
-    (4) varlist -> VAR idlist COLON type . SEMI varlist1
+    (13) RFunction -> Primitive Identifier LPAREN ParamList . RPAREN RFBlock
 
-    SEMI            shift and go to state 47
+    RPAREN          shift and go to state 45
 
 
 state 33
 
-    (8) idlist1 -> COMMA idlist .
+    (12) Function -> VOID Identifier LPAREN ParamList . RPAREN FBlock
 
-    COLON           reduce using rule 8 (idlist1 -> COMMA idlist .)
+    RPAREN          shift and go to state 46
 
 
 state 34
 
-    (32) exp -> term . exp1
-    (33) exp1 -> . PLUS exp
-    (34) exp1 -> . MINUS exp
-    (35) exp1 -> . empty
-    (48) empty -> .
+    (4) Main -> MAIN LPAREN RPAREN . FBlock
+    (15) FBlock -> . LBRACE Declaration Instruction RBRACE
 
-    PLUS            shift and go to state 49
-    MINUS           shift and go to state 50
-    GREATER         reduce using rule 48 (empty -> .)
-    LESS            reduce using rule 48 (empty -> .)
-    NOTEQUAL        reduce using rule 48 (empty -> .)
-    SEMI            reduce using rule 48 (empty -> .)
-    COMMA           reduce using rule 48 (empty -> .)
-    RPAREN          reduce using rule 48 (empty -> .)
+    LBRACE          shift and go to state 47
 
-    empty                          shift and go to state 51
-    exp1                           shift and go to state 48
+    FBlock                         shift and go to state 48
 
 state 35
 
-    (18) assign -> ID EQUAL expr . SEMI
+    (10) Matrix -> LBRACKET . INTEGER RBRACKET
 
-    SEMI            shift and go to state 52
+    INTEGER         shift and go to state 49
 
 
 state 36
 
-    (40) factor1 -> MINUS .
+    (9) Array -> LBRACKET INTEGER RBRACKET Matrix .
 
-    ID              reduce using rule 40 (factor1 -> MINUS .)
-    ICONST          reduce using rule 40 (factor1 -> MINUS .)
-    FCONST          reduce using rule 40 (factor1 -> MINUS .)
+    SEMI            reduce using rule 9 (Array -> LBRACKET INTEGER RBRACKET Matrix .)
 
 
 state 37
 
-    (39) factor1 -> PLUS .
+    (11) Matrix -> empty .
 
-    ID              reduce using rule 39 (factor1 -> PLUS .)
-    ICONST          reduce using rule 39 (factor1 -> PLUS .)
-    FCONST          reduce using rule 39 (factor1 -> PLUS .)
+    SEMI            reduce using rule 11 (Matrix -> empty .)
 
 
 state 38
 
-    (27) expr -> exp . expr1
-    (28) expr1 -> . GREATER exp
-    (29) expr1 -> . LESS exp
-    (30) expr1 -> . NOTEQUAL exp
-    (31) expr1 -> . empty
-    (48) empty -> .
+    (91) ArrayP -> LBRACE . RBRACE
 
-    GREATER         shift and go to state 54
-    LESS            shift and go to state 55
-    NOTEQUAL        shift and go to state 53
-    SEMI            reduce using rule 48 (empty -> .)
-    COMMA           reduce using rule 48 (empty -> .)
-    RPAREN          reduce using rule 48 (empty -> .)
+    RBRACE          shift and go to state 50
 
-    expr1                          shift and go to state 56
-    empty                          shift and go to state 57
 
 state 39
 
-    (36) term -> factor . term1
-    (42) term1 -> . TIMES term
-    (43) term1 -> . DIVIDE term
-    (44) term1 -> . empty
-    (48) empty -> .
+    (90) ListP -> ArrayP . ArrayP
+    (91) ArrayP -> . LBRACE RBRACE
+    (92) ArrayP -> . empty
+    (101) empty -> .
 
-    TIMES           shift and go to state 60
-    DIVIDE          shift and go to state 58
-    PLUS            reduce using rule 48 (empty -> .)
-    MINUS           reduce using rule 48 (empty -> .)
-    GREATER         reduce using rule 48 (empty -> .)
-    LESS            reduce using rule 48 (empty -> .)
-    NOTEQUAL        reduce using rule 48 (empty -> .)
-    SEMI            reduce using rule 48 (empty -> .)
-    COMMA           reduce using rule 48 (empty -> .)
-    RPAREN          reduce using rule 48 (empty -> .)
+    LBRACE          shift and go to state 38
+    ID              reduce using rule 101 (empty -> .)
 
-    empty                          shift and go to state 61
-    term1                          shift and go to state 59
+    ArrayP                         shift and go to state 51
+    empty                          shift and go to state 41
 
 state 40
 
-    (37) factor -> LPAREN . expr RPAREN
-    (27) expr -> . exp expr1
-    (32) exp -> . term exp1
-    (36) term -> . factor term1
-    (37) factor -> . LPAREN expr RPAREN
-    (38) factor -> . factor1 const
-    (39) factor1 -> . PLUS
-    (40) factor1 -> . MINUS
-    (41) factor1 -> . empty
-    (48) empty -> .
+    (89) Param -> Primitive ListP . Identifier
+    (97) Identifier -> . ID
 
-    LPAREN          shift and go to state 40
-    PLUS            shift and go to state 37
-    MINUS           shift and go to state 36
-    ID              reduce using rule 48 (empty -> .)
-    ICONST          reduce using rule 48 (empty -> .)
-    FCONST          reduce using rule 48 (empty -> .)
+    ID              shift and go to state 10
 
-    term                           shift and go to state 34
-    factor1                        shift and go to state 42
-    expr                           shift and go to state 62
-    exp                            shift and go to state 38
-    factor                         shift and go to state 39
-    empty                          shift and go to state 41
+    Identifier                     shift and go to state 52
 
 state 41
 
-    (41) factor1 -> empty .
+    (92) ArrayP -> empty .
 
-    ID              reduce using rule 41 (factor1 -> empty .)
-    ICONST          reduce using rule 41 (factor1 -> empty .)
-    FCONST          reduce using rule 41 (factor1 -> empty .)
+    LBRACE          reduce using rule 92 (ArrayP -> empty .)
+    ID              reduce using rule 92 (ArrayP -> empty .)
 
 
 state 42
 
-    (38) factor -> factor1 . const
-    (45) const -> . ID
-    (46) const -> . ICONST
-    (47) const -> . FCONST
+    (88) ParamList1 -> empty .
 
-    ID              shift and go to state 66
-    ICONST          shift and go to state 63
-    FCONST          shift and go to state 64
+    RPAREN          reduce using rule 88 (ParamList1 -> empty .)
 
-    const                          shift and go to state 65
 
 state 43
 
-    (20) write -> PRINT LPAREN write1 . RPAREN SEMI
+    (87) ParamList1 -> COMMA . ParamList
+    (86) ParamList -> . Param ParamList1
+    (89) Param -> . Primitive ListP Identifier
+    (93) Primitive -> . INT
+    (94) Primitive -> . FLOAT
+    (95) Primitive -> . BOOL
+    (96) Primitive -> . CHAR
 
-    RPAREN          shift and go to state 67
+    INT             shift and go to state 2
+    FLOAT           shift and go to state 3
+    BOOL            shift and go to state 6
+    CHAR            shift and go to state 4
 
+    Primitive                      shift and go to state 30
+    Param                          shift and go to state 31
+    ParamList                      shift and go to state 53
 
 state 44
 
-    (21) write1 -> expr . write2
-    (23) write2 -> . COMMA write1
-    (24) write2 -> . empty
-    (48) empty -> .
+    (86) ParamList -> Param ParamList1 .
 
-    COMMA           shift and go to state 69
-    RPAREN          reduce using rule 48 (empty -> .)
+    RPAREN          reduce using rule 86 (ParamList -> Param ParamList1 .)
 
-    write2                         shift and go to state 68
-    empty                          shift and go to state 70
 
 state 45
 
-    (22) write1 -> SCONST . write2
-    (23) write2 -> . COMMA write1
-    (24) write2 -> . empty
-    (48) empty -> .
+    (13) RFunction -> Primitive Identifier LPAREN ParamList RPAREN . RFBlock
+    (16) RFBlock -> . LBRACE Declaration Instruction RETURN SuperExpr SEMI RBRACE
 
-    COMMA           shift and go to state 69
-    RPAREN          reduce using rule 48 (empty -> .)
+    LBRACE          shift and go to state 54
 
-    write2                         shift and go to state 71
-    empty                          shift and go to state 70
+    RFBlock                        shift and go to state 55
 
 state 46
 
-    (19) cond -> IF LPAREN expr . RPAREN block cond1 SEMI
+    (12) Function -> VOID Identifier LPAREN ParamList RPAREN . FBlock
+    (15) FBlock -> . LBRACE Declaration Instruction RBRACE
 
-    RPAREN          shift and go to state 72
+    LBRACE          shift and go to state 47
 
+    FBlock                         shift and go to state 56
 
 state 47
 
-    (4) varlist -> VAR idlist COLON type SEMI . varlist1
-    (5) varlist1 -> . idlist COLON type SEMI varlist1
-    (6) varlist1 -> . empty
-    (7) idlist -> . ID idlist1
-    (48) empty -> .
+    (15) FBlock -> LBRACE . Declaration Instruction RBRACE
+    (5) Declaration -> . Primitive Identifier List SEMI
+    (6) Declaration -> . empty
+    (93) Primitive -> . INT
+    (94) Primitive -> . FLOAT
+    (95) Primitive -> . BOOL
+    (96) Primitive -> . CHAR
+    (101) empty -> .
 
-    ID              shift and go to state 12
-    LBRACE          reduce using rule 48 (empty -> .)
+    INT             shift and go to state 2
+    FLOAT           shift and go to state 3
+    BOOL            shift and go to state 6
+    CHAR            shift and go to state 4
+    LOOP            reduce using rule 101 (empty -> .)
+    BRUSH           reduce using rule 101 (empty -> .)
+    READ            reduce using rule 101 (empty -> .)
+    PRINT           reduce using rule 101 (empty -> .)
+    PD              reduce using rule 101 (empty -> .)
+    PU              reduce using rule 101 (empty -> .)
+    HOME            reduce using rule 101 (empty -> .)
+    FD              reduce using rule 101 (empty -> .)
+    RT              reduce using rule 101 (empty -> .)
+    COLOR           reduce using rule 101 (empty -> .)
+    CIRCLE          reduce using rule 101 (empty -> .)
+    ARC             reduce using rule 101 (empty -> .)
+    SQUARE          reduce using rule 101 (empty -> .)
+    ID              reduce using rule 101 (empty -> .)
 
-    varlist1                       shift and go to state 74
-    idlist                         shift and go to state 73
-    empty                          shift and go to state 75
+    Primitive                      shift and go to state 1
+    Declaration                    shift and go to state 57
+    empty                          shift and go to state 8
 
 state 48
 
-    (32) exp -> term exp1 .
+    (4) Main -> MAIN LPAREN RPAREN FBlock .
 
-    GREATER         reduce using rule 32 (exp -> term exp1 .)
-    LESS            reduce using rule 32 (exp -> term exp1 .)
-    NOTEQUAL        reduce using rule 32 (exp -> term exp1 .)
-    SEMI            reduce using rule 32 (exp -> term exp1 .)
-    COMMA           reduce using rule 32 (exp -> term exp1 .)
-    RPAREN          reduce using rule 32 (exp -> term exp1 .)
+    $end            reduce using rule 4 (Main -> MAIN LPAREN RPAREN FBlock .)
 
 
 state 49
 
-    (33) exp1 -> PLUS . exp
-    (32) exp -> . term exp1
-    (36) term -> . factor term1
-    (37) factor -> . LPAREN expr RPAREN
-    (38) factor -> . factor1 const
-    (39) factor1 -> . PLUS
-    (40) factor1 -> . MINUS
-    (41) factor1 -> . empty
-    (48) empty -> .
+    (10) Matrix -> LBRACKET INTEGER . RBRACKET
 
-    LPAREN          shift and go to state 40
-    PLUS            shift and go to state 37
-    MINUS           shift and go to state 36
-    ID              reduce using rule 48 (empty -> .)
-    ICONST          reduce using rule 48 (empty -> .)
-    FCONST          reduce using rule 48 (empty -> .)
+    RBRACKET        shift and go to state 58
 
-    term                           shift and go to state 34
-    factor1                        shift and go to state 42
-    exp                            shift and go to state 76
-    factor                         shift and go to state 39
-    empty                          shift and go to state 41
 
 state 50
 
-    (34) exp1 -> MINUS . exp
-    (32) exp -> . term exp1
-    (36) term -> . factor term1
-    (37) factor -> . LPAREN expr RPAREN
-    (38) factor -> . factor1 const
-    (39) factor1 -> . PLUS
-    (40) factor1 -> . MINUS
-    (41) factor1 -> . empty
-    (48) empty -> .
+    (91) ArrayP -> LBRACE RBRACE .
 
-    LPAREN          shift and go to state 40
-    PLUS            shift and go to state 37
-    MINUS           shift and go to state 36
-    ID              reduce using rule 48 (empty -> .)
-    ICONST          reduce using rule 48 (empty -> .)
-    FCONST          reduce using rule 48 (empty -> .)
+    LBRACE          reduce using rule 91 (ArrayP -> LBRACE RBRACE .)
+    ID              reduce using rule 91 (ArrayP -> LBRACE RBRACE .)
 
-    term                           shift and go to state 34
-    factor1                        shift and go to state 42
-    exp                            shift and go to state 77
-    factor                         shift and go to state 39
-    empty                          shift and go to state 41
 
 state 51
 
-    (35) exp1 -> empty .
+    (90) ListP -> ArrayP ArrayP .
 
-    GREATER         reduce using rule 35 (exp1 -> empty .)
-    LESS            reduce using rule 35 (exp1 -> empty .)
-    NOTEQUAL        reduce using rule 35 (exp1 -> empty .)
-    SEMI            reduce using rule 35 (exp1 -> empty .)
-    COMMA           reduce using rule 35 (exp1 -> empty .)
-    RPAREN          reduce using rule 35 (exp1 -> empty .)
+    ID              reduce using rule 90 (ListP -> ArrayP ArrayP .)
 
 
 state 52
 
-    (18) assign -> ID EQUAL expr SEMI .
+    (89) Param -> Primitive ListP Identifier .
 
-    RBRACE          reduce using rule 18 (assign -> ID EQUAL expr SEMI .)
+    COMMA           reduce using rule 89 (Param -> Primitive ListP Identifier .)
+    RPAREN          reduce using rule 89 (Param -> Primitive ListP Identifier .)
 
 
 state 53
 
-    (30) expr1 -> NOTEQUAL . exp
-    (32) exp -> . term exp1
-    (36) term -> . factor term1
-    (37) factor -> . LPAREN expr RPAREN
-    (38) factor -> . factor1 const
-    (39) factor1 -> . PLUS
-    (40) factor1 -> . MINUS
-    (41) factor1 -> . empty
-    (48) empty -> .
+    (87) ParamList1 -> COMMA ParamList .
 
-    LPAREN          shift and go to state 40
-    PLUS            shift and go to state 37
-    MINUS           shift and go to state 36
-    ID              reduce using rule 48 (empty -> .)
-    ICONST          reduce using rule 48 (empty -> .)
-    FCONST          reduce using rule 48 (empty -> .)
+    RPAREN          reduce using rule 87 (ParamList1 -> COMMA ParamList .)
 
-    term                           shift and go to state 34
-    factor1                        shift and go to state 42
-    exp                            shift and go to state 78
-    factor                         shift and go to state 39
-    empty                          shift and go to state 41
 
 state 54
 
-    (28) expr1 -> GREATER . exp
-    (32) exp -> . term exp1
-    (36) term -> . factor term1
-    (37) factor -> . LPAREN expr RPAREN
-    (38) factor -> . factor1 const
-    (39) factor1 -> . PLUS
-    (40) factor1 -> . MINUS
-    (41) factor1 -> . empty
-    (48) empty -> .
+    (16) RFBlock -> LBRACE . Declaration Instruction RETURN SuperExpr SEMI RBRACE
+    (5) Declaration -> . Primitive Identifier List SEMI
+    (6) Declaration -> . empty
+    (93) Primitive -> . INT
+    (94) Primitive -> . FLOAT
+    (95) Primitive -> . BOOL
+    (96) Primitive -> . CHAR
+    (101) empty -> .
 
-    LPAREN          shift and go to state 40
-    PLUS            shift and go to state 37
-    MINUS           shift and go to state 36
-    ID              reduce using rule 48 (empty -> .)
-    ICONST          reduce using rule 48 (empty -> .)
-    FCONST          reduce using rule 48 (empty -> .)
+    INT             shift and go to state 2
+    FLOAT           shift and go to state 3
+    BOOL            shift and go to state 6
+    CHAR            shift and go to state 4
+    LOOP            reduce using rule 101 (empty -> .)
+    BRUSH           reduce using rule 101 (empty -> .)
+    READ            reduce using rule 101 (empty -> .)
+    PRINT           reduce using rule 101 (empty -> .)
+    PD              reduce using rule 101 (empty -> .)
+    PU              reduce using rule 101 (empty -> .)
+    HOME            reduce using rule 101 (empty -> .)
+    FD              reduce using rule 101 (empty -> .)
+    RT              reduce using rule 101 (empty -> .)
+    COLOR           reduce using rule 101 (empty -> .)
+    CIRCLE          reduce using rule 101 (empty -> .)
+    ARC             reduce using rule 101 (empty -> .)
+    SQUARE          reduce using rule 101 (empty -> .)
+    ID              reduce using rule 101 (empty -> .)
 
-    term                           shift and go to state 34
-    factor1                        shift and go to state 42
-    exp                            shift and go to state 79
-    factor                         shift and go to state 39
-    empty                          shift and go to state 41
+    Primitive                      shift and go to state 1
+    Declaration                    shift and go to state 59
+    empty                          shift and go to state 8
 
 state 55
 
-    (29) expr1 -> LESS . exp
-    (32) exp -> . term exp1
-    (36) term -> . factor term1
-    (37) factor -> . LPAREN expr RPAREN
-    (38) factor -> . factor1 const
-    (39) factor1 -> . PLUS
-    (40) factor1 -> . MINUS
-    (41) factor1 -> . empty
-    (48) empty -> .
+    (13) RFunction -> Primitive Identifier LPAREN ParamList RPAREN RFBlock .
 
-    LPAREN          shift and go to state 40
-    PLUS            shift and go to state 37
-    MINUS           shift and go to state 36
-    ID              reduce using rule 48 (empty -> .)
-    ICONST          reduce using rule 48 (empty -> .)
-    FCONST          reduce using rule 48 (empty -> .)
+    MAIN            reduce using rule 13 (RFunction -> Primitive Identifier LPAREN ParamList RPAREN RFBlock .)
 
-    term                           shift and go to state 34
-    factor1                        shift and go to state 42
-    exp                            shift and go to state 80
-    factor                         shift and go to state 39
-    empty                          shift and go to state 41
 
 state 56
 
-    (27) expr -> exp expr1 .
+    (12) Function -> VOID Identifier LPAREN ParamList RPAREN FBlock .
 
-    COMMA           reduce using rule 27 (expr -> exp expr1 .)
-    RPAREN          reduce using rule 27 (expr -> exp expr1 .)
-    SEMI            reduce using rule 27 (expr -> exp expr1 .)
+    MAIN            reduce using rule 12 (Function -> VOID Identifier LPAREN ParamList RPAREN FBlock .)
 
 
 state 57
 
-    (31) expr1 -> empty .
+    (15) FBlock -> LBRACE Declaration . Instruction RBRACE
+    (46) Instruction -> . Loop SEMI
+    (47) Instruction -> . Assign SEMI
+    (48) Instruction -> . Call SEMI
+    (49) Instruction -> . Brush SEMI
+    (50) Instruction -> . Read SEMI
+    (51) Instruction -> . Print SEMI
+    (52) Instruction -> . PenDown SEMI
+    (53) Instruction -> . PenUp SEMI
+    (54) Instruction -> . Home SEMI
+    (55) Instruction -> . Forward SEMI
+    (56) Instruction -> . Rotate SEMI
+    (57) Instruction -> . Color SEMI
+    (58) Instruction -> . Circle SEMI
+    (59) Instruction -> . Arc SEMI
+    (60) Instruction -> . Square SEMI
+    (17) Loop -> . LOOP LPAREN SuperExpr RPAREN Block
+    (61) Assign -> . Identifier EQUAL Assignation
+    (65) Call -> . Identifier LPAREN Parameters RPAREN
+    (76) Brush -> . BRUSH LPAREN Color COMMA SuperExpr RPAREN
+    (66) Read -> . READ LPAREN Type COMMA Identifier RPAREN
+    (69) Print -> . PRINT LPAREN Parameters RPAREN
+    (78) PenDown -> . PD LPAREN RPAREN
+    (79) PenUp -> . PU LPAREN RPAREN
+    (80) Home -> . HOME LPAREN RPAREN
+    (81) Forward -> . FD LPAREN SuperExpr RPAREN
+    (82) Rotate -> . RT LPAREN SuperExpr RPAREN
+    (77) Color -> . COLOR LPAREN SuperExpr COMMA SuperExpr COMMA SuperExpr RPAREN
+    (83) Circle -> . CIRCLE LPAREN SuperExpr RPAREN
+    (84) Arc -> . ARC LPAREN SuperExpr COMMA SuperExpr RPAREN
+    (85) Square -> . SQUARE LPAREN SuperExpr RPAREN
+    (97) Identifier -> . ID
 
-    SEMI            reduce using rule 31 (expr1 -> empty .)
-    COMMA           reduce using rule 31 (expr1 -> empty .)
-    RPAREN          reduce using rule 31 (expr1 -> empty .)
+    LOOP            shift and go to state 89
+    BRUSH           shift and go to state 75
+    READ            shift and go to state 61
+    PRINT           shift and go to state 62
+    PD              shift and go to state 74
+    PU              shift and go to state 71
+    HOME            shift and go to state 68
+    FD              shift and go to state 82
+    RT              shift and go to state 70
+    COLOR           shift and go to state 84
+    CIRCLE          shift and go to state 88
+    ARC             shift and go to state 73
+    SQUARE          shift and go to state 65
+    ID              shift and go to state 10
 
+    PenUp                          shift and go to state 60
+    Print                          shift and go to state 63
+    PenDown                        shift and go to state 64
+    Call                           shift and go to state 66
+    Forward                        shift and go to state 67
+    Circle                         shift and go to state 69
+    Read                           shift and go to state 72
+    Loop                           shift and go to state 81
+    Rotate                         shift and go to state 76
+    Instruction                    shift and go to state 77
+    Identifier                     shift and go to state 79
+    Assign                         shift and go to state 80
+    Square                         shift and go to state 78
+    Color                          shift and go to state 83
+    Arc                            shift and go to state 85
+    Brush                          shift and go to state 86
+    Home                           shift and go to state 87
 
 state 58
 
-    (43) term1 -> DIVIDE . term
-    (36) term -> . factor term1
-    (37) factor -> . LPAREN expr RPAREN
-    (38) factor -> . factor1 const
-    (39) factor1 -> . PLUS
-    (40) factor1 -> . MINUS
-    (41) factor1 -> . empty
-    (48) empty -> .
+    (10) Matrix -> LBRACKET INTEGER RBRACKET .
 
-    LPAREN          shift and go to state 40
-    PLUS            shift and go to state 37
-    MINUS           shift and go to state 36
-    ID              reduce using rule 48 (empty -> .)
-    ICONST          reduce using rule 48 (empty -> .)
-    FCONST          reduce using rule 48 (empty -> .)
+    SEMI            reduce using rule 10 (Matrix -> LBRACKET INTEGER RBRACKET .)
 
-    term                           shift and go to state 81
-    factor1                        shift and go to state 42
-    factor                         shift and go to state 39
-    empty                          shift and go to state 41
 
 state 59
 
-    (36) term -> factor term1 .
+    (16) RFBlock -> LBRACE Declaration . Instruction RETURN SuperExpr SEMI RBRACE
+    (46) Instruction -> . Loop SEMI
+    (47) Instruction -> . Assign SEMI
+    (48) Instruction -> . Call SEMI
+    (49) Instruction -> . Brush SEMI
+    (50) Instruction -> . Read SEMI
+    (51) Instruction -> . Print SEMI
+    (52) Instruction -> . PenDown SEMI
+    (53) Instruction -> . PenUp SEMI
+    (54) Instruction -> . Home SEMI
+    (55) Instruction -> . Forward SEMI
+    (56) Instruction -> . Rotate SEMI
+    (57) Instruction -> . Color SEMI
+    (58) Instruction -> . Circle SEMI
+    (59) Instruction -> . Arc SEMI
+    (60) Instruction -> . Square SEMI
+    (17) Loop -> . LOOP LPAREN SuperExpr RPAREN Block
+    (61) Assign -> . Identifier EQUAL Assignation
+    (65) Call -> . Identifier LPAREN Parameters RPAREN
+    (76) Brush -> . BRUSH LPAREN Color COMMA SuperExpr RPAREN
+    (66) Read -> . READ LPAREN Type COMMA Identifier RPAREN
+    (69) Print -> . PRINT LPAREN Parameters RPAREN
+    (78) PenDown -> . PD LPAREN RPAREN
+    (79) PenUp -> . PU LPAREN RPAREN
+    (80) Home -> . HOME LPAREN RPAREN
+    (81) Forward -> . FD LPAREN SuperExpr RPAREN
+    (82) Rotate -> . RT LPAREN SuperExpr RPAREN
+    (77) Color -> . COLOR LPAREN SuperExpr COMMA SuperExpr COMMA SuperExpr RPAREN
+    (83) Circle -> . CIRCLE LPAREN SuperExpr RPAREN
+    (84) Arc -> . ARC LPAREN SuperExpr COMMA SuperExpr RPAREN
+    (85) Square -> . SQUARE LPAREN SuperExpr RPAREN
+    (97) Identifier -> . ID
 
-    PLUS            reduce using rule 36 (term -> factor term1 .)
-    MINUS           reduce using rule 36 (term -> factor term1 .)
-    GREATER         reduce using rule 36 (term -> factor term1 .)
-    LESS            reduce using rule 36 (term -> factor term1 .)
-    NOTEQUAL        reduce using rule 36 (term -> factor term1 .)
-    SEMI            reduce using rule 36 (term -> factor term1 .)
-    COMMA           reduce using rule 36 (term -> factor term1 .)
-    RPAREN          reduce using rule 36 (term -> factor term1 .)
+    LOOP            shift and go to state 89
+    BRUSH           shift and go to state 75
+    READ            shift and go to state 61
+    PRINT           shift and go to state 62
+    PD              shift and go to state 74
+    PU              shift and go to state 71
+    HOME            shift and go to state 68
+    FD              shift and go to state 82
+    RT              shift and go to state 70
+    COLOR           shift and go to state 84
+    CIRCLE          shift and go to state 88
+    ARC             shift and go to state 73
+    SQUARE          shift and go to state 65
+    ID              shift and go to state 10
 
+    PenUp                          shift and go to state 60
+    Print                          shift and go to state 63
+    PenDown                        shift and go to state 64
+    Call                           shift and go to state 66
+    Forward                        shift and go to state 67
+    Circle                         shift and go to state 69
+    Read                           shift and go to state 72
+    Loop                           shift and go to state 81
+    Rotate                         shift and go to state 76
+    Instruction                    shift and go to state 90
+    Identifier                     shift and go to state 79
+    Assign                         shift and go to state 80
+    Square                         shift and go to state 78
+    Color                          shift and go to state 83
+    Arc                            shift and go to state 85
+    Brush                          shift and go to state 86
+    Home                           shift and go to state 87
 
 state 60
 
-    (42) term1 -> TIMES . term
-    (36) term -> . factor term1
-    (37) factor -> . LPAREN expr RPAREN
-    (38) factor -> . factor1 const
-    (39) factor1 -> . PLUS
-    (40) factor1 -> . MINUS
-    (41) factor1 -> . empty
-    (48) empty -> .
+    (53) Instruction -> PenUp . SEMI
 
-    LPAREN          shift and go to state 40
-    PLUS            shift and go to state 37
-    MINUS           shift and go to state 36
-    ID              reduce using rule 48 (empty -> .)
-    ICONST          reduce using rule 48 (empty -> .)
-    FCONST          reduce using rule 48 (empty -> .)
+    SEMI            shift and go to state 91
 
-    term                           shift and go to state 82
-    factor1                        shift and go to state 42
-    factor                         shift and go to state 39
-    empty                          shift and go to state 41
 
 state 61
 
-    (44) term1 -> empty .
+    (66) Read -> READ . LPAREN Type COMMA Identifier RPAREN
 
-    PLUS            reduce using rule 44 (term1 -> empty .)
-    MINUS           reduce using rule 44 (term1 -> empty .)
-    GREATER         reduce using rule 44 (term1 -> empty .)
-    LESS            reduce using rule 44 (term1 -> empty .)
-    NOTEQUAL        reduce using rule 44 (term1 -> empty .)
-    SEMI            reduce using rule 44 (term1 -> empty .)
-    COMMA           reduce using rule 44 (term1 -> empty .)
-    RPAREN          reduce using rule 44 (term1 -> empty .)
+    LPAREN          shift and go to state 92
 
 
 state 62
 
-    (37) factor -> LPAREN expr . RPAREN
+    (69) Print -> PRINT . LPAREN Parameters RPAREN
 
-    RPAREN          shift and go to state 83
+    LPAREN          shift and go to state 93
 
 
 state 63
 
-    (46) const -> ICONST .
-
-    TIMES           reduce using rule 46 (const -> ICONST .)
-    DIVIDE          reduce using rule 46 (const -> ICONST .)
-    PLUS            reduce using rule 46 (const -> ICONST .)
-    MINUS           reduce using rule 46 (const -> ICONST .)
-    GREATER         reduce using rule 46 (const -> ICONST .)
-    LESS            reduce using rule 46 (const -> ICONST .)
-    NOTEQUAL        reduce using rule 46 (const -> ICONST .)
-    SEMI            reduce using rule 46 (const -> ICONST .)
-    COMMA           reduce using rule 46 (const -> ICONST .)
-    RPAREN          reduce using rule 46 (const -> ICONST .)
-
-
-state 64
-
-    (47) const -> FCONST .
-
-    TIMES           reduce using rule 47 (const -> FCONST .)
-    DIVIDE          reduce using rule 47 (const -> FCONST .)
-    PLUS            reduce using rule 47 (const -> FCONST .)
-    MINUS           reduce using rule 47 (const -> FCONST .)
-    GREATER         reduce using rule 47 (const -> FCONST .)
-    LESS            reduce using rule 47 (const -> FCONST .)
-    NOTEQUAL        reduce using rule 47 (const -> FCONST .)
-    SEMI            reduce using rule 47 (const -> FCONST .)
-    COMMA           reduce using rule 47 (const -> FCONST .)
-    RPAREN          reduce using rule 47 (const -> FCONST .)
-
-
-state 65
-
-    (38) factor -> factor1 const .
-
-    TIMES           reduce using rule 38 (factor -> factor1 const .)
-    DIVIDE          reduce using rule 38 (factor -> factor1 const .)
-    PLUS            reduce using rule 38 (factor -> factor1 const .)
-    MINUS           reduce using rule 38 (factor -> factor1 const .)
-    SEMI            reduce using rule 38 (factor -> factor1 const .)
-    COMMA           reduce using rule 38 (factor -> factor1 const .)
-    RPAREN          reduce using rule 38 (factor -> factor1 const .)
-    GREATER         reduce using rule 38 (factor -> factor1 const .)
-    LESS            reduce using rule 38 (factor -> factor1 const .)
-    NOTEQUAL        reduce using rule 38 (factor -> factor1 const .)
-
-
-state 66
-
-    (45) const -> ID .
-
-    TIMES           reduce using rule 45 (const -> ID .)
-    DIVIDE          reduce using rule 45 (const -> ID .)
-    PLUS            reduce using rule 45 (const -> ID .)
-    MINUS           reduce using rule 45 (const -> ID .)
-    GREATER         reduce using rule 45 (const -> ID .)
-    LESS            reduce using rule 45 (const -> ID .)
-    NOTEQUAL        reduce using rule 45 (const -> ID .)
-    SEMI            reduce using rule 45 (const -> ID .)
-    COMMA           reduce using rule 45 (const -> ID .)
-    RPAREN          reduce using rule 45 (const -> ID .)
-
-
-state 67
-
-    (20) write -> PRINT LPAREN write1 RPAREN . SEMI
-
-    SEMI            shift and go to state 84
-
-
-state 68
-
-    (21) write1 -> expr write2 .
-
-    RPAREN          reduce using rule 21 (write1 -> expr write2 .)
-
-
-state 69
-
-    (23) write2 -> COMMA . write1
-    (21) write1 -> . expr write2
-    (22) write1 -> . SCONST write2
-    (27) expr -> . exp expr1
-    (32) exp -> . term exp1
-    (36) term -> . factor term1
-    (37) factor -> . LPAREN expr RPAREN
-    (38) factor -> . factor1 const
-    (39) factor1 -> . PLUS
-    (40) factor1 -> . MINUS
-    (41) factor1 -> . empty
-    (48) empty -> .
-
-    SCONST          shift and go to state 45
-    LPAREN          shift and go to state 40
-    PLUS            shift and go to state 37
-    MINUS           shift and go to state 36
-    ID              reduce using rule 48 (empty -> .)
-    ICONST          reduce using rule 48 (empty -> .)
-    FCONST          reduce using rule 48 (empty -> .)
-
-    term                           shift and go to state 34
-    factor1                        shift and go to state 42
-    write1                         shift and go to state 85
-    expr                           shift and go to state 44
-    exp                            shift and go to state 38
-    factor                         shift and go to state 39
-    empty                          shift and go to state 41
-
-state 70
-
-    (24) write2 -> empty .
-
-    RPAREN          reduce using rule 24 (write2 -> empty .)
-
-
-state 71
-
-    (22) write1 -> SCONST write2 .
-
-    RPAREN          reduce using rule 22 (write1 -> SCONST write2 .)
-
-
-state 72
-
-    (19) cond -> IF LPAREN expr RPAREN . block cond1 SEMI
-    (12) block -> . LBRACE block1 RBRACE
-
-    LBRACE          shift and go to state 9
-
-    block                          shift and go to state 86
-
-state 73
-
-    (5) varlist1 -> idlist . COLON type SEMI varlist1
-
-    COLON           shift and go to state 87
-
-
-state 74
-
-    (4) varlist -> VAR idlist COLON type SEMI varlist1 .
-
-    LBRACE          reduce using rule 4 (varlist -> VAR idlist COLON type SEMI varlist1 .)
-
-
-state 75
-
-    (6) varlist1 -> empty .
-
-    LBRACE          reduce using rule 6 (varlist1 -> empty .)
-
-
-state 76
-
-    (33) exp1 -> PLUS exp .
-
-    GREATER         reduce using rule 33 (exp1 -> PLUS exp .)
-    LESS            reduce using rule 33 (exp1 -> PLUS exp .)
-    NOTEQUAL        reduce using rule 33 (exp1 -> PLUS exp .)
-    SEMI            reduce using rule 33 (exp1 -> PLUS exp .)
-    COMMA           reduce using rule 33 (exp1 -> PLUS exp .)
-    RPAREN          reduce using rule 33 (exp1 -> PLUS exp .)
-
-
-state 77
-
-    (34) exp1 -> MINUS exp .
-
-    GREATER         reduce using rule 34 (exp1 -> MINUS exp .)
-    LESS            reduce using rule 34 (exp1 -> MINUS exp .)
-    NOTEQUAL        reduce using rule 34 (exp1 -> MINUS exp .)
-    SEMI            reduce using rule 34 (exp1 -> MINUS exp .)
-    COMMA           reduce using rule 34 (exp1 -> MINUS exp .)
-    RPAREN          reduce using rule 34 (exp1 -> MINUS exp .)
-
-
-state 78
-
-    (30) expr1 -> NOTEQUAL exp .
-
-    SEMI            reduce using rule 30 (expr1 -> NOTEQUAL exp .)
-    COMMA           reduce using rule 30 (expr1 -> NOTEQUAL exp .)
-    RPAREN          reduce using rule 30 (expr1 -> NOTEQUAL exp .)
-
-
-state 79
-
-    (28) expr1 -> GREATER exp .
-
-    SEMI            reduce using rule 28 (expr1 -> GREATER exp .)
-    COMMA           reduce using rule 28 (expr1 -> GREATER exp .)
-    RPAREN          reduce using rule 28 (expr1 -> GREATER exp .)
-
-
-state 80
-
-    (29) expr1 -> LESS exp .
-
-    SEMI            reduce using rule 29 (expr1 -> LESS exp .)
-    COMMA           reduce using rule 29 (expr1 -> LESS exp .)
-    RPAREN          reduce using rule 29 (expr1 -> LESS exp .)
-
-
-state 81
-
-    (43) term1 -> DIVIDE term .
-
-    PLUS            reduce using rule 43 (term1 -> DIVIDE term .)
-    MINUS           reduce using rule 43 (term1 -> DIVIDE term .)
-    GREATER         reduce using rule 43 (term1 -> DIVIDE term .)
-    LESS            reduce using rule 43 (term1 -> DIVIDE term .)
-    NOTEQUAL        reduce using rule 43 (term1 -> DIVIDE term .)
-    SEMI            reduce using rule 43 (term1 -> DIVIDE term .)
-    COMMA           reduce using rule 43 (term1 -> DIVIDE term .)
-    RPAREN          reduce using rule 43 (term1 -> DIVIDE term .)
-
-
-state 82
-
-    (42) term1 -> TIMES term .
-
-    PLUS            reduce using rule 42 (term1 -> TIMES term .)
-    MINUS           reduce using rule 42 (term1 -> TIMES term .)
-    GREATER         reduce using rule 42 (term1 -> TIMES term .)
-    LESS            reduce using rule 42 (term1 -> TIMES term .)
-    NOTEQUAL        reduce using rule 42 (term1 -> TIMES term .)
-    SEMI            reduce using rule 42 (term1 -> TIMES term .)
-    COMMA           reduce using rule 42 (term1 -> TIMES term .)
-    RPAREN          reduce using rule 42 (term1 -> TIMES term .)
-
-
-state 83
-
-    (37) factor -> LPAREN expr RPAREN .
-
-    TIMES           reduce using rule 37 (factor -> LPAREN expr RPAREN .)
-    DIVIDE          reduce using rule 37 (factor -> LPAREN expr RPAREN .)
-    PLUS            reduce using rule 37 (factor -> LPAREN expr RPAREN .)
-    MINUS           reduce using rule 37 (factor -> LPAREN expr RPAREN .)
-    SEMI            reduce using rule 37 (factor -> LPAREN expr RPAREN .)
-    COMMA           reduce using rule 37 (factor -> LPAREN expr RPAREN .)
-    RPAREN          reduce using rule 37 (factor -> LPAREN expr RPAREN .)
-    GREATER         reduce using rule 37 (factor -> LPAREN expr RPAREN .)
-    LESS            reduce using rule 37 (factor -> LPAREN expr RPAREN .)
-    NOTEQUAL        reduce using rule 37 (factor -> LPAREN expr RPAREN .)
-
-
-state 84
-
-    (20) write -> PRINT LPAREN write1 RPAREN SEMI .
-
-    RBRACE          reduce using rule 20 (write -> PRINT LPAREN write1 RPAREN SEMI .)
-
-
-state 85
-
-    (23) write2 -> COMMA write1 .
-
-    RPAREN          reduce using rule 23 (write2 -> COMMA write1 .)
-
-
-state 86
-
-    (19) cond -> IF LPAREN expr RPAREN block . cond1 SEMI
-    (25) cond1 -> . ELSE block
-    (26) cond1 -> . empty
-    (48) empty -> .
-
-    ELSE            shift and go to state 89
-    SEMI            reduce using rule 48 (empty -> .)
-
-    cond1                          shift and go to state 88
-    empty                          shift and go to state 90
-
-state 87
-
-    (5) varlist1 -> idlist COLON . type SEMI varlist1
-    (10) type -> . INT
-    (11) type -> . FLOAT
-
-    INT             shift and go to state 30
-    FLOAT           shift and go to state 31
-
-    type                           shift and go to state 91
-
-state 88
-
-    (19) cond -> IF LPAREN expr RPAREN block cond1 . SEMI
-
-    SEMI            shift and go to state 92
-
-
-state 89
-
-    (25) cond1 -> ELSE . block
-    (12) block -> . LBRACE block1 RBRACE
-
-    LBRACE          shift and go to state 9
-
-    block                          shift and go to state 93
-
-state 90
-
-    (26) cond1 -> empty .
-
-    SEMI            reduce using rule 26 (cond1 -> empty .)
-
-
-state 91
-
-    (5) varlist1 -> idlist COLON type . SEMI varlist1
+    (51) Instruction -> Print . SEMI
 
     SEMI            shift and go to state 94
 
 
+state 64
+
+    (52) Instruction -> PenDown . SEMI
+
+    SEMI            shift and go to state 95
+
+
+state 65
+
+    (85) Square -> SQUARE . LPAREN SuperExpr RPAREN
+
+    LPAREN          shift and go to state 96
+
+
+state 66
+
+    (48) Instruction -> Call . SEMI
+
+    SEMI            shift and go to state 97
+
+
+state 67
+
+    (55) Instruction -> Forward . SEMI
+
+    SEMI            shift and go to state 98
+
+
+state 68
+
+    (80) Home -> HOME . LPAREN RPAREN
+
+    LPAREN          shift and go to state 99
+
+
+state 69
+
+    (58) Instruction -> Circle . SEMI
+
+    SEMI            shift and go to state 100
+
+
+state 70
+
+    (82) Rotate -> RT . LPAREN SuperExpr RPAREN
+
+    LPAREN          shift and go to state 101
+
+
+state 71
+
+    (79) PenUp -> PU . LPAREN RPAREN
+
+    LPAREN          shift and go to state 102
+
+
+state 72
+
+    (50) Instruction -> Read . SEMI
+
+    SEMI            shift and go to state 103
+
+
+state 73
+
+    (84) Arc -> ARC . LPAREN SuperExpr COMMA SuperExpr RPAREN
+
+    LPAREN          shift and go to state 104
+
+
+state 74
+
+    (78) PenDown -> PD . LPAREN RPAREN
+
+    LPAREN          shift and go to state 105
+
+
+state 75
+
+    (76) Brush -> BRUSH . LPAREN Color COMMA SuperExpr RPAREN
+
+    LPAREN          shift and go to state 106
+
+
+state 76
+
+    (56) Instruction -> Rotate . SEMI
+
+    SEMI            shift and go to state 107
+
+
+state 77
+
+    (15) FBlock -> LBRACE Declaration Instruction . RBRACE
+
+    RBRACE          shift and go to state 108
+
+
+state 78
+
+    (60) Instruction -> Square . SEMI
+
+    SEMI            shift and go to state 109
+
+
+state 79
+
+    (61) Assign -> Identifier . EQUAL Assignation
+    (65) Call -> Identifier . LPAREN Parameters RPAREN
+
+    EQUAL           shift and go to state 110
+    LPAREN          shift and go to state 111
+
+
+state 80
+
+    (47) Instruction -> Assign . SEMI
+
+    SEMI            shift and go to state 112
+
+
+state 81
+
+    (46) Instruction -> Loop . SEMI
+
+    SEMI            shift and go to state 113
+
+
+state 82
+
+    (81) Forward -> FD . LPAREN SuperExpr RPAREN
+
+    LPAREN          shift and go to state 114
+
+
+state 83
+
+    (57) Instruction -> Color . SEMI
+
+    SEMI            shift and go to state 115
+
+
+state 84
+
+    (77) Color -> COLOR . LPAREN SuperExpr COMMA SuperExpr COMMA SuperExpr RPAREN
+
+    LPAREN          shift and go to state 116
+
+
+state 85
+
+    (59) Instruction -> Arc . SEMI
+
+    SEMI            shift and go to state 117
+
+
+state 86
+
+    (49) Instruction -> Brush . SEMI
+
+    SEMI            shift and go to state 118
+
+
+state 87
+
+    (54) Instruction -> Home . SEMI
+
+    SEMI            shift and go to state 119
+
+
+state 88
+
+    (83) Circle -> CIRCLE . LPAREN SuperExpr RPAREN
+
+    LPAREN          shift and go to state 120
+
+
+state 89
+
+    (17) Loop -> LOOP . LPAREN SuperExpr RPAREN Block
+
+    LPAREN          shift and go to state 121
+
+
+state 90
+
+    (16) RFBlock -> LBRACE Declaration Instruction . RETURN SuperExpr SEMI RBRACE
+
+    RETURN          shift and go to state 122
+
+
+state 91
+
+    (53) Instruction -> PenUp SEMI .
+
+    RBRACE          reduce using rule 53 (Instruction -> PenUp SEMI .)
+    RETURN          reduce using rule 53 (Instruction -> PenUp SEMI .)
+
+
 state 92
 
-    (19) cond -> IF LPAREN expr RPAREN block cond1 SEMI .
+    (66) Read -> READ LPAREN . Type COMMA Identifier RPAREN
+    (67) Type -> . Primitive
+    (68) Type -> . STRING
+    (93) Primitive -> . INT
+    (94) Primitive -> . FLOAT
+    (95) Primitive -> . BOOL
+    (96) Primitive -> . CHAR
 
-    RBRACE          reduce using rule 19 (cond -> IF LPAREN expr RPAREN block cond1 SEMI .)
+    STRING          shift and go to state 124
+    INT             shift and go to state 2
+    FLOAT           shift and go to state 3
+    BOOL            shift and go to state 6
+    CHAR            shift and go to state 4
 
+    Primitive                      shift and go to state 123
+    Type                           shift and go to state 125
 
 state 93
 
-    (25) cond1 -> ELSE block .
+    (69) Print -> PRINT LPAREN . Parameters RPAREN
+    (70) Parameters -> . Params
+    (71) Parameters -> . empty
+    (72) Params -> . SuperExpr Params1
+    (73) Params -> . STRING Params1
+    (101) empty -> .
+    (21) SuperExpr -> . Expression LogicalOp
+    (25) Expression -> . Expr Comparison
+    (33) Expr -> . Term Op1
+    (37) Term -> . Factor Op2
+    (41) Factor -> . LPAREN SuperExpr RPAREN
+    (42) Factor -> . Op3 Constant
+    (43) Op3 -> . PLUS
+    (44) Op3 -> . MINUS
+    (45) Op3 -> . empty
 
-    SEMI            reduce using rule 25 (cond1 -> ELSE block .)
+    STRING          shift and go to state 127
+    RPAREN          reduce using rule 101 (empty -> .)
+    INTEGER         reduce using rule 101 (empty -> .)
+    FLOAT           reduce using rule 101 (empty -> .)
+    ID              reduce using rule 101 (empty -> .)
+    LPAREN          shift and go to state 135
+    PLUS            shift and go to state 132
+    MINUS           shift and go to state 133
 
+    Term                           shift and go to state 126
+    Parameters                     shift and go to state 128
+    Op3                            shift and go to state 129
+    SuperExpr                      shift and go to state 130
+    Factor                         shift and go to state 131
+    Params                         shift and go to state 134
+    Expr                           shift and go to state 136
+    Expression                     shift and go to state 137
+    empty                          shift and go to state 138
 
 state 94
 
-    (5) varlist1 -> idlist COLON type SEMI . varlist1
-    (5) varlist1 -> . idlist COLON type SEMI varlist1
-    (6) varlist1 -> . empty
-    (7) idlist -> . ID idlist1
-    (48) empty -> .
+    (51) Instruction -> Print SEMI .
 
-    ID              shift and go to state 12
-    LBRACE          reduce using rule 48 (empty -> .)
+    RBRACE          reduce using rule 51 (Instruction -> Print SEMI .)
+    RETURN          reduce using rule 51 (Instruction -> Print SEMI .)
 
-    varlist1                       shift and go to state 95
-    idlist                         shift and go to state 73
-    empty                          shift and go to state 75
 
 state 95
 
-    (5) varlist1 -> idlist COLON type SEMI varlist1 .
+    (52) Instruction -> PenDown SEMI .
 
-    LBRACE          reduce using rule 5 (varlist1 -> idlist COLON type SEMI varlist1 .)
+    RBRACE          reduce using rule 52 (Instruction -> PenDown SEMI .)
+    RETURN          reduce using rule 52 (Instruction -> PenDown SEMI .)
 
+
+state 96
+
+    (85) Square -> SQUARE LPAREN . SuperExpr RPAREN
+    (21) SuperExpr -> . Expression LogicalOp
+    (25) Expression -> . Expr Comparison
+    (33) Expr -> . Term Op1
+    (37) Term -> . Factor Op2
+    (41) Factor -> . LPAREN SuperExpr RPAREN
+    (42) Factor -> . Op3 Constant
+    (43) Op3 -> . PLUS
+    (44) Op3 -> . MINUS
+    (45) Op3 -> . empty
+    (101) empty -> .
+
+    LPAREN          shift and go to state 135
+    PLUS            shift and go to state 132
+    MINUS           shift and go to state 133
+    INTEGER         reduce using rule 101 (empty -> .)
+    FLOAT           reduce using rule 101 (empty -> .)
+    ID              reduce using rule 101 (empty -> .)
+
+    Term                           shift and go to state 126
+    Op3                            shift and go to state 129
+    SuperExpr                      shift and go to state 139
+    Factor                         shift and go to state 131
+    Expr                           shift and go to state 136
+    Expression                     shift and go to state 137
+    empty                          shift and go to state 140
+
+state 97
+
+    (48) Instruction -> Call SEMI .
+
+    RBRACE          reduce using rule 48 (Instruction -> Call SEMI .)
+    RETURN          reduce using rule 48 (Instruction -> Call SEMI .)
+
+
+state 98
+
+    (55) Instruction -> Forward SEMI .
+
+    RBRACE          reduce using rule 55 (Instruction -> Forward SEMI .)
+    RETURN          reduce using rule 55 (Instruction -> Forward SEMI .)
+
+
+state 99
+
+    (80) Home -> HOME LPAREN . RPAREN
+
+    RPAREN          shift and go to state 141
+
+
+state 100
+
+    (58) Instruction -> Circle SEMI .
+
+    RBRACE          reduce using rule 58 (Instruction -> Circle SEMI .)
+    RETURN          reduce using rule 58 (Instruction -> Circle SEMI .)
+
+
+state 101
+
+    (82) Rotate -> RT LPAREN . SuperExpr RPAREN
+    (21) SuperExpr -> . Expression LogicalOp
+    (25) Expression -> . Expr Comparison
+    (33) Expr -> . Term Op1
+    (37) Term -> . Factor Op2
+    (41) Factor -> . LPAREN SuperExpr RPAREN
+    (42) Factor -> . Op3 Constant
+    (43) Op3 -> . PLUS
+    (44) Op3 -> . MINUS
+    (45) Op3 -> . empty
+    (101) empty -> .
+
+    LPAREN          shift and go to state 135
+    PLUS            shift and go to state 132
+    MINUS           shift and go to state 133
+    INTEGER         reduce using rule 101 (empty -> .)
+    FLOAT           reduce using rule 101 (empty -> .)
+    ID              reduce using rule 101 (empty -> .)
+
+    Term                           shift and go to state 126
+    Op3                            shift and go to state 129
+    SuperExpr                      shift and go to state 142
+    Factor                         shift and go to state 131
+    Expr                           shift and go to state 136
+    Expression                     shift and go to state 137
+    empty                          shift and go to state 140
+
+state 102
+
+    (79) PenUp -> PU LPAREN . RPAREN
+
+    RPAREN          shift and go to state 143
+
+
+state 103
+
+    (50) Instruction -> Read SEMI .
+
+    RBRACE          reduce using rule 50 (Instruction -> Read SEMI .)
+    RETURN          reduce using rule 50 (Instruction -> Read SEMI .)
+
+
+state 104
+
+    (84) Arc -> ARC LPAREN . SuperExpr COMMA SuperExpr RPAREN
+    (21) SuperExpr -> . Expression LogicalOp
+    (25) Expression -> . Expr Comparison
+    (33) Expr -> . Term Op1
+    (37) Term -> . Factor Op2
+    (41) Factor -> . LPAREN SuperExpr RPAREN
+    (42) Factor -> . Op3 Constant
+    (43) Op3 -> . PLUS
+    (44) Op3 -> . MINUS
+    (45) Op3 -> . empty
+    (101) empty -> .
+
+    LPAREN          shift and go to state 135
+    PLUS            shift and go to state 132
+    MINUS           shift and go to state 133
+    INTEGER         reduce using rule 101 (empty -> .)
+    FLOAT           reduce using rule 101 (empty -> .)
+    ID              reduce using rule 101 (empty -> .)
+
+    Term                           shift and go to state 126
+    Op3                            shift and go to state 129
+    SuperExpr                      shift and go to state 144
+    Factor                         shift and go to state 131
+    Expr                           shift and go to state 136
+    Expression                     shift and go to state 137
+    empty                          shift and go to state 140
+
+state 105
+
+    (78) PenDown -> PD LPAREN . RPAREN
+
+    RPAREN          shift and go to state 145
+
+
+state 106
+
+    (76) Brush -> BRUSH LPAREN . Color COMMA SuperExpr RPAREN
+    (77) Color -> . COLOR LPAREN SuperExpr COMMA SuperExpr COMMA SuperExpr RPAREN
+
+    COLOR           shift and go to state 84
+
+    Color                          shift and go to state 146
+
+state 107
+
+    (56) Instruction -> Rotate SEMI .
+
+    RBRACE          reduce using rule 56 (Instruction -> Rotate SEMI .)
+    RETURN          reduce using rule 56 (Instruction -> Rotate SEMI .)
+
+
+state 108
+
+    (15) FBlock -> LBRACE Declaration Instruction RBRACE .
+
+    MAIN            reduce using rule 15 (FBlock -> LBRACE Declaration Instruction RBRACE .)
+    $end            reduce using rule 15 (FBlock -> LBRACE Declaration Instruction RBRACE .)
+
+
+state 109
+
+    (60) Instruction -> Square SEMI .
+
+    RBRACE          reduce using rule 60 (Instruction -> Square SEMI .)
+    RETURN          reduce using rule 60 (Instruction -> Square SEMI .)
+
+
+state 110
+
+    (61) Assign -> Identifier EQUAL . Assignation
+    (62) Assignation -> . SuperExpr
+    (63) Assignation -> . STRING
+    (64) Assignation -> . Call
+    (21) SuperExpr -> . Expression LogicalOp
+    (65) Call -> . Identifier LPAREN Parameters RPAREN
+    (25) Expression -> . Expr Comparison
+    (97) Identifier -> . ID
+    (33) Expr -> . Term Op1
+    (37) Term -> . Factor Op2
+    (41) Factor -> . LPAREN SuperExpr RPAREN
+    (42) Factor -> . Op3 Constant
+    (43) Op3 -> . PLUS
+    (44) Op3 -> . MINUS
+    (45) Op3 -> . empty
+    (101) empty -> .
+
+  ! shift/reduce conflict for ID resolved as shift
+    STRING          shift and go to state 150
+    ID              shift and go to state 10
+    LPAREN          shift and go to state 135
+    PLUS            shift and go to state 132
+    MINUS           shift and go to state 133
+    INTEGER         reduce using rule 101 (empty -> .)
+    FLOAT           reduce using rule 101 (empty -> .)
+
+  ! ID              [ reduce using rule 101 (empty -> .) ]
+
+    Term                           shift and go to state 126
+    Assignation                    shift and go to state 149
+    Op3                            shift and go to state 129
+    SuperExpr                      shift and go to state 147
+    Factor                         shift and go to state 131
+    Call                           shift and go to state 148
+    Expr                           shift and go to state 136
+    Identifier                     shift and go to state 151
+    Expression                     shift and go to state 137
+    empty                          shift and go to state 140
+
+state 111
+
+    (65) Call -> Identifier LPAREN . Parameters RPAREN
+    (70) Parameters -> . Params
+    (71) Parameters -> . empty
+    (72) Params -> . SuperExpr Params1
+    (73) Params -> . STRING Params1
+    (101) empty -> .
+    (21) SuperExpr -> . Expression LogicalOp
+    (25) Expression -> . Expr Comparison
+    (33) Expr -> . Term Op1
+    (37) Term -> . Factor Op2
+    (41) Factor -> . LPAREN SuperExpr RPAREN
+    (42) Factor -> . Op3 Constant
+    (43) Op3 -> . PLUS
+    (44) Op3 -> . MINUS
+    (45) Op3 -> . empty
+
+    STRING          shift and go to state 127
+    RPAREN          reduce using rule 101 (empty -> .)
+    INTEGER         reduce using rule 101 (empty -> .)
+    FLOAT           reduce using rule 101 (empty -> .)
+    ID              reduce using rule 101 (empty -> .)
+    LPAREN          shift and go to state 135
+    PLUS            shift and go to state 132
+    MINUS           shift and go to state 133
+
+    Term                           shift and go to state 126
+    Parameters                     shift and go to state 152
+    Op3                            shift and go to state 129
+    SuperExpr                      shift and go to state 130
+    Factor                         shift and go to state 131
+    Params                         shift and go to state 134
+    Expr                           shift and go to state 136
+    Expression                     shift and go to state 137
+    empty                          shift and go to state 138
+
+state 112
+
+    (47) Instruction -> Assign SEMI .
+
+    RBRACE          reduce using rule 47 (Instruction -> Assign SEMI .)
+    RETURN          reduce using rule 47 (Instruction -> Assign SEMI .)
+
+
+state 113
+
+    (46) Instruction -> Loop SEMI .
+
+    RBRACE          reduce using rule 46 (Instruction -> Loop SEMI .)
+    RETURN          reduce using rule 46 (Instruction -> Loop SEMI .)
+
+
+state 114
+
+    (81) Forward -> FD LPAREN . SuperExpr RPAREN
+    (21) SuperExpr -> . Expression LogicalOp
+    (25) Expression -> . Expr Comparison
+    (33) Expr -> . Term Op1
+    (37) Term -> . Factor Op2
+    (41) Factor -> . LPAREN SuperExpr RPAREN
+    (42) Factor -> . Op3 Constant
+    (43) Op3 -> . PLUS
+    (44) Op3 -> . MINUS
+    (45) Op3 -> . empty
+    (101) empty -> .
+
+    LPAREN          shift and go to state 135
+    PLUS            shift and go to state 132
+    MINUS           shift and go to state 133
+    INTEGER         reduce using rule 101 (empty -> .)
+    FLOAT           reduce using rule 101 (empty -> .)
+    ID              reduce using rule 101 (empty -> .)
+
+    Term                           shift and go to state 126
+    Op3                            shift and go to state 129
+    SuperExpr                      shift and go to state 153
+    Factor                         shift and go to state 131
+    Expr                           shift and go to state 136
+    Expression                     shift and go to state 137
+    empty                          shift and go to state 140
+
+state 115
+
+    (57) Instruction -> Color SEMI .
+
+    RBRACE          reduce using rule 57 (Instruction -> Color SEMI .)
+    RETURN          reduce using rule 57 (Instruction -> Color SEMI .)
+
+
+state 116
+
+    (77) Color -> COLOR LPAREN . SuperExpr COMMA SuperExpr COMMA SuperExpr RPAREN
+    (21) SuperExpr -> . Expression LogicalOp
+    (25) Expression -> . Expr Comparison
+    (33) Expr -> . Term Op1
+    (37) Term -> . Factor Op2
+    (41) Factor -> . LPAREN SuperExpr RPAREN
+    (42) Factor -> . Op3 Constant
+    (43) Op3 -> . PLUS
+    (44) Op3 -> . MINUS
+    (45) Op3 -> . empty
+    (101) empty -> .
+
+    LPAREN          shift and go to state 135
+    PLUS            shift and go to state 132
+    MINUS           shift and go to state 133
+    INTEGER         reduce using rule 101 (empty -> .)
+    FLOAT           reduce using rule 101 (empty -> .)
+    ID              reduce using rule 101 (empty -> .)
+
+    Term                           shift and go to state 126
+    Op3                            shift and go to state 129
+    SuperExpr                      shift and go to state 154
+    Factor                         shift and go to state 131
+    Expr                           shift and go to state 136
+    Expression                     shift and go to state 137
+    empty                          shift and go to state 140
+
+state 117
+
+    (59) Instruction -> Arc SEMI .
+
+    RBRACE          reduce using rule 59 (Instruction -> Arc SEMI .)
+    RETURN          reduce using rule 59 (Instruction -> Arc SEMI .)
+
+
+state 118
+
+    (49) Instruction -> Brush SEMI .
+
+    RBRACE          reduce using rule 49 (Instruction -> Brush SEMI .)
+    RETURN          reduce using rule 49 (Instruction -> Brush SEMI .)
+
+
+state 119
+
+    (54) Instruction -> Home SEMI .
+
+    RBRACE          reduce using rule 54 (Instruction -> Home SEMI .)
+    RETURN          reduce using rule 54 (Instruction -> Home SEMI .)
+
+
+state 120
+
+    (83) Circle -> CIRCLE LPAREN . SuperExpr RPAREN
+    (21) SuperExpr -> . Expression LogicalOp
+    (25) Expression -> . Expr Comparison
+    (33) Expr -> . Term Op1
+    (37) Term -> . Factor Op2
+    (41) Factor -> . LPAREN SuperExpr RPAREN
+    (42) Factor -> . Op3 Constant
+    (43) Op3 -> . PLUS
+    (44) Op3 -> . MINUS
+    (45) Op3 -> . empty
+    (101) empty -> .
+
+    LPAREN          shift and go to state 135
+    PLUS            shift and go to state 132
+    MINUS           shift and go to state 133
+    INTEGER         reduce using rule 101 (empty -> .)
+    FLOAT           reduce using rule 101 (empty -> .)
+    ID              reduce using rule 101 (empty -> .)
+
+    Term                           shift and go to state 126
+    Op3                            shift and go to state 129
+    SuperExpr                      shift and go to state 155
+    Factor                         shift and go to state 131
+    Expr                           shift and go to state 136
+    Expression                     shift and go to state 137
+    empty                          shift and go to state 140
+
+state 121
+
+    (17) Loop -> LOOP LPAREN . SuperExpr RPAREN Block
+    (21) SuperExpr -> . Expression LogicalOp
+    (25) Expression -> . Expr Comparison
+    (33) Expr -> . Term Op1
+    (37) Term -> . Factor Op2
+    (41) Factor -> . LPAREN SuperExpr RPAREN
+    (42) Factor -> . Op3 Constant
+    (43) Op3 -> . PLUS
+    (44) Op3 -> . MINUS
+    (45) Op3 -> . empty
+    (101) empty -> .
+
+    LPAREN          shift and go to state 135
+    PLUS            shift and go to state 132
+    MINUS           shift and go to state 133
+    INTEGER         reduce using rule 101 (empty -> .)
+    FLOAT           reduce using rule 101 (empty -> .)
+    ID              reduce using rule 101 (empty -> .)
+
+    Term                           shift and go to state 126
+    Op3                            shift and go to state 129
+    SuperExpr                      shift and go to state 156
+    Factor                         shift and go to state 131
+    empty                          shift and go to state 140
+    Expr                           shift and go to state 136
+    Expression                     shift and go to state 137
+
+state 122
+
+    (16) RFBlock -> LBRACE Declaration Instruction RETURN . SuperExpr SEMI RBRACE
+    (21) SuperExpr -> . Expression LogicalOp
+    (25) Expression -> . Expr Comparison
+    (33) Expr -> . Term Op1
+    (37) Term -> . Factor Op2
+    (41) Factor -> . LPAREN SuperExpr RPAREN
+    (42) Factor -> . Op3 Constant
+    (43) Op3 -> . PLUS
+    (44) Op3 -> . MINUS
+    (45) Op3 -> . empty
+    (101) empty -> .
+
+    LPAREN          shift and go to state 135
+    PLUS            shift and go to state 132
+    MINUS           shift and go to state 133
+    INTEGER         reduce using rule 101 (empty -> .)
+    FLOAT           reduce using rule 101 (empty -> .)
+    ID              reduce using rule 101 (empty -> .)
+
+    Term                           shift and go to state 126
+    SuperExpr                      shift and go to state 157
+    Factor                         shift and go to state 131
+    Expr                           shift and go to state 136
+    Op3                            shift and go to state 129
+    Expression                     shift and go to state 137
+    empty                          shift and go to state 140
+
+state 123
+
+    (67) Type -> Primitive .
+
+    COMMA           reduce using rule 67 (Type -> Primitive .)
+
+
+state 124
+
+    (68) Type -> STRING .
+
+    COMMA           reduce using rule 68 (Type -> STRING .)
+
+
+state 125
+
+    (66) Read -> READ LPAREN Type . COMMA Identifier RPAREN
+
+    COMMA           shift and go to state 158
+
+
+state 126
+
+    (33) Expr -> Term . Op1
+    (34) Op1 -> . PLUS Expr
+    (35) Op1 -> . MINUS Expr
+    (36) Op1 -> . empty
+    (101) empty -> .
+
+    PLUS            shift and go to state 160
+    MINUS           shift and go to state 161
+    GREATHAN        reduce using rule 101 (empty -> .)
+    LESSTHAN        reduce using rule 101 (empty -> .)
+    DIFFERENT       reduce using rule 101 (empty -> .)
+    TWOEQUAL        reduce using rule 101 (empty -> .)
+    GREATEQUAL      reduce using rule 101 (empty -> .)
+    LESSEQUAL       reduce using rule 101 (empty -> .)
+    OR              reduce using rule 101 (empty -> .)
+    AND             reduce using rule 101 (empty -> .)
+    COMMA           reduce using rule 101 (empty -> .)
+    RPAREN          reduce using rule 101 (empty -> .)
+    SEMI            reduce using rule 101 (empty -> .)
+
+    Op1                            shift and go to state 159
+    empty                          shift and go to state 162
+
+state 127
+
+    (73) Params -> STRING . Params1
+    (74) Params1 -> . COMMA Params
+    (75) Params1 -> . empty
+    (101) empty -> .
+
+    COMMA           shift and go to state 164
+    RPAREN          reduce using rule 101 (empty -> .)
+
+    Params1                        shift and go to state 163
+    empty                          shift and go to state 165
+
+state 128
+
+    (69) Print -> PRINT LPAREN Parameters . RPAREN
+
+    RPAREN          shift and go to state 166
+
+
+state 129
+
+    (42) Factor -> Op3 . Constant
+    (98) Constant -> . INTEGER
+    (99) Constant -> . FLOAT
+    (100) Constant -> . Identifier
+    (97) Identifier -> . ID
+
+    INTEGER         shift and go to state 169
+    FLOAT           shift and go to state 168
+    ID              shift and go to state 10
+
+    Identifier                     shift and go to state 170
+    Constant                       shift and go to state 167
+
+state 130
+
+    (72) Params -> SuperExpr . Params1
+    (74) Params1 -> . COMMA Params
+    (75) Params1 -> . empty
+    (101) empty -> .
+
+    COMMA           shift and go to state 164
+    RPAREN          reduce using rule 101 (empty -> .)
+
+    Params1                        shift and go to state 171
+    empty                          shift and go to state 165
+
+state 131
+
+    (37) Term -> Factor . Op2
+    (38) Op2 -> . TIMES Term
+    (39) Op2 -> . DIVIDE Term
+    (40) Op2 -> . empty
+    (101) empty -> .
+
+    TIMES           shift and go to state 174
+    DIVIDE          shift and go to state 172
+    PLUS            reduce using rule 101 (empty -> .)
+    MINUS           reduce using rule 101 (empty -> .)
+    GREATHAN        reduce using rule 101 (empty -> .)
+    LESSTHAN        reduce using rule 101 (empty -> .)
+    DIFFERENT       reduce using rule 101 (empty -> .)
+    TWOEQUAL        reduce using rule 101 (empty -> .)
+    GREATEQUAL      reduce using rule 101 (empty -> .)
+    LESSEQUAL       reduce using rule 101 (empty -> .)
+    OR              reduce using rule 101 (empty -> .)
+    AND             reduce using rule 101 (empty -> .)
+    COMMA           reduce using rule 101 (empty -> .)
+    RPAREN          reduce using rule 101 (empty -> .)
+    SEMI            reduce using rule 101 (empty -> .)
+
+    empty                          shift and go to state 175
+    Op2                            shift and go to state 173
+
+state 132
+
+    (43) Op3 -> PLUS .
+
+    INTEGER         reduce using rule 43 (Op3 -> PLUS .)
+    FLOAT           reduce using rule 43 (Op3 -> PLUS .)
+    ID              reduce using rule 43 (Op3 -> PLUS .)
+
+
+state 133
+
+    (44) Op3 -> MINUS .
+
+    INTEGER         reduce using rule 44 (Op3 -> MINUS .)
+    FLOAT           reduce using rule 44 (Op3 -> MINUS .)
+    ID              reduce using rule 44 (Op3 -> MINUS .)
+
+
+state 134
+
+    (70) Parameters -> Params .
+
+    RPAREN          reduce using rule 70 (Parameters -> Params .)
+
+
+state 135
+
+    (41) Factor -> LPAREN . SuperExpr RPAREN
+    (21) SuperExpr -> . Expression LogicalOp
+    (25) Expression -> . Expr Comparison
+    (33) Expr -> . Term Op1
+    (37) Term -> . Factor Op2
+    (41) Factor -> . LPAREN SuperExpr RPAREN
+    (42) Factor -> . Op3 Constant
+    (43) Op3 -> . PLUS
+    (44) Op3 -> . MINUS
+    (45) Op3 -> . empty
+    (101) empty -> .
+
+    LPAREN          shift and go to state 135
+    PLUS            shift and go to state 132
+    MINUS           shift and go to state 133
+    INTEGER         reduce using rule 101 (empty -> .)
+    FLOAT           reduce using rule 101 (empty -> .)
+    ID              reduce using rule 101 (empty -> .)
+
+    Term                           shift and go to state 126
+    Op3                            shift and go to state 129
+    SuperExpr                      shift and go to state 176
+    Factor                         shift and go to state 131
+    Expr                           shift and go to state 136
+    Expression                     shift and go to state 137
+    empty                          shift and go to state 140
+
+state 136
+
+    (25) Expression -> Expr . Comparison
+    (26) Comparison -> . GREATHAN Expr
+    (27) Comparison -> . LESSTHAN Expr
+    (28) Comparison -> . DIFFERENT Expr
+    (29) Comparison -> . TWOEQUAL Expr
+    (30) Comparison -> . GREATEQUAL Expr
+    (31) Comparison -> . LESSEQUAL Expr
+    (32) Comparison -> . empty
+    (101) empty -> .
+
+    GREATHAN        shift and go to state 179
+    LESSTHAN        shift and go to state 182
+    DIFFERENT       shift and go to state 178
+    TWOEQUAL        shift and go to state 180
+    GREATEQUAL      shift and go to state 181
+    LESSEQUAL       shift and go to state 183
+    OR              reduce using rule 101 (empty -> .)
+    AND             reduce using rule 101 (empty -> .)
+    COMMA           reduce using rule 101 (empty -> .)
+    RPAREN          reduce using rule 101 (empty -> .)
+    SEMI            reduce using rule 101 (empty -> .)
+
+    empty                          shift and go to state 184
+    Comparison                     shift and go to state 177
+
+state 137
+
+    (21) SuperExpr -> Expression . LogicalOp
+    (22) LogicalOp -> . OR SuperExpr
+    (23) LogicalOp -> . AND SuperExpr
+    (24) LogicalOp -> . empty
+    (101) empty -> .
+
+    OR              shift and go to state 187
+    AND             shift and go to state 185
+    COMMA           reduce using rule 101 (empty -> .)
+    RPAREN          reduce using rule 101 (empty -> .)
+    SEMI            reduce using rule 101 (empty -> .)
+
+    LogicalOp                      shift and go to state 186
+    empty                          shift and go to state 188
+
+state 138
+
+    (71) Parameters -> empty .
+    (45) Op3 -> empty .
+
+    RPAREN          reduce using rule 71 (Parameters -> empty .)
+    INTEGER         reduce using rule 45 (Op3 -> empty .)
+    FLOAT           reduce using rule 45 (Op3 -> empty .)
+    ID              reduce using rule 45 (Op3 -> empty .)
+
+
+state 139
+
+    (85) Square -> SQUARE LPAREN SuperExpr . RPAREN
+
+    RPAREN          shift and go to state 189
+
+
+state 140
+
+    (45) Op3 -> empty .
+
+    INTEGER         reduce using rule 45 (Op3 -> empty .)
+    FLOAT           reduce using rule 45 (Op3 -> empty .)
+    ID              reduce using rule 45 (Op3 -> empty .)
+
+
+state 141
+
+    (80) Home -> HOME LPAREN RPAREN .
+
+    SEMI            reduce using rule 80 (Home -> HOME LPAREN RPAREN .)
+
+
+state 142
+
+    (82) Rotate -> RT LPAREN SuperExpr . RPAREN
+
+    RPAREN          shift and go to state 190
+
+
+state 143
+
+    (79) PenUp -> PU LPAREN RPAREN .
+
+    SEMI            reduce using rule 79 (PenUp -> PU LPAREN RPAREN .)
+
+
+state 144
+
+    (84) Arc -> ARC LPAREN SuperExpr . COMMA SuperExpr RPAREN
+
+    COMMA           shift and go to state 191
+
+
+state 145
+
+    (78) PenDown -> PD LPAREN RPAREN .
+
+    SEMI            reduce using rule 78 (PenDown -> PD LPAREN RPAREN .)
+
+
+state 146
+
+    (76) Brush -> BRUSH LPAREN Color . COMMA SuperExpr RPAREN
+
+    COMMA           shift and go to state 192
+
+
+state 147
+
+    (62) Assignation -> SuperExpr .
+
+    SEMI            reduce using rule 62 (Assignation -> SuperExpr .)
+
+
+state 148
+
+    (64) Assignation -> Call .
+
+    SEMI            reduce using rule 64 (Assignation -> Call .)
+
+
+state 149
+
+    (61) Assign -> Identifier EQUAL Assignation .
+
+    SEMI            reduce using rule 61 (Assign -> Identifier EQUAL Assignation .)
+
+
+state 150
+
+    (63) Assignation -> STRING .
+
+    SEMI            reduce using rule 63 (Assignation -> STRING .)
+
+
+state 151
+
+    (65) Call -> Identifier . LPAREN Parameters RPAREN
+
+    LPAREN          shift and go to state 111
+
+
+state 152
+
+    (65) Call -> Identifier LPAREN Parameters . RPAREN
+
+    RPAREN          shift and go to state 193
+
+
+state 153
+
+    (81) Forward -> FD LPAREN SuperExpr . RPAREN
+
+    RPAREN          shift and go to state 194
+
+
+state 154
+
+    (77) Color -> COLOR LPAREN SuperExpr . COMMA SuperExpr COMMA SuperExpr RPAREN
+
+    COMMA           shift and go to state 195
+
+
+state 155
+
+    (83) Circle -> CIRCLE LPAREN SuperExpr . RPAREN
+
+    RPAREN          shift and go to state 196
+
+
+state 156
+
+    (17) Loop -> LOOP LPAREN SuperExpr . RPAREN Block
+
+    RPAREN          shift and go to state 197
+
+
+state 157
+
+    (16) RFBlock -> LBRACE Declaration Instruction RETURN SuperExpr . SEMI RBRACE
+
+    SEMI            shift and go to state 198
+
+
+state 158
+
+    (66) Read -> READ LPAREN Type COMMA . Identifier RPAREN
+    (97) Identifier -> . ID
+
+    ID              shift and go to state 10
+
+    Identifier                     shift and go to state 199
+
+state 159
+
+    (33) Expr -> Term Op1 .
+
+    GREATHAN        reduce using rule 33 (Expr -> Term Op1 .)
+    LESSTHAN        reduce using rule 33 (Expr -> Term Op1 .)
+    DIFFERENT       reduce using rule 33 (Expr -> Term Op1 .)
+    TWOEQUAL        reduce using rule 33 (Expr -> Term Op1 .)
+    GREATEQUAL      reduce using rule 33 (Expr -> Term Op1 .)
+    LESSEQUAL       reduce using rule 33 (Expr -> Term Op1 .)
+    OR              reduce using rule 33 (Expr -> Term Op1 .)
+    AND             reduce using rule 33 (Expr -> Term Op1 .)
+    COMMA           reduce using rule 33 (Expr -> Term Op1 .)
+    RPAREN          reduce using rule 33 (Expr -> Term Op1 .)
+    SEMI            reduce using rule 33 (Expr -> Term Op1 .)
+
+
+state 160
+
+    (34) Op1 -> PLUS . Expr
+    (33) Expr -> . Term Op1
+    (37) Term -> . Factor Op2
+    (41) Factor -> . LPAREN SuperExpr RPAREN
+    (42) Factor -> . Op3 Constant
+    (43) Op3 -> . PLUS
+    (44) Op3 -> . MINUS
+    (45) Op3 -> . empty
+    (101) empty -> .
+
+    LPAREN          shift and go to state 135
+    PLUS            shift and go to state 132
+    MINUS           shift and go to state 133
+    INTEGER         reduce using rule 101 (empty -> .)
+    FLOAT           reduce using rule 101 (empty -> .)
+    ID              reduce using rule 101 (empty -> .)
+
+    Term                           shift and go to state 126
+    Op3                            shift and go to state 129
+    Expr                           shift and go to state 200
+    Factor                         shift and go to state 131
+    empty                          shift and go to state 140
+
+state 161
+
+    (35) Op1 -> MINUS . Expr
+    (33) Expr -> . Term Op1
+    (37) Term -> . Factor Op2
+    (41) Factor -> . LPAREN SuperExpr RPAREN
+    (42) Factor -> . Op3 Constant
+    (43) Op3 -> . PLUS
+    (44) Op3 -> . MINUS
+    (45) Op3 -> . empty
+    (101) empty -> .
+
+    LPAREN          shift and go to state 135
+    PLUS            shift and go to state 132
+    MINUS           shift and go to state 133
+    INTEGER         reduce using rule 101 (empty -> .)
+    FLOAT           reduce using rule 101 (empty -> .)
+    ID              reduce using rule 101 (empty -> .)
+
+    Term                           shift and go to state 126
+    Op3                            shift and go to state 129
+    Expr                           shift and go to state 201
+    Factor                         shift and go to state 131
+    empty                          shift and go to state 140
+
+state 162
+
+    (36) Op1 -> empty .
+
+    GREATHAN        reduce using rule 36 (Op1 -> empty .)
+    LESSTHAN        reduce using rule 36 (Op1 -> empty .)
+    DIFFERENT       reduce using rule 36 (Op1 -> empty .)
+    TWOEQUAL        reduce using rule 36 (Op1 -> empty .)
+    GREATEQUAL      reduce using rule 36 (Op1 -> empty .)
+    LESSEQUAL       reduce using rule 36 (Op1 -> empty .)
+    OR              reduce using rule 36 (Op1 -> empty .)
+    AND             reduce using rule 36 (Op1 -> empty .)
+    COMMA           reduce using rule 36 (Op1 -> empty .)
+    RPAREN          reduce using rule 36 (Op1 -> empty .)
+    SEMI            reduce using rule 36 (Op1 -> empty .)
+
+
+state 163
+
+    (73) Params -> STRING Params1 .
+
+    RPAREN          reduce using rule 73 (Params -> STRING Params1 .)
+
+
+state 164
+
+    (74) Params1 -> COMMA . Params
+    (72) Params -> . SuperExpr Params1
+    (73) Params -> . STRING Params1
+    (21) SuperExpr -> . Expression LogicalOp
+    (25) Expression -> . Expr Comparison
+    (33) Expr -> . Term Op1
+    (37) Term -> . Factor Op2
+    (41) Factor -> . LPAREN SuperExpr RPAREN
+    (42) Factor -> . Op3 Constant
+    (43) Op3 -> . PLUS
+    (44) Op3 -> . MINUS
+    (45) Op3 -> . empty
+    (101) empty -> .
+
+    STRING          shift and go to state 127
+    LPAREN          shift and go to state 135
+    PLUS            shift and go to state 132
+    MINUS           shift and go to state 133
+    INTEGER         reduce using rule 101 (empty -> .)
+    FLOAT           reduce using rule 101 (empty -> .)
+    ID              reduce using rule 101 (empty -> .)
+
+    Term                           shift and go to state 126
+    Op3                            shift and go to state 129
+    SuperExpr                      shift and go to state 130
+    Factor                         shift and go to state 131
+    Params                         shift and go to state 202
+    Expr                           shift and go to state 136
+    Expression                     shift and go to state 137
+    empty                          shift and go to state 140
+
+state 165
+
+    (75) Params1 -> empty .
+
+    RPAREN          reduce using rule 75 (Params1 -> empty .)
+
+
+state 166
+
+    (69) Print -> PRINT LPAREN Parameters RPAREN .
+
+    SEMI            reduce using rule 69 (Print -> PRINT LPAREN Parameters RPAREN .)
+
+
+state 167
+
+    (42) Factor -> Op3 Constant .
+
+    TIMES           reduce using rule 42 (Factor -> Op3 Constant .)
+    DIVIDE          reduce using rule 42 (Factor -> Op3 Constant .)
+    PLUS            reduce using rule 42 (Factor -> Op3 Constant .)
+    MINUS           reduce using rule 42 (Factor -> Op3 Constant .)
+    OR              reduce using rule 42 (Factor -> Op3 Constant .)
+    AND             reduce using rule 42 (Factor -> Op3 Constant .)
+    COMMA           reduce using rule 42 (Factor -> Op3 Constant .)
+    RPAREN          reduce using rule 42 (Factor -> Op3 Constant .)
+    SEMI            reduce using rule 42 (Factor -> Op3 Constant .)
+    GREATHAN        reduce using rule 42 (Factor -> Op3 Constant .)
+    LESSTHAN        reduce using rule 42 (Factor -> Op3 Constant .)
+    DIFFERENT       reduce using rule 42 (Factor -> Op3 Constant .)
+    TWOEQUAL        reduce using rule 42 (Factor -> Op3 Constant .)
+    GREATEQUAL      reduce using rule 42 (Factor -> Op3 Constant .)
+    LESSEQUAL       reduce using rule 42 (Factor -> Op3 Constant .)
+
+
+state 168
+
+    (99) Constant -> FLOAT .
+
+    TIMES           reduce using rule 99 (Constant -> FLOAT .)
+    DIVIDE          reduce using rule 99 (Constant -> FLOAT .)
+    PLUS            reduce using rule 99 (Constant -> FLOAT .)
+    MINUS           reduce using rule 99 (Constant -> FLOAT .)
+    GREATHAN        reduce using rule 99 (Constant -> FLOAT .)
+    LESSTHAN        reduce using rule 99 (Constant -> FLOAT .)
+    DIFFERENT       reduce using rule 99 (Constant -> FLOAT .)
+    TWOEQUAL        reduce using rule 99 (Constant -> FLOAT .)
+    GREATEQUAL      reduce using rule 99 (Constant -> FLOAT .)
+    LESSEQUAL       reduce using rule 99 (Constant -> FLOAT .)
+    OR              reduce using rule 99 (Constant -> FLOAT .)
+    AND             reduce using rule 99 (Constant -> FLOAT .)
+    COMMA           reduce using rule 99 (Constant -> FLOAT .)
+    RPAREN          reduce using rule 99 (Constant -> FLOAT .)
+    SEMI            reduce using rule 99 (Constant -> FLOAT .)
+
+
+state 169
+
+    (98) Constant -> INTEGER .
+
+    TIMES           reduce using rule 98 (Constant -> INTEGER .)
+    DIVIDE          reduce using rule 98 (Constant -> INTEGER .)
+    PLUS            reduce using rule 98 (Constant -> INTEGER .)
+    MINUS           reduce using rule 98 (Constant -> INTEGER .)
+    GREATHAN        reduce using rule 98 (Constant -> INTEGER .)
+    LESSTHAN        reduce using rule 98 (Constant -> INTEGER .)
+    DIFFERENT       reduce using rule 98 (Constant -> INTEGER .)
+    TWOEQUAL        reduce using rule 98 (Constant -> INTEGER .)
+    GREATEQUAL      reduce using rule 98 (Constant -> INTEGER .)
+    LESSEQUAL       reduce using rule 98 (Constant -> INTEGER .)
+    OR              reduce using rule 98 (Constant -> INTEGER .)
+    AND             reduce using rule 98 (Constant -> INTEGER .)
+    COMMA           reduce using rule 98 (Constant -> INTEGER .)
+    RPAREN          reduce using rule 98 (Constant -> INTEGER .)
+    SEMI            reduce using rule 98 (Constant -> INTEGER .)
+
+
+state 170
+
+    (100) Constant -> Identifier .
+
+    TIMES           reduce using rule 100 (Constant -> Identifier .)
+    DIVIDE          reduce using rule 100 (Constant -> Identifier .)
+    PLUS            reduce using rule 100 (Constant -> Identifier .)
+    MINUS           reduce using rule 100 (Constant -> Identifier .)
+    GREATHAN        reduce using rule 100 (Constant -> Identifier .)
+    LESSTHAN        reduce using rule 100 (Constant -> Identifier .)
+    DIFFERENT       reduce using rule 100 (Constant -> Identifier .)
+    TWOEQUAL        reduce using rule 100 (Constant -> Identifier .)
+    GREATEQUAL      reduce using rule 100 (Constant -> Identifier .)
+    LESSEQUAL       reduce using rule 100 (Constant -> Identifier .)
+    OR              reduce using rule 100 (Constant -> Identifier .)
+    AND             reduce using rule 100 (Constant -> Identifier .)
+    COMMA           reduce using rule 100 (Constant -> Identifier .)
+    RPAREN          reduce using rule 100 (Constant -> Identifier .)
+    SEMI            reduce using rule 100 (Constant -> Identifier .)
+
+
+state 171
+
+    (72) Params -> SuperExpr Params1 .
+
+    RPAREN          reduce using rule 72 (Params -> SuperExpr Params1 .)
+
+
+state 172
+
+    (39) Op2 -> DIVIDE . Term
+    (37) Term -> . Factor Op2
+    (41) Factor -> . LPAREN SuperExpr RPAREN
+    (42) Factor -> . Op3 Constant
+    (43) Op3 -> . PLUS
+    (44) Op3 -> . MINUS
+    (45) Op3 -> . empty
+    (101) empty -> .
+
+    LPAREN          shift and go to state 135
+    PLUS            shift and go to state 132
+    MINUS           shift and go to state 133
+    INTEGER         reduce using rule 101 (empty -> .)
+    FLOAT           reduce using rule 101 (empty -> .)
+    ID              reduce using rule 101 (empty -> .)
+
+    Term                           shift and go to state 203
+    Op3                            shift and go to state 129
+    Factor                         shift and go to state 131
+    empty                          shift and go to state 140
+
+state 173
+
+    (37) Term -> Factor Op2 .
+
+    PLUS            reduce using rule 37 (Term -> Factor Op2 .)
+    MINUS           reduce using rule 37 (Term -> Factor Op2 .)
+    GREATHAN        reduce using rule 37 (Term -> Factor Op2 .)
+    LESSTHAN        reduce using rule 37 (Term -> Factor Op2 .)
+    DIFFERENT       reduce using rule 37 (Term -> Factor Op2 .)
+    TWOEQUAL        reduce using rule 37 (Term -> Factor Op2 .)
+    GREATEQUAL      reduce using rule 37 (Term -> Factor Op2 .)
+    LESSEQUAL       reduce using rule 37 (Term -> Factor Op2 .)
+    OR              reduce using rule 37 (Term -> Factor Op2 .)
+    AND             reduce using rule 37 (Term -> Factor Op2 .)
+    COMMA           reduce using rule 37 (Term -> Factor Op2 .)
+    RPAREN          reduce using rule 37 (Term -> Factor Op2 .)
+    SEMI            reduce using rule 37 (Term -> Factor Op2 .)
+
+
+state 174
+
+    (38) Op2 -> TIMES . Term
+    (37) Term -> . Factor Op2
+    (41) Factor -> . LPAREN SuperExpr RPAREN
+    (42) Factor -> . Op3 Constant
+    (43) Op3 -> . PLUS
+    (44) Op3 -> . MINUS
+    (45) Op3 -> . empty
+    (101) empty -> .
+
+    LPAREN          shift and go to state 135
+    PLUS            shift and go to state 132
+    MINUS           shift and go to state 133
+    INTEGER         reduce using rule 101 (empty -> .)
+    FLOAT           reduce using rule 101 (empty -> .)
+    ID              reduce using rule 101 (empty -> .)
+
+    Term                           shift and go to state 204
+    Op3                            shift and go to state 129
+    Factor                         shift and go to state 131
+    empty                          shift and go to state 140
+
+state 175
+
+    (40) Op2 -> empty .
+
+    PLUS            reduce using rule 40 (Op2 -> empty .)
+    MINUS           reduce using rule 40 (Op2 -> empty .)
+    GREATHAN        reduce using rule 40 (Op2 -> empty .)
+    LESSTHAN        reduce using rule 40 (Op2 -> empty .)
+    DIFFERENT       reduce using rule 40 (Op2 -> empty .)
+    TWOEQUAL        reduce using rule 40 (Op2 -> empty .)
+    GREATEQUAL      reduce using rule 40 (Op2 -> empty .)
+    LESSEQUAL       reduce using rule 40 (Op2 -> empty .)
+    OR              reduce using rule 40 (Op2 -> empty .)
+    AND             reduce using rule 40 (Op2 -> empty .)
+    COMMA           reduce using rule 40 (Op2 -> empty .)
+    RPAREN          reduce using rule 40 (Op2 -> empty .)
+    SEMI            reduce using rule 40 (Op2 -> empty .)
+
+
+state 176
+
+    (41) Factor -> LPAREN SuperExpr . RPAREN
+
+    RPAREN          shift and go to state 205
+
+
+state 177
+
+    (25) Expression -> Expr Comparison .
+
+    OR              reduce using rule 25 (Expression -> Expr Comparison .)
+    AND             reduce using rule 25 (Expression -> Expr Comparison .)
+    COMMA           reduce using rule 25 (Expression -> Expr Comparison .)
+    RPAREN          reduce using rule 25 (Expression -> Expr Comparison .)
+    SEMI            reduce using rule 25 (Expression -> Expr Comparison .)
+
+
+state 178
+
+    (28) Comparison -> DIFFERENT . Expr
+    (33) Expr -> . Term Op1
+    (37) Term -> . Factor Op2
+    (41) Factor -> . LPAREN SuperExpr RPAREN
+    (42) Factor -> . Op3 Constant
+    (43) Op3 -> . PLUS
+    (44) Op3 -> . MINUS
+    (45) Op3 -> . empty
+    (101) empty -> .
+
+    LPAREN          shift and go to state 135
+    PLUS            shift and go to state 132
+    MINUS           shift and go to state 133
+    INTEGER         reduce using rule 101 (empty -> .)
+    FLOAT           reduce using rule 101 (empty -> .)
+    ID              reduce using rule 101 (empty -> .)
+
+    Term                           shift and go to state 126
+    Op3                            shift and go to state 129
+    Expr                           shift and go to state 206
+    Factor                         shift and go to state 131
+    empty                          shift and go to state 140
+
+state 179
+
+    (26) Comparison -> GREATHAN . Expr
+    (33) Expr -> . Term Op1
+    (37) Term -> . Factor Op2
+    (41) Factor -> . LPAREN SuperExpr RPAREN
+    (42) Factor -> . Op3 Constant
+    (43) Op3 -> . PLUS
+    (44) Op3 -> . MINUS
+    (45) Op3 -> . empty
+    (101) empty -> .
+
+    LPAREN          shift and go to state 135
+    PLUS            shift and go to state 132
+    MINUS           shift and go to state 133
+    INTEGER         reduce using rule 101 (empty -> .)
+    FLOAT           reduce using rule 101 (empty -> .)
+    ID              reduce using rule 101 (empty -> .)
+
+    Term                           shift and go to state 126
+    Op3                            shift and go to state 129
+    Expr                           shift and go to state 207
+    Factor                         shift and go to state 131
+    empty                          shift and go to state 140
+
+state 180
+
+    (29) Comparison -> TWOEQUAL . Expr
+    (33) Expr -> . Term Op1
+    (37) Term -> . Factor Op2
+    (41) Factor -> . LPAREN SuperExpr RPAREN
+    (42) Factor -> . Op3 Constant
+    (43) Op3 -> . PLUS
+    (44) Op3 -> . MINUS
+    (45) Op3 -> . empty
+    (101) empty -> .
+
+    LPAREN          shift and go to state 135
+    PLUS            shift and go to state 132
+    MINUS           shift and go to state 133
+    INTEGER         reduce using rule 101 (empty -> .)
+    FLOAT           reduce using rule 101 (empty -> .)
+    ID              reduce using rule 101 (empty -> .)
+
+    Term                           shift and go to state 126
+    Op3                            shift and go to state 129
+    Expr                           shift and go to state 208
+    Factor                         shift and go to state 131
+    empty                          shift and go to state 140
+
+state 181
+
+    (30) Comparison -> GREATEQUAL . Expr
+    (33) Expr -> . Term Op1
+    (37) Term -> . Factor Op2
+    (41) Factor -> . LPAREN SuperExpr RPAREN
+    (42) Factor -> . Op3 Constant
+    (43) Op3 -> . PLUS
+    (44) Op3 -> . MINUS
+    (45) Op3 -> . empty
+    (101) empty -> .
+
+    LPAREN          shift and go to state 135
+    PLUS            shift and go to state 132
+    MINUS           shift and go to state 133
+    INTEGER         reduce using rule 101 (empty -> .)
+    FLOAT           reduce using rule 101 (empty -> .)
+    ID              reduce using rule 101 (empty -> .)
+
+    Term                           shift and go to state 126
+    Op3                            shift and go to state 129
+    Expr                           shift and go to state 209
+    Factor                         shift and go to state 131
+    empty                          shift and go to state 140
+
+state 182
+
+    (27) Comparison -> LESSTHAN . Expr
+    (33) Expr -> . Term Op1
+    (37) Term -> . Factor Op2
+    (41) Factor -> . LPAREN SuperExpr RPAREN
+    (42) Factor -> . Op3 Constant
+    (43) Op3 -> . PLUS
+    (44) Op3 -> . MINUS
+    (45) Op3 -> . empty
+    (101) empty -> .
+
+    LPAREN          shift and go to state 135
+    PLUS            shift and go to state 132
+    MINUS           shift and go to state 133
+    INTEGER         reduce using rule 101 (empty -> .)
+    FLOAT           reduce using rule 101 (empty -> .)
+    ID              reduce using rule 101 (empty -> .)
+
+    Term                           shift and go to state 126
+    Op3                            shift and go to state 129
+    Expr                           shift and go to state 210
+    Factor                         shift and go to state 131
+    empty                          shift and go to state 140
+
+state 183
+
+    (31) Comparison -> LESSEQUAL . Expr
+    (33) Expr -> . Term Op1
+    (37) Term -> . Factor Op2
+    (41) Factor -> . LPAREN SuperExpr RPAREN
+    (42) Factor -> . Op3 Constant
+    (43) Op3 -> . PLUS
+    (44) Op3 -> . MINUS
+    (45) Op3 -> . empty
+    (101) empty -> .
+
+    LPAREN          shift and go to state 135
+    PLUS            shift and go to state 132
+    MINUS           shift and go to state 133
+    INTEGER         reduce using rule 101 (empty -> .)
+    FLOAT           reduce using rule 101 (empty -> .)
+    ID              reduce using rule 101 (empty -> .)
+
+    Term                           shift and go to state 126
+    Op3                            shift and go to state 129
+    Expr                           shift and go to state 211
+    Factor                         shift and go to state 131
+    empty                          shift and go to state 140
+
+state 184
+
+    (32) Comparison -> empty .
+
+    OR              reduce using rule 32 (Comparison -> empty .)
+    AND             reduce using rule 32 (Comparison -> empty .)
+    COMMA           reduce using rule 32 (Comparison -> empty .)
+    RPAREN          reduce using rule 32 (Comparison -> empty .)
+    SEMI            reduce using rule 32 (Comparison -> empty .)
+
+
+state 185
+
+    (23) LogicalOp -> AND . SuperExpr
+    (21) SuperExpr -> . Expression LogicalOp
+    (25) Expression -> . Expr Comparison
+    (33) Expr -> . Term Op1
+    (37) Term -> . Factor Op2
+    (41) Factor -> . LPAREN SuperExpr RPAREN
+    (42) Factor -> . Op3 Constant
+    (43) Op3 -> . PLUS
+    (44) Op3 -> . MINUS
+    (45) Op3 -> . empty
+    (101) empty -> .
+
+    LPAREN          shift and go to state 135
+    PLUS            shift and go to state 132
+    MINUS           shift and go to state 133
+    INTEGER         reduce using rule 101 (empty -> .)
+    FLOAT           reduce using rule 101 (empty -> .)
+    ID              reduce using rule 101 (empty -> .)
+
+    Term                           shift and go to state 126
+    Op3                            shift and go to state 129
+    SuperExpr                      shift and go to state 212
+    Factor                         shift and go to state 131
+    Expr                           shift and go to state 136
+    Expression                     shift and go to state 137
+    empty                          shift and go to state 140
+
+state 186
+
+    (21) SuperExpr -> Expression LogicalOp .
+
+    COMMA           reduce using rule 21 (SuperExpr -> Expression LogicalOp .)
+    RPAREN          reduce using rule 21 (SuperExpr -> Expression LogicalOp .)
+    SEMI            reduce using rule 21 (SuperExpr -> Expression LogicalOp .)
+
+
+state 187
+
+    (22) LogicalOp -> OR . SuperExpr
+    (21) SuperExpr -> . Expression LogicalOp
+    (25) Expression -> . Expr Comparison
+    (33) Expr -> . Term Op1
+    (37) Term -> . Factor Op2
+    (41) Factor -> . LPAREN SuperExpr RPAREN
+    (42) Factor -> . Op3 Constant
+    (43) Op3 -> . PLUS
+    (44) Op3 -> . MINUS
+    (45) Op3 -> . empty
+    (101) empty -> .
+
+    LPAREN          shift and go to state 135
+    PLUS            shift and go to state 132
+    MINUS           shift and go to state 133
+    INTEGER         reduce using rule 101 (empty -> .)
+    FLOAT           reduce using rule 101 (empty -> .)
+    ID              reduce using rule 101 (empty -> .)
+
+    Term                           shift and go to state 126
+    Op3                            shift and go to state 129
+    SuperExpr                      shift and go to state 213
+    Factor                         shift and go to state 131
+    Expr                           shift and go to state 136
+    Expression                     shift and go to state 137
+    empty                          shift and go to state 140
+
+state 188
+
+    (24) LogicalOp -> empty .
+
+    COMMA           reduce using rule 24 (LogicalOp -> empty .)
+    RPAREN          reduce using rule 24 (LogicalOp -> empty .)
+    SEMI            reduce using rule 24 (LogicalOp -> empty .)
+
+
+state 189
+
+    (85) Square -> SQUARE LPAREN SuperExpr RPAREN .
+
+    SEMI            reduce using rule 85 (Square -> SQUARE LPAREN SuperExpr RPAREN .)
+
+
+state 190
+
+    (82) Rotate -> RT LPAREN SuperExpr RPAREN .
+
+    SEMI            reduce using rule 82 (Rotate -> RT LPAREN SuperExpr RPAREN .)
+
+
+state 191
+
+    (84) Arc -> ARC LPAREN SuperExpr COMMA . SuperExpr RPAREN
+    (21) SuperExpr -> . Expression LogicalOp
+    (25) Expression -> . Expr Comparison
+    (33) Expr -> . Term Op1
+    (37) Term -> . Factor Op2
+    (41) Factor -> . LPAREN SuperExpr RPAREN
+    (42) Factor -> . Op3 Constant
+    (43) Op3 -> . PLUS
+    (44) Op3 -> . MINUS
+    (45) Op3 -> . empty
+    (101) empty -> .
+
+    LPAREN          shift and go to state 135
+    PLUS            shift and go to state 132
+    MINUS           shift and go to state 133
+    INTEGER         reduce using rule 101 (empty -> .)
+    FLOAT           reduce using rule 101 (empty -> .)
+    ID              reduce using rule 101 (empty -> .)
+
+    Term                           shift and go to state 126
+    Op3                            shift and go to state 129
+    SuperExpr                      shift and go to state 214
+    Factor                         shift and go to state 131
+    Expr                           shift and go to state 136
+    Expression                     shift and go to state 137
+    empty                          shift and go to state 140
+
+state 192
+
+    (76) Brush -> BRUSH LPAREN Color COMMA . SuperExpr RPAREN
+    (21) SuperExpr -> . Expression LogicalOp
+    (25) Expression -> . Expr Comparison
+    (33) Expr -> . Term Op1
+    (37) Term -> . Factor Op2
+    (41) Factor -> . LPAREN SuperExpr RPAREN
+    (42) Factor -> . Op3 Constant
+    (43) Op3 -> . PLUS
+    (44) Op3 -> . MINUS
+    (45) Op3 -> . empty
+    (101) empty -> .
+
+    LPAREN          shift and go to state 135
+    PLUS            shift and go to state 132
+    MINUS           shift and go to state 133
+    INTEGER         reduce using rule 101 (empty -> .)
+    FLOAT           reduce using rule 101 (empty -> .)
+    ID              reduce using rule 101 (empty -> .)
+
+    Term                           shift and go to state 126
+    Op3                            shift and go to state 129
+    SuperExpr                      shift and go to state 215
+    Factor                         shift and go to state 131
+    Expr                           shift and go to state 136
+    Expression                     shift and go to state 137
+    empty                          shift and go to state 140
+
+state 193
+
+    (65) Call -> Identifier LPAREN Parameters RPAREN .
+
+    SEMI            reduce using rule 65 (Call -> Identifier LPAREN Parameters RPAREN .)
+
+
+state 194
+
+    (81) Forward -> FD LPAREN SuperExpr RPAREN .
+
+    SEMI            reduce using rule 81 (Forward -> FD LPAREN SuperExpr RPAREN .)
+
+
+state 195
+
+    (77) Color -> COLOR LPAREN SuperExpr COMMA . SuperExpr COMMA SuperExpr RPAREN
+    (21) SuperExpr -> . Expression LogicalOp
+    (25) Expression -> . Expr Comparison
+    (33) Expr -> . Term Op1
+    (37) Term -> . Factor Op2
+    (41) Factor -> . LPAREN SuperExpr RPAREN
+    (42) Factor -> . Op3 Constant
+    (43) Op3 -> . PLUS
+    (44) Op3 -> . MINUS
+    (45) Op3 -> . empty
+    (101) empty -> .
+
+    LPAREN          shift and go to state 135
+    PLUS            shift and go to state 132
+    MINUS           shift and go to state 133
+    INTEGER         reduce using rule 101 (empty -> .)
+    FLOAT           reduce using rule 101 (empty -> .)
+    ID              reduce using rule 101 (empty -> .)
+
+    Term                           shift and go to state 126
+    Op3                            shift and go to state 129
+    SuperExpr                      shift and go to state 216
+    Factor                         shift and go to state 131
+    Expr                           shift and go to state 136
+    Expression                     shift and go to state 137
+    empty                          shift and go to state 140
+
+state 196
+
+    (83) Circle -> CIRCLE LPAREN SuperExpr RPAREN .
+
+    SEMI            reduce using rule 83 (Circle -> CIRCLE LPAREN SuperExpr RPAREN .)
+
+
+state 197
+
+    (17) Loop -> LOOP LPAREN SuperExpr RPAREN . Block
+    (14) Block -> . LBRACE Instruction RBRACE
+
+    LBRACE          shift and go to state 217
+
+    Block                          shift and go to state 218
+
+state 198
+
+    (16) RFBlock -> LBRACE Declaration Instruction RETURN SuperExpr SEMI . RBRACE
+
+    RBRACE          shift and go to state 219
+
+
+state 199
+
+    (66) Read -> READ LPAREN Type COMMA Identifier . RPAREN
+
+    RPAREN          shift and go to state 220
+
+
+state 200
+
+    (34) Op1 -> PLUS Expr .
+
+    GREATHAN        reduce using rule 34 (Op1 -> PLUS Expr .)
+    LESSTHAN        reduce using rule 34 (Op1 -> PLUS Expr .)
+    DIFFERENT       reduce using rule 34 (Op1 -> PLUS Expr .)
+    TWOEQUAL        reduce using rule 34 (Op1 -> PLUS Expr .)
+    GREATEQUAL      reduce using rule 34 (Op1 -> PLUS Expr .)
+    LESSEQUAL       reduce using rule 34 (Op1 -> PLUS Expr .)
+    OR              reduce using rule 34 (Op1 -> PLUS Expr .)
+    AND             reduce using rule 34 (Op1 -> PLUS Expr .)
+    COMMA           reduce using rule 34 (Op1 -> PLUS Expr .)
+    RPAREN          reduce using rule 34 (Op1 -> PLUS Expr .)
+    SEMI            reduce using rule 34 (Op1 -> PLUS Expr .)
+
+
+state 201
+
+    (35) Op1 -> MINUS Expr .
+
+    GREATHAN        reduce using rule 35 (Op1 -> MINUS Expr .)
+    LESSTHAN        reduce using rule 35 (Op1 -> MINUS Expr .)
+    DIFFERENT       reduce using rule 35 (Op1 -> MINUS Expr .)
+    TWOEQUAL        reduce using rule 35 (Op1 -> MINUS Expr .)
+    GREATEQUAL      reduce using rule 35 (Op1 -> MINUS Expr .)
+    LESSEQUAL       reduce using rule 35 (Op1 -> MINUS Expr .)
+    OR              reduce using rule 35 (Op1 -> MINUS Expr .)
+    AND             reduce using rule 35 (Op1 -> MINUS Expr .)
+    COMMA           reduce using rule 35 (Op1 -> MINUS Expr .)
+    RPAREN          reduce using rule 35 (Op1 -> MINUS Expr .)
+    SEMI            reduce using rule 35 (Op1 -> MINUS Expr .)
+
+
+state 202
+
+    (74) Params1 -> COMMA Params .
+
+    RPAREN          reduce using rule 74 (Params1 -> COMMA Params .)
+
+
+state 203
+
+    (39) Op2 -> DIVIDE Term .
+
+    PLUS            reduce using rule 39 (Op2 -> DIVIDE Term .)
+    MINUS           reduce using rule 39 (Op2 -> DIVIDE Term .)
+    GREATHAN        reduce using rule 39 (Op2 -> DIVIDE Term .)
+    LESSTHAN        reduce using rule 39 (Op2 -> DIVIDE Term .)
+    DIFFERENT       reduce using rule 39 (Op2 -> DIVIDE Term .)
+    TWOEQUAL        reduce using rule 39 (Op2 -> DIVIDE Term .)
+    GREATEQUAL      reduce using rule 39 (Op2 -> DIVIDE Term .)
+    LESSEQUAL       reduce using rule 39 (Op2 -> DIVIDE Term .)
+    OR              reduce using rule 39 (Op2 -> DIVIDE Term .)
+    AND             reduce using rule 39 (Op2 -> DIVIDE Term .)
+    COMMA           reduce using rule 39 (Op2 -> DIVIDE Term .)
+    RPAREN          reduce using rule 39 (Op2 -> DIVIDE Term .)
+    SEMI            reduce using rule 39 (Op2 -> DIVIDE Term .)
+
+
+state 204
+
+    (38) Op2 -> TIMES Term .
+
+    PLUS            reduce using rule 38 (Op2 -> TIMES Term .)
+    MINUS           reduce using rule 38 (Op2 -> TIMES Term .)
+    GREATHAN        reduce using rule 38 (Op2 -> TIMES Term .)
+    LESSTHAN        reduce using rule 38 (Op2 -> TIMES Term .)
+    DIFFERENT       reduce using rule 38 (Op2 -> TIMES Term .)
+    TWOEQUAL        reduce using rule 38 (Op2 -> TIMES Term .)
+    GREATEQUAL      reduce using rule 38 (Op2 -> TIMES Term .)
+    LESSEQUAL       reduce using rule 38 (Op2 -> TIMES Term .)
+    OR              reduce using rule 38 (Op2 -> TIMES Term .)
+    AND             reduce using rule 38 (Op2 -> TIMES Term .)
+    COMMA           reduce using rule 38 (Op2 -> TIMES Term .)
+    RPAREN          reduce using rule 38 (Op2 -> TIMES Term .)
+    SEMI            reduce using rule 38 (Op2 -> TIMES Term .)
+
+
+state 205
+
+    (41) Factor -> LPAREN SuperExpr RPAREN .
+
+    TIMES           reduce using rule 41 (Factor -> LPAREN SuperExpr RPAREN .)
+    DIVIDE          reduce using rule 41 (Factor -> LPAREN SuperExpr RPAREN .)
+    PLUS            reduce using rule 41 (Factor -> LPAREN SuperExpr RPAREN .)
+    MINUS           reduce using rule 41 (Factor -> LPAREN SuperExpr RPAREN .)
+    OR              reduce using rule 41 (Factor -> LPAREN SuperExpr RPAREN .)
+    AND             reduce using rule 41 (Factor -> LPAREN SuperExpr RPAREN .)
+    COMMA           reduce using rule 41 (Factor -> LPAREN SuperExpr RPAREN .)
+    RPAREN          reduce using rule 41 (Factor -> LPAREN SuperExpr RPAREN .)
+    SEMI            reduce using rule 41 (Factor -> LPAREN SuperExpr RPAREN .)
+    GREATHAN        reduce using rule 41 (Factor -> LPAREN SuperExpr RPAREN .)
+    LESSTHAN        reduce using rule 41 (Factor -> LPAREN SuperExpr RPAREN .)
+    DIFFERENT       reduce using rule 41 (Factor -> LPAREN SuperExpr RPAREN .)
+    TWOEQUAL        reduce using rule 41 (Factor -> LPAREN SuperExpr RPAREN .)
+    GREATEQUAL      reduce using rule 41 (Factor -> LPAREN SuperExpr RPAREN .)
+    LESSEQUAL       reduce using rule 41 (Factor -> LPAREN SuperExpr RPAREN .)
+
+
+state 206
+
+    (28) Comparison -> DIFFERENT Expr .
+
+    OR              reduce using rule 28 (Comparison -> DIFFERENT Expr .)
+    AND             reduce using rule 28 (Comparison -> DIFFERENT Expr .)
+    COMMA           reduce using rule 28 (Comparison -> DIFFERENT Expr .)
+    RPAREN          reduce using rule 28 (Comparison -> DIFFERENT Expr .)
+    SEMI            reduce using rule 28 (Comparison -> DIFFERENT Expr .)
+
+
+state 207
+
+    (26) Comparison -> GREATHAN Expr .
+
+    OR              reduce using rule 26 (Comparison -> GREATHAN Expr .)
+    AND             reduce using rule 26 (Comparison -> GREATHAN Expr .)
+    COMMA           reduce using rule 26 (Comparison -> GREATHAN Expr .)
+    RPAREN          reduce using rule 26 (Comparison -> GREATHAN Expr .)
+    SEMI            reduce using rule 26 (Comparison -> GREATHAN Expr .)
+
+
+state 208
+
+    (29) Comparison -> TWOEQUAL Expr .
+
+    OR              reduce using rule 29 (Comparison -> TWOEQUAL Expr .)
+    AND             reduce using rule 29 (Comparison -> TWOEQUAL Expr .)
+    COMMA           reduce using rule 29 (Comparison -> TWOEQUAL Expr .)
+    RPAREN          reduce using rule 29 (Comparison -> TWOEQUAL Expr .)
+    SEMI            reduce using rule 29 (Comparison -> TWOEQUAL Expr .)
+
+
+state 209
+
+    (30) Comparison -> GREATEQUAL Expr .
+
+    OR              reduce using rule 30 (Comparison -> GREATEQUAL Expr .)
+    AND             reduce using rule 30 (Comparison -> GREATEQUAL Expr .)
+    COMMA           reduce using rule 30 (Comparison -> GREATEQUAL Expr .)
+    RPAREN          reduce using rule 30 (Comparison -> GREATEQUAL Expr .)
+    SEMI            reduce using rule 30 (Comparison -> GREATEQUAL Expr .)
+
+
+state 210
+
+    (27) Comparison -> LESSTHAN Expr .
+
+    OR              reduce using rule 27 (Comparison -> LESSTHAN Expr .)
+    AND             reduce using rule 27 (Comparison -> LESSTHAN Expr .)
+    COMMA           reduce using rule 27 (Comparison -> LESSTHAN Expr .)
+    RPAREN          reduce using rule 27 (Comparison -> LESSTHAN Expr .)
+    SEMI            reduce using rule 27 (Comparison -> LESSTHAN Expr .)
+
+
+state 211
+
+    (31) Comparison -> LESSEQUAL Expr .
+
+    OR              reduce using rule 31 (Comparison -> LESSEQUAL Expr .)
+    AND             reduce using rule 31 (Comparison -> LESSEQUAL Expr .)
+    COMMA           reduce using rule 31 (Comparison -> LESSEQUAL Expr .)
+    RPAREN          reduce using rule 31 (Comparison -> LESSEQUAL Expr .)
+    SEMI            reduce using rule 31 (Comparison -> LESSEQUAL Expr .)
+
+
+state 212
+
+    (23) LogicalOp -> AND SuperExpr .
+
+    COMMA           reduce using rule 23 (LogicalOp -> AND SuperExpr .)
+    RPAREN          reduce using rule 23 (LogicalOp -> AND SuperExpr .)
+    SEMI            reduce using rule 23 (LogicalOp -> AND SuperExpr .)
+
+
+state 213
+
+    (22) LogicalOp -> OR SuperExpr .
+
+    COMMA           reduce using rule 22 (LogicalOp -> OR SuperExpr .)
+    RPAREN          reduce using rule 22 (LogicalOp -> OR SuperExpr .)
+    SEMI            reduce using rule 22 (LogicalOp -> OR SuperExpr .)
+
+
+state 214
+
+    (84) Arc -> ARC LPAREN SuperExpr COMMA SuperExpr . RPAREN
+
+    RPAREN          shift and go to state 221
+
+
+state 215
+
+    (76) Brush -> BRUSH LPAREN Color COMMA SuperExpr . RPAREN
+
+    RPAREN          shift and go to state 222
+
+
+state 216
+
+    (77) Color -> COLOR LPAREN SuperExpr COMMA SuperExpr . COMMA SuperExpr RPAREN
+
+    COMMA           shift and go to state 223
+
+
+state 217
+
+    (14) Block -> LBRACE . Instruction RBRACE
+    (46) Instruction -> . Loop SEMI
+    (47) Instruction -> . Assign SEMI
+    (48) Instruction -> . Call SEMI
+    (49) Instruction -> . Brush SEMI
+    (50) Instruction -> . Read SEMI
+    (51) Instruction -> . Print SEMI
+    (52) Instruction -> . PenDown SEMI
+    (53) Instruction -> . PenUp SEMI
+    (54) Instruction -> . Home SEMI
+    (55) Instruction -> . Forward SEMI
+    (56) Instruction -> . Rotate SEMI
+    (57) Instruction -> . Color SEMI
+    (58) Instruction -> . Circle SEMI
+    (59) Instruction -> . Arc SEMI
+    (60) Instruction -> . Square SEMI
+    (17) Loop -> . LOOP LPAREN SuperExpr RPAREN Block
+    (61) Assign -> . Identifier EQUAL Assignation
+    (65) Call -> . Identifier LPAREN Parameters RPAREN
+    (76) Brush -> . BRUSH LPAREN Color COMMA SuperExpr RPAREN
+    (66) Read -> . READ LPAREN Type COMMA Identifier RPAREN
+    (69) Print -> . PRINT LPAREN Parameters RPAREN
+    (78) PenDown -> . PD LPAREN RPAREN
+    (79) PenUp -> . PU LPAREN RPAREN
+    (80) Home -> . HOME LPAREN RPAREN
+    (81) Forward -> . FD LPAREN SuperExpr RPAREN
+    (82) Rotate -> . RT LPAREN SuperExpr RPAREN
+    (77) Color -> . COLOR LPAREN SuperExpr COMMA SuperExpr COMMA SuperExpr RPAREN
+    (83) Circle -> . CIRCLE LPAREN SuperExpr RPAREN
+    (84) Arc -> . ARC LPAREN SuperExpr COMMA SuperExpr RPAREN
+    (85) Square -> . SQUARE LPAREN SuperExpr RPAREN
+    (97) Identifier -> . ID
+
+    LOOP            shift and go to state 89
+    BRUSH           shift and go to state 75
+    READ            shift and go to state 61
+    PRINT           shift and go to state 62
+    PD              shift and go to state 74
+    PU              shift and go to state 71
+    HOME            shift and go to state 68
+    FD              shift and go to state 82
+    RT              shift and go to state 70
+    COLOR           shift and go to state 84
+    CIRCLE          shift and go to state 88
+    ARC             shift and go to state 73
+    SQUARE          shift and go to state 65
+    ID              shift and go to state 10
+
+    PenUp                          shift and go to state 60
+    Print                          shift and go to state 63
+    PenDown                        shift and go to state 64
+    Call                           shift and go to state 66
+    Forward                        shift and go to state 67
+    Circle                         shift and go to state 69
+    Read                           shift and go to state 72
+    Loop                           shift and go to state 81
+    Rotate                         shift and go to state 76
+    Instruction                    shift and go to state 224
+    Identifier                     shift and go to state 79
+    Assign                         shift and go to state 80
+    Square                         shift and go to state 78
+    Color                          shift and go to state 83
+    Arc                            shift and go to state 85
+    Brush                          shift and go to state 86
+    Home                           shift and go to state 87
+
+state 218
+
+    (17) Loop -> LOOP LPAREN SuperExpr RPAREN Block .
+
+    SEMI            reduce using rule 17 (Loop -> LOOP LPAREN SuperExpr RPAREN Block .)
+
+
+state 219
+
+    (16) RFBlock -> LBRACE Declaration Instruction RETURN SuperExpr SEMI RBRACE .
+
+    MAIN            reduce using rule 16 (RFBlock -> LBRACE Declaration Instruction RETURN SuperExpr SEMI RBRACE .)
+
+
+state 220
+
+    (66) Read -> READ LPAREN Type COMMA Identifier RPAREN .
+
+    SEMI            reduce using rule 66 (Read -> READ LPAREN Type COMMA Identifier RPAREN .)
+
+
+state 221
+
+    (84) Arc -> ARC LPAREN SuperExpr COMMA SuperExpr RPAREN .
+
+    SEMI            reduce using rule 84 (Arc -> ARC LPAREN SuperExpr COMMA SuperExpr RPAREN .)
+
+
+state 222
+
+    (76) Brush -> BRUSH LPAREN Color COMMA SuperExpr RPAREN .
+
+    SEMI            reduce using rule 76 (Brush -> BRUSH LPAREN Color COMMA SuperExpr RPAREN .)
+
+
+state 223
+
+    (77) Color -> COLOR LPAREN SuperExpr COMMA SuperExpr COMMA . SuperExpr RPAREN
+    (21) SuperExpr -> . Expression LogicalOp
+    (25) Expression -> . Expr Comparison
+    (33) Expr -> . Term Op1
+    (37) Term -> . Factor Op2
+    (41) Factor -> . LPAREN SuperExpr RPAREN
+    (42) Factor -> . Op3 Constant
+    (43) Op3 -> . PLUS
+    (44) Op3 -> . MINUS
+    (45) Op3 -> . empty
+    (101) empty -> .
+
+    LPAREN          shift and go to state 135
+    PLUS            shift and go to state 132
+    MINUS           shift and go to state 133
+    INTEGER         reduce using rule 101 (empty -> .)
+    FLOAT           reduce using rule 101 (empty -> .)
+    ID              reduce using rule 101 (empty -> .)
+
+    Term                           shift and go to state 126
+    Op3                            shift and go to state 129
+    SuperExpr                      shift and go to state 225
+    Factor                         shift and go to state 131
+    Expr                           shift and go to state 136
+    Expression                     shift and go to state 137
+    empty                          shift and go to state 140
+
+state 224
+
+    (14) Block -> LBRACE Instruction . RBRACE
+
+    RBRACE          shift and go to state 226
+
+
+state 225
+
+    (77) Color -> COLOR LPAREN SuperExpr COMMA SuperExpr COMMA SuperExpr . RPAREN
+
+    RPAREN          shift and go to state 227
+
+
+state 226
+
+    (14) Block -> LBRACE Instruction RBRACE .
+
+    SEMI            reduce using rule 14 (Block -> LBRACE Instruction RBRACE .)
+
+
+state 227
+
+    (77) Color -> COLOR LPAREN SuperExpr COMMA SuperExpr COMMA SuperExpr RPAREN .
+
+    SEMI            reduce using rule 77 (Color -> COLOR LPAREN SuperExpr COMMA SuperExpr COMMA SuperExpr RPAREN .)
+    COMMA           reduce using rule 77 (Color -> COLOR LPAREN SuperExpr COMMA SuperExpr COMMA SuperExpr RPAREN .)
+
+WARNING: 
+WARNING: Conflicts:
+WARNING: 
+WARNING: shift/reduce conflict for INT in state 0 resolved as shift
+WARNING: shift/reduce conflict for FLOAT in state 0 resolved as shift
+WARNING: shift/reduce conflict for BOOL in state 0 resolved as shift
+WARNING: shift/reduce conflict for CHAR in state 0 resolved as shift
+WARNING: shift/reduce conflict for LBRACE in state 30 resolved as shift
+WARNING: shift/reduce conflict for ID in state 110 resolved as shift
