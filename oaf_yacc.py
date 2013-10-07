@@ -202,7 +202,7 @@ def p_instruccion(p):
                    | Read SEMI Instruction
                    | Print SEMI Instruction
                    | PenDown SEMI Instruction
-                   | PenUp  SEMI Instruction
+                   | PenUp SEMI Instruction
                    | Home SEMI Instruction
                    | Forward SEMI Instruction
                    | Rotate SEMI Instruction
@@ -245,18 +245,33 @@ def p_restore_scope(p):
 def p_empty(p):
     '''empty : '''
     pass
-    
+
 # Error rules for productions
-def p_program_err(p):
+def p_program_error(p):
     '''Program : ASCII Program'''
+
+def p_block_error(p):
+    '''Block : LBRACE error RBRACE'''
+
+def p_fblock_error(p):
+    '''FBlock : LBRACE Declaration error RBRACE'''
+
+def p_rfblock_error(p):
+    '''RFBlock : LBRACE Declaration error RETURN SuperExpr SEMI RBRACE'''
+
+def p_circle_error(p):
+    '''Circle : CIRCLE LPAREN error RPAREN'''
+    print("Missing parameter(s)")
+
 def p_superexpr_error(p):
     '''SuperExpr : Expression error SuperExpr1'''
     print("Malformed expression")
-    
+
 def p_term_error(p):
     '''Term1 : DIVIDE error Term
-             | TIMES error Term'''    
-    
+             | TIMES error Term'''
+    print("Malformed expression")
+
 # Error rule for syntax errors
 def p_error(p):
     try:
@@ -264,23 +279,28 @@ def p_error(p):
     except:
         print("Syntax error")
     lexer.push_state("err")
-    while(True):
-        tok = lexer.token()
-        if(tok):
-            if(tok.type != 'ASCII'):
-                lexer.pop_state()
-                yacc.errok()
-                return(tok)
-        else:
-            print("Abrupt file termination")
-            break    
+    #print(tok, p.type)
+    #print(p)
+    if(p):
+        lexer.pop_state()
+        if(p.type == 'SEMI'):
+            print("in$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+            while(True):
+                tok = lexer.token()
+                if(tok.type != 'ASCII'):
+                    yacc.errok()
+                    return(tok)
+                else:
+                    break
+    else:
+        print("Abrupt file termination")
 
 # Build the parser
 parser = yacc.yacc()
 
 with open(raw_input('filename > '), 'r') as f:
     input = f.read()
-    result = parser.parse(input,0,0)
+    result = parser.parse(input,0,1)
     var_table = sem.var_table
     print result
     print "Scope\t|Id\t|Type"
