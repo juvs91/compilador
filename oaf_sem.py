@@ -7,44 +7,28 @@ scope = "global"
 var_table = {scope:{}}
                    
 
-def fill_symbol_table_variable(symbol,type,scope):
-	#create a new array everytime you found a new symbol, it goning to be the row of the symbos and its 
-	#always in this order type symbol and scope dirScope in scope send de function or global and the dir Scope send null if its global  
-	#new_symbol = []    
-	#fill the row                           
-	#new_symbol.append(type)#insert the type in the row
-	#new_symbol.append(symbol)#insert the symbol in the row  
-	#newSymbol.append(scope)#the scope the name of the function or the word global    
-	
-	
-	#check if the symbol is global or local 
-	#if scope == "global"  
-	#	newSymbol.append("global")#the scope the name of the function or the word global    
-	#	
-	#else:
-		#create a new table to set the scope of the variable on the table 
-	#	function_table = func_table()
-		
-	#	function_table.fill_table(newSymbol) 
-		
-		#put the new object in the table,it has the local scope of the function
-	#	newSymbol.append(function_table) 
+def fill_symbol_table_variable(symbol,type):
+     
+     #verifica si existe el scope dado
+     if(var_table.get(scope) == None):
+         var_table[scope] = {}
 
-		
-		
-	#self.var_table.append(newSymbol)#insert the row in the matrix 
+     if(symbol == scope or var_table[scope].get(symbol) != None):
+         raise NameError("Variable redeclaration, {0} already exists".format(symbol))
+     else:
+         var_table[scope][symbol] = [type]  
+    #print("{0} {1} {2} {3} {4}".format(p[-4], p[-3], p[-2], p[-1], p[0]))
 	
-	new_dictionary_symbol = {}
 	
-	##fill the diccionary
-	new_dictionary_symbol["type"] = type
-	new_dictionary_symbol["symbol"] = symbol
-	scope = scope
-	var_table[scope]=new_dictionary_symbol
 	
 def get_scope():
-	return scope
+	return scope  
+	
+def validate_redeclaration_function(validate_scope):
+	if(var_table.get(validate_scope) != None): raise NameError('se declaro varias veces una misma funcion')
+	
+	
 
-	   
+
 
 	

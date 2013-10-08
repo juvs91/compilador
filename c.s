@@ -1,17 +1,19 @@
 int hurr;
 
 void yeah(float f) {
-    b = quack; 
-	c = asdf;
+    int alo;
+	b = quack; 
+	c = asdf; 
 }  
 
 
-void yeah(int t){}
 
 
 main(){
     char ch;
-	int a;
+	int a; 
+	char f;
+	y = "yolo";
     ch = 'g';
     hurr = a + b * c;
 }
