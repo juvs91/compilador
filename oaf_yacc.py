@@ -12,11 +12,13 @@ from oaf_lex import tokens
 from oaf_lex import lexer
 from oaf_lex import find_column
 
+scope = "global"
+
 def p_program(p):
     '''Program : Declaration Function Main'''
 
 def p_main(p):
-    '''Main : MAIN Change_Scope LPAREN RPAREN FBlock'''
+    '''Main : MAIN Push_Scope LPAREN RPAREN FBlock'''
 
 def p_declaration(p):
     '''Declaration : Primitive ID Array Array Seen_Variable SEMI Declaration
@@ -32,10 +34,10 @@ def p_function(p):
                 | empty'''
 
 def p_function_1(p):
-    '''Function1 : VOID ID Change_Scope LPAREN ParamList RPAREN FBlock Restore_Scope Function'''
+    '''Function1 : VOID ID Push_Scope LPAREN ParamList RPAREN FBlock Pop_Scope Function'''
 
 def p_rfunction(p):
-    '''RFunction : Primitive ID Change_Scope LPAREN ParamList RPAREN RFBlock Restore_Scope Function'''
+    '''RFunction : Primitive ID Push_Scope LPAREN ParamList RPAREN RFBlock Pop_Scope Function'''
 
 def p_block(p):
     '''Block : LBRACE Instruction RBRACE'''
@@ -222,26 +224,27 @@ def p_constant(p):
 # Update variable table
 def p_seen_variable(p):
     '''Seen_Variable : '''
-    var_table = sem.var_table
-    scope = sem.scope
-    if(var_table.get(scope) == None):
-        var_table[scope] = {}
-    elif(scope != "global"):
-        print("Function redeclaration, {0} already exists".format(scope))
-    if(p[-3] == scope or var_table[scope].get(p[-3]) != None):
-        print("Variable redeclaration, {0} already exists".format(p[-3]))
-        #raise SyntaxError
-    else:
-        var_table[scope][p[-3]] = [p[-4]]
+    sem.fill_symbol_table_variable(p[-3], p[-4], scope)
+    # var_table = sem.var_table
+    # scope = sem.scope
+    # if(var_table.get(scope) == None):
+        # var_table[scope] = {}
+    # elif(scope != "global"):
+        # print("Function redeclaration, {0} already exists".format(scope))
+    # if(p[-3] == scope or var_table[scope].get(p[-3]) != None):
+        # print("Variable redeclaration, {0} already exists".format(p[-3]))
+        # #raise SyntaxError
+    # else:
+        # var_table[scope][p[-3]] = [p[-4]]
     #print("{0} {1} {2} {3} {4}".format(p[-4], p[-3], p[-2], p[-1], p[0]))
 
 def p_change_scope(p):
-    '''Change_Scope : '''
-    sem.scope = p[-1]
+    '''Push_Scope : '''
+    scope = p[-1]
 
 def p_restore_scope(p):
-    '''Restore_Scope : '''
-    sem.scope = 'global'
+    '''Pop_Scope : '''
+    scope = 'global'
 
 # Empty production
 def p_empty(p):
@@ -303,13 +306,13 @@ parser = yacc.yacc()
 with open(raw_input('filename > '), 'r') as f:
     input = f.read()
     result = parser.parse(input,0,0)
-    var_table = sem.var_table
+    #var_table = sem.var_table
     print result
-    print "Scope\t|Id\t|Type"
-    print "--------|-------|--------"
-    for k in var_table:
-        sys.stdout.write(k)
-        for k1 in var_table[k]:
-            print("\t|" + k1 + "\t|" + var_table[k][k1][0])
-        print "--------|-------|--------"
+    # print "Scope\t|Id\t|Type"
+    # print "--------|-------|--------"
+    # for k in var_table:
+        # sys.stdout.write(k)
+        # for k1 in var_table[k]:
+            # print("\t|" + k1 + "\t|" + var_table[k][k1][0])
+        # print "--------|-------|--------"
     #print var_table
