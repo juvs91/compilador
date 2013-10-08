@@ -119,7 +119,9 @@ def p_loop(p):
     '''Loop : LOOP LPAREN SuperExpr RPAREN Block'''
 
 def p_assign(p):
-    '''Assign : ID EQUAL Assign1'''
+    '''Assign : ID EQUAL Assign1''' 
+     #verificar si las variables que se estan utilizando ya han sido declaradas 
+      #sem.validate_variable_is_declared(p[1])
 
 def p_assign_1(p):
     '''Assign1 : SuperExpr
