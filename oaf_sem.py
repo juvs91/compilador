@@ -1,5 +1,5 @@
 #import the funcTable to create a new one every time a scope is needed 
-import func_table as func_table                                          
+# import func_table as func_table                                          
 #import the quad to maque the quadric more generic
 
 
@@ -29,6 +29,7 @@ def fill_symbol_table_variable(symbol,type,scope):
 		
 		#put the new object in the table,it has the local scope of the function
 	#	newSymbol.append(function_table) 
+
 		
 		
 	#self.var_table.append(newSymbol)#insert the row in the matrix 

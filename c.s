@@ -8,6 +8,7 @@ void yeah(float f) {
 
 void yeah(int t){}
 
+
 main(){
     char ch;
 	int a;
