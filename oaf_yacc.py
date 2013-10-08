@@ -226,8 +226,10 @@ def p_seen_variable(p):
     scope = sem.scope
     if(var_table.get(scope) == None):
         var_table[scope] = {}
+    elif(scope != "global"):
+        print("Function redeclaration, {0} already exists".format(scope))
     if(p[-3] == scope or var_table[scope].get(p[-3]) != None):
-        print("{0} already exists".format(p[-3]))
+        print("Variable redeclaration, {0} already exists".format(p[-3]))
         #raise SyntaxError
     else:
         var_table[scope][p[-3]] = [p[-4]]
@@ -300,7 +302,7 @@ parser = yacc.yacc()
 
 with open(raw_input('filename > '), 'r') as f:
     input = f.read()
-    result = parser.parse(input,0,1)
+    result = parser.parse(input,0,0)
     var_table = sem.var_table
     print result
     print "Scope\t|Id\t|Type"

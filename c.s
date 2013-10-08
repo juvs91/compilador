@@ -5,6 +5,11 @@ void yeah(float f) {
     circle(center);
 }
 
+void yeah(float f) {
+    b = quack;
+    circle(center);
+}
+
 main(){
     char ch;
     ch = 'g';
