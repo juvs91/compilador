@@ -225,7 +225,10 @@ def p_seen_variable(p):
     var_table = sem.var_table
     scope = sem.scope
     if(var_table.get(scope) == None):
-        var_table[scope] = {}
+        var_table[scope] = {} 
+
+
+
     if(p[-3] == scope or var_table[scope].get(p[-3]) != None):
         print("{0} already exists".format(p[-3]))
         #raise SyntaxError
