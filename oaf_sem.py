@@ -4,7 +4,322 @@
 
 
 scope = "global"
-var_table = {scope:{}}
+var_table = {scope:{}} 
+
+operation = None
+semantic_cube = {"*":{
+	"int":{
+		"int":"int",
+		"char":None,
+		"float":"float",
+		"bool":None,
+	},
+	"char":{
+		"int":None,
+		"char":None,
+		"float":None,
+		"bool":None,
+	},
+	"float":{
+		"int":"float",
+		"char":None,
+		"float":"float",
+		"bool":None,
+	},
+	"bool":{
+		"int":None,
+		"char":None,
+		"float":None,
+		"bool":None,
+	}
+},
+"+":{
+	"int":{
+		"int":"int",
+		"char":"char",
+		"float":"float",
+		"bool":None,
+	},
+	"char":{
+		"int":None,
+		"char":None,
+		"float":None,
+		"bool":None,
+	},
+	"float":{
+		"int":"float",
+		"char":None,
+		"float":"float",
+		"bool":None,
+	},
+	"bool":{
+		"int":None,
+		"char":None,
+		"float":None,
+		"bool":None,
+	},
+},
+"-":{
+	"int":{
+		"int":"int",
+		"char":"char",
+		"float":"float",
+		"bool":None,
+	},
+	"char":{
+		"int":None,
+		"char":"char",
+		"float":None,
+		"bool":None,
+	},
+	"float":{
+		"int":"float",
+		"char":None,
+		"float":"float",
+		"bool":None,
+	},
+	"bool":{
+		"int":None,
+		"char":None,
+		"float":None,
+		"bool":None,
+	},
+},
+"/":{
+	"int":{
+		"int":"float",
+		"char":None,
+		"float":"float",
+		"bool":None,
+	},
+	"char":{
+		"int":None,
+		"char":None,
+		"float":None,
+		"bool":None,
+	},
+	"float":{
+		"int":"float",
+		"char":None,
+		"float":"float",
+		"bool":None,
+	},
+	"bool":{
+		"int":None,
+		"char":None,
+		"float":None,
+		"bool":None,
+	},
+},
+">":{
+	"int":{
+		"int":"bool",
+		"char":"bool",
+		"float":"bool",
+		"bool":None,
+	},
+	"char":{
+		"int":"bool",
+		"char":"bool",
+		"float":None,
+		"bool":None,
+	},
+	"float":{
+		"int":"bool",
+		"char":None,
+		"float":"bool",
+		"bool":None,
+	},
+	"bool":{
+		"int":None,
+		"char":None,
+		"float":None,
+		"bool":None,
+	 }, 
+},
+"<":{
+	"int":{
+		"int":"bool",
+		"char":"bool",
+		"float":"bool",
+		"bool":None,
+	},
+	"char":{
+		"int":"bool",
+		"char":"bool",
+		"float":None,
+		"bool":None,
+	},
+	"float":{
+		"int":"bool",
+		"char":None,
+		"float":"bool",
+		"bool":None,
+	},
+	"bool":{
+		"int":None,
+		"char":None,
+		"float":None,
+		"bool":None,
+	}, 
+},
+">=":{
+	"int":{
+		"int":"bool",
+		"char":"bool",
+		"float":"bool",
+		"bool":None,
+	},
+	"char":{
+		"int":"bool",
+		"char":"bool",
+		"float":None,
+		"bool":None,
+	},
+	"float":{
+		"int":"bool",
+		"char":None,
+		"float":"bool",
+		"bool":None,
+	},
+	"bool":{
+		"int":None,
+		"char":None,
+		"float":None,
+		"bool":None,
+	},
+},
+"<=":{
+	"int":{
+		"int":"bool",
+		"char":"bool",
+		"float":"bool",
+		"bool":None,
+	},
+	"char":{
+		"int":"bool",
+		"char":"bool",
+		"float":None,
+		"bool":None,
+	},
+	"float":{
+		"int":"bool",
+		"char":None,
+		"float":"bool",
+		"bool":None,
+	},
+	"bool":{
+		"int":None,
+		"char":None,
+		"float":None,
+		"bool":None,
+	},
+},
+"<>":{
+	"int":{
+		"int":"bool",
+		"char":"bool",
+		"float":"bool",
+		"bool":None,
+	},
+	"char":{
+		"int":"bool",
+		"char":"bool",
+		"float":None,
+		"bool":None,
+	},
+	"float":{
+		"int":"bool",
+		"char":None,
+		"float":"bool",
+		"bool":None,
+	},
+	"bool":{
+		"int":None,
+		"char":None,
+		"float":None,
+		"bool":"bool",
+	},
+},
+"==":{
+	"int":{
+		"int":"bool",
+		"char":"bool",
+		"float":"bool",
+		"bool":None,
+	},
+	"char":{
+		"int":"bool",
+		"char":"bool",
+		"float":None,
+		"bool":None,
+	},
+	"float":{
+		"int":"bool",
+		"char":None,
+		"float":"bool",
+		"bool":None,
+	},
+	"bool":{
+		"int":None,
+		"char":None,
+		"float":None,
+		"bool":"bool",
+	},
+},
+"||":{
+	"int":{
+		"int":None,
+		"char":None,
+		"float":None,
+		"bool":None,
+	},
+	"char":{
+		"int":None,
+		"char":None,
+		"float":None,
+		"bool":None,
+	},
+	"float":{
+		"int":None,
+		"char":None,
+		"float":None,
+		"bool":None,
+	},
+	"bool":{
+		"int":None,
+		"char":None,
+		"float":None,
+		"bool":"bool",
+	},
+}
+,"&&":{
+	"int":{
+		"int":None,
+		"char":None,
+		"float":None,
+		"bool":None,
+	},
+	"char":{
+		"int":None,
+		"char":None,
+		"float":None,
+		"bool":None,
+	},
+	"float":{
+		"int":None,
+		"char":None,
+		"float":None,
+		"bool":None,
+	},
+	"bool":{
+		"int":None,
+		"char":None,
+		"float":None,
+		"bool":"bool",
+	}	
+}
+}
                    
 
 def fill_symbol_table_variable(symbol,type):
@@ -25,7 +340,10 @@ def get_scope():
 	return scope  
 	
 def validate_redeclaration_function(validate_scope):
-	if(var_table.get(validate_scope) != None): raise NameError('se declaro varias veces una misma funcion')
+	if(var_table.get(validate_scope) != None): raise NameError('se declaro varias veces una misma funcion')  
+
+def validate_variable_is_declared(var):
+	if(var_table[scope][var] == None): raise NameError('la variable {0} no se a declarado'.var) 
 	
 	
 
