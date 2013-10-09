@@ -3,6 +3,9 @@ import ply.yacc as yacc
 # debug
 import sys
 
+# Math module
+import oaf_math as math
+
 # Get semantic variables
 import oaf_sem as sem
 
@@ -46,7 +49,6 @@ def p_fblock(p):
 
 def p_rfblock(p):
     '''RFBlock : LBRACE Declaration Instruction RETURN SuperExpr SEMI RBRACE'''
-    
 
 def p_conditional(p):
     '''Conditional : IF LPAREN SuperExpr RPAREN Block Else'''
@@ -76,29 +78,34 @@ def p_expression_1(p):
                    | empty'''
 
 def p_expr(p):
-    '''Expr : Term Expr1'''
+    '''Expr : Term Gen_Quad2 Expr1'''
 
 def p_expr_1(p):
-    '''Expr1 : MINUS Expr
-             | PLUS Expr
+    '''Expr1 : MINUS Seen_Operator Expr
+             | PLUS Seen_Operator Expr
              | empty'''
 
 def p_term(p):
-    '''Term : Factor Term1'''
+    '''Term : Factor Gen_Quad1 Term1'''
 
 def p_term_1(p):
-    '''Term1 : DIVIDE Term
-             | TIMES Term
+    '''Term1 : DIVIDE Seen_Operator Term
+             | TIMES Seen_Operator Term
              | empty'''
 
 def p_factor(p):
-    '''Factor : LPAREN SuperExpr RPAREN
-              | Factor1'''
+    '''Factor : LPAREN Push_Expr SuperExpr RPAREN Pop_Expr
+              | Factor1 Seen_Operand'''
 
 def p_factor_1(p):
-    '''Factor1 : MINUS Constant
-               | PLUS Constant
+    '''Factor1 : Factor2
                | Constant'''
+    p[0] = p[1]
+               
+def p_factor_2(p):
+    '''Factor2 : MINUS Gen_Quad0 Constant
+               | PLUS Gen_Quad0 Constant'''
+    p[0] = p[3]
 
 def p_params(p):
     '''Params : Params2
@@ -119,10 +126,10 @@ def p_loop(p):
     '''Loop : LOOP LPAREN SuperExpr RPAREN Block'''
 
 def p_assign(p):
-    '''Assign : ID EQUAL Assign1'''
+    '''Assign : ID Seen_Operand EQUAL Seen_Operator Assign1'''
 
 def p_assign_1(p):
-    '''Assign1 : SuperExpr
+    '''Assign1 : SuperExpr Gen_Quad5
                | Call
                | STRING
                | CCONST'''
@@ -220,18 +227,53 @@ def p_constant(p):
                 | ICONST
                 | FALSE
                 | TRUE'''
+    p[0] = p[1]
 
+# Math rules
+def p_seen_operand(p):
+    '''Seen_Operand : '''
+    math.add_operand(p[-1], 0)
+    
+def p_seen_operator(p):
+    '''Seen_Operator : '''
+    math.add_operator(p[-1])
+    p[0] = p[-1]
+    
+def p_push_expr(p):
+    '''Push_Expr : '''
+    math.push_expr()
+    
+def p_pop_expr(p):
+    '''Pop_Expr : '''
+    math.pop_expr()
+    
+def p_gen_quad_0(p):
+    '''Gen_Quad0 : '''
+    
+# * or /
+def p_gen_quad_1(p):
+    '''Gen_Quad1 : '''
+    math.generate_quad(1)
+    
+def p_gen_quad_2(p):
+    '''Gen_Quad2 : '''
+    math.generate_quad(2)
+    
+def p_gen_quad_5(p):
+    '''Gen_Quad5 : '''
+    math.generate_quad(5)
+                
 # Update variable table
 def p_seen_variable(p):
     '''Seen_Variable : '''      
     sem.fill_symbol_table_variable(p[-3], p[-4])
 
-def p_change_scope(p):
+def p_push_scope(p):
     '''Push_Scope : '''
     sem.scope =p[-1] 
     sem.validate_redeclaration_function(p[-1])
 
-def p_restore_scope(p):
+def p_pop_scope(p):
     '''Pop_Scope : '''
     sem.scope = 'global'
 
@@ -297,10 +339,12 @@ with open(raw_input('filename > '), 'r') as f:
     result = parser.parse(input,0,0)
     var_table = sem.var_table
     print result
-    print "Scope\t|Id\t|Type"
-    print "--------|-------|--------"
-    for k in var_table:
-        sys.stdout.write(k)
-        for k1 in var_table[k]:
-            print("\t|" + k1 + "\t|" + var_table[k][k1][0])
-        print "--------|-------|--------"
+    for quad in math.quads:
+        print(quad.operator, quad.operand1, quad.operand2, quad.result)
+    # print "Scope\t|Id\t|Type"
+    # print "--------|-------|--------"
+    # for k in var_table:
+        # sys.stdout.write(k)
+        # for k1 in var_table[k]:
+            # print("\t|" + k1 + "\t|" + var_table[k][k1][0])
+        # print "--------|-------|--------"
