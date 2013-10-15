@@ -4,7 +4,8 @@ import ply.yacc as yacc
 import sys
 
 # Math module
-import oaf_math as math
+import oaf_math as math 
+import oaf_global_quad as quads
 
 # Get semantic variables
 import oaf_sem as sem
@@ -138,7 +139,14 @@ def p_call(p):
     '''Call : ID LPAREN Params RPAREN'''
 
 def p_read(p):
-    '''Read : READ LPAREN Type COMMA ID RPAREN'''
+    '''Read : READ LPAREN Type COMMA ID Check_type RPAREN'''   
+                        
+   
+def p_check_type(p):
+    '''Check_type : ''' 
+    sem.validate_read_types(p[-3],p[-1])
+
+
 
 def p_type(p):
     '''Type : Primitive
@@ -231,12 +239,12 @@ def p_constant(p):
 
 # Math rules
 def p_seen_operand(p):
-    '''Seen_Operand : '''
+    '''Seen_Operand : ''' 
     math.add_operand(p[-1], 0)
     
 def p_seen_operator(p):
-    '''Seen_Operator : '''
-    math.add_operator(p[-1])
+    '''Seen_Operator : '''   
+    math.add_operator(p[-1]) 
     p[0] = p[-1]
     
 def p_push_expr(p):
@@ -244,7 +252,7 @@ def p_push_expr(p):
     math.push_expr()
     
 def p_pop_expr(p):
-    '''Pop_Expr : '''
+    '''Pop_Expr : ''' 
     math.pop_expr()
     
 def p_gen_quad_0(p):
@@ -256,7 +264,7 @@ def p_gen_quad_1(p):
     math.generate_quad(1)
     
 def p_gen_quad_2(p):
-    '''Gen_Quad2 : '''
+    '''Gen_Quad2 : ''' 
     math.generate_quad(2)
     
 def p_gen_quad_5(p):
@@ -339,8 +347,8 @@ with open(raw_input('filename > '), 'r') as f:
     result = parser.parse(input,0,0)
     var_table = sem.var_table
     print result
-    for quad in math.quads:
-        print(quad.operator, quad.operand1, quad.operand2, quad.result)
+    for quad in quads.quad.quads:
+        print(quad[0], quad[1], quad[2], quad[3])
     # print "Scope\t|Id\t|Type"
     # print "--------|-------|--------"
     # for k in var_table:
