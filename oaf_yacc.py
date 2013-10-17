@@ -58,23 +58,23 @@ def p_else(p):
             | empty'''
 
 def p_superexpr(p):
-    '''SuperExpr : Expression SuperExpr1'''
+    '''SuperExpr : Expression Gen_Quad4 SuperExpr1'''
 
 def p_superexpr_1(p):
-    '''SuperExpr1 : AND SuperExpr
-                  | OR SuperExpr
+    '''SuperExpr1 : AND Seen_Operator SuperExpr
+                  | OR Seen_Operator SuperExpr
                   | empty'''
 
 def p_expression(p):
-    '''Expression : Expr Expression1'''
+    '''Expression : Expr Expression1 Gen_Quad3'''
 
 def p_expression_1(p):
-    '''Expression1 : LESSTHAN Expr
-                   | GREATHAN Expr
-                   | DIFFERENT Expr
-                   | TWOEQUAL Expr
-                   | GREATEQUAL Expr
-                   | LESSEQUAL Expr
+    '''Expression1 : LESSTHAN Seen_Operator Expr
+                   | GREATHAN Seen_Operator Expr
+                   | DIFFERENT Seen_Operator Expr
+                   | TWOEQUAL Seen_Operator Expr
+                   | GREATEQUAL Seen_Operator Expr
+                   | LESSEQUAL Seen_Operator Expr
                    | empty'''
 
 def p_expr(p):
@@ -251,18 +251,31 @@ def p_pop_expr(p):
     '''Pop_Expr : '''
     math.pop_expr()
     
+# Unary operators
 def p_gen_quad_0(p):
     '''Gen_Quad0 : '''
     
-# * or /
+# *, /
 def p_gen_quad_1(p):
     '''Gen_Quad1 : '''
     math.generate_quad(1)
     
+# +, -
 def p_gen_quad_2(p):
     '''Gen_Quad2 : '''
     math.generate_quad(2)
     
+# Logical operators
+def p_gen_quad_3(p):
+    '''Gen_Quad3 : '''
+    math.generate_quad(3)
+    
+# &&, ||    
+def p_gen_quad_4(p):
+    '''Gen_Quad4 : '''
+    math.generate_quad(4)
+    
+# Assign
 def p_gen_quad_5(p):
     '''Gen_Quad5 : '''
     math.generate_quad(5)
