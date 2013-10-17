@@ -2,8 +2,6 @@
 # Temp pool
 # TODO: Add a pool for each primitive
 
-import oaf_math as math
-
 # Operands stack
 operand_stack = []
 

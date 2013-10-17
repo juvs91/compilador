@@ -32,7 +32,12 @@ def generate_quad(hierarchy):
     print operator_stack, operand_stack, hierarchy
     quad = Quad()
     if(hierarchy == 0):
-        pass
+        if(last_operator == 'u+' or last_operator == 'u-'):
+            quad = create_quad(operator_stack.pop(), None, operand_stack.pop(), operand_stack.pop())
+            operand_stack.append(quad.result)
+            quads.append(quad)
+            if(len(operator_stack) > 0):
+                last_operator = operator_stack[-1]
     elif(hierarchy == 1):
         if(last_operator == '*' or last_operator == '/'):
             quad = create_quad(operator_stack.pop(), operand_stack.pop(), operand_stack.pop(), "t" + str(temp_counter))
