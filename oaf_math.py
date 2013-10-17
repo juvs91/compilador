@@ -1,5 +1,4 @@
 import oaf_sem as sem
-import oaf_state as state
 from oaf_quad import *
 
 # Temp pool
@@ -7,10 +6,15 @@ from oaf_quad import *
 
 # Operands stack
 operand_stack = []
-
 # Operator stack
 operator_stack = []
 last_operator = None
+
+# Temp counter
+temp_counter = 0
+
+# Quad list
+quads = []
 
 # ID found
 def add_operand(operand):
@@ -18,28 +22,32 @@ def add_operand(operand):
 
 def add_operator(operator):
     global last_operator
-    operator_stack.append(operator) 
-    last_operator = operator_stack[-1]  
+    operator_stack.append(operator)
+    if(operator == '#'):
+        last_operator = None
+    else:
+        last_operator = operator_stack[-1]
 
 def push_expr():
     global operator_stack, last_operator
     operator_stack.append('#')
     last_operator = None
 
-def pop_expr():  
+def pop_expr():
     global operator_stack, last_operator
     operator_stack.pop()
-    last_operator = operator_stack[-1]      
+    last_operator = operator_stack[-1]
         
 def generate_quad(level):
-    global last_operator, operand_stack, temp_counter
+    global last_operator, operand_stack, temp_counter, quads
+    quad = Quad()
     if(level == 0):
         pass
     elif(level == 1):
         if(last_operator == '*' or last_operator == '/'):
             quad = create_quad(operator_stack.pop(), operand_stack.pop(), operand_stack.pop(), "t" + str(temp_counter))
             operand_stack.append(quad.result)
-            state.quads.append(quad)
+            quads.append(quad)
             if(len(operator_stack) > 0):
                 last_operator = operator_stack[-1]
             temp_counter += 1
@@ -48,7 +56,7 @@ def generate_quad(level):
         if(last_operator == '+' or last_operator == '-'):
             quad = create_quad(operator_stack.pop(), operand_stack.pop(), operand_stack.pop(), "t" + str(temp_counter))
             operand_stack.append(quad.result)
-            state.quads.append(quad)
+            quads.append(quad)
             if(len(operator_stack) > 0):
                 last_operator = operator_stack[-1]
             temp_counter += 1
@@ -57,7 +65,7 @@ def generate_quad(level):
         if(last_operator == '='):
             quad = create_quad(operator_stack.pop(), None, operand_stack.pop(), operand_stack.pop())
             operand_stack.append(quad.result)
-            state.quads.append(quad)
+            quads.append(quad)
             if(len(operator_stack) > 0):
                 last_operator = operator_stack[-1]
             #print(quad.operator, quad.operand1, quad.operand2, quad.result)
