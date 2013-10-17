@@ -202,24 +202,27 @@ def p_paramlist_2(p):
     '''ParamList2 : COMMA ParamList1
                   | empty'''
 
-def p_instruccion(p):
-    '''Instruction : Loop SEMI Instruction
-                   | Conditional SEMI Instruction
-                   | Assign SEMI Instruction
-                   | Call SEMI Instruction
-                   | Brush SEMI Instruction
-                   | Read SEMI Instruction
-                   | Print SEMI Instruction
-                   | PenDown SEMI Instruction
-                   | PenUp SEMI Instruction
-                   | Home SEMI Instruction
-                   | Forward SEMI Instruction
-                   | Rotate SEMI Instruction
-                   | Color SEMI Instruction
-                   | Circle SEMI Instruction
-                   | Arc SEMI Instruction
-                   | Square SEMI Instruction
+def p_instruction(p):
+    '''Instruction : Instruction1 SEMI Seen_Semi Instruction
                    | empty'''
+                  
+def p_instruccion(p):
+    '''Instruction1 : Loop
+                    | Conditional
+                    | Assign
+                    | Call
+                    | Brush
+                    | Read
+                    | Print
+                    | PenDown
+                    | PenUp
+                    | Home
+                    | Forward
+                    | Rotate
+                    | Color
+                    | Circle
+                    | Arc
+                    | Square'''
 
 def p_constant(p):
     '''Constant : ID
@@ -232,7 +235,8 @@ def p_constant(p):
 # Math rules
 def p_seen_operand(p):
     '''Seen_Operand : '''
-    math.add_operand(p[-1], 0)
+    if(sem.is_declared(p[-1])):
+        math.add_operand(sem.get_variable(p[-1]))
     
 def p_seen_operator(p):
     '''Seen_Operator : '''
@@ -267,10 +271,14 @@ def p_gen_quad_5(p):
 def p_seen_variable(p):
     '''Seen_Variable : '''      
     sem.fill_symbol_table_variable(p[-3], p[-4])
+    
+def p_seen_semi(p):
+    '''Seen_Semi : '''
+    math.clear_stacks()
 
 def p_push_scope(p):
     '''Push_Scope : '''
-    sem.scope =p[-1] 
+    sem.scope = p[-1] 
     sem.validate_redeclaration_function(p[-1])
 
 def p_pop_scope(p):
@@ -341,10 +349,10 @@ with open(raw_input('filename > '), 'r') as f:
     print result
     for quad in math.quads:
         print(quad.operator, quad.operand1, quad.operand2, quad.result)
-    # print "Scope\t|Id\t|Type"
-    # print "--------|-------|--------"
-    # for k in var_table:
-        # sys.stdout.write(k)
-        # for k1 in var_table[k]:
-            # print("\t|" + k1 + "\t|" + var_table[k][k1][0])
-        # print "--------|-------|--------"
+    print "Scope\t|Id\t|Type"
+    print "--------|-------|--------"
+    for k in var_table:
+        sys.stdout.write(k)
+        for k1 in var_table[k]:
+            print("\t|" + k1 + "\t|" + var_table[k][k1][0])
+        print "--------|-------|--------"

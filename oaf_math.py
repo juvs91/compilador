@@ -1,3 +1,4 @@
+import oaf_sem as sem
 from oaf_quad import *
 
 # Temp pool
@@ -16,8 +17,8 @@ temp_counter = 0
 quads = []
 
 # ID found
-def add_operand(id, type):
-    operand_stack.append([id, type])
+def add_operand(operand):
+    operand_stack.append(operand)
 
 def add_operator(operator):
     global last_operator
@@ -44,11 +45,8 @@ def generate_quad(level):
         pass
     elif(level == 1):
         if(last_operator == '*' or last_operator == '/'):
-            quad.operator = operator_stack.pop()
-            quad.operand2 = operand_stack.pop()[0]
-            quad.operand1 = operand_stack.pop()[0]
-            quad.result = "t" + str(temp_counter)
-            operand_stack.append([quad.result, 0])
+            quad = create_quad(operator_stack.pop(), operand_stack.pop(), operand_stack.pop(), "t" + str(temp_counter))
+            operand_stack.append(quad.result)
             quads.append(quad)
             if(len(operator_stack) > 0):
                 last_operator = operator_stack[-1]
@@ -56,11 +54,8 @@ def generate_quad(level):
             #print(quad.operator, quad.operand1, quad.operand2, quad.result)
     elif(level == 2):
         if(last_operator == '+' or last_operator == '-'):
-            quad.operator = operator_stack.pop()
-            quad.operand2 = operand_stack.pop()[0]
-            quad.operand1 = operand_stack.pop()[0]
-            quad.result = "t" + str(temp_counter)
-            operand_stack.append([quad.result, 0])
+            quad = create_quad(operator_stack.pop(), operand_stack.pop(), operand_stack.pop(), "t" + str(temp_counter))
+            operand_stack.append(quad.result)
             quads.append(quad)
             if(len(operator_stack) > 0):
                 last_operator = operator_stack[-1]
@@ -68,12 +63,27 @@ def generate_quad(level):
             #print(quad.operator, quad.operand1, quad.operand2, quad.result)
     elif(level == 5):
         if(last_operator == '='):
-            quad.operator = operator_stack.pop()
-            quad.operand1 = operand_stack.pop()[0]
-            quad.result = operand_stack.pop()[0]
-            operand_stack.append([quad.result, 0])
+            quad = create_quad(operator_stack.pop(), None, operand_stack.pop(), operand_stack.pop())
+            operand_stack.append(quad.result)
             quads.append(quad)
             if(len(operator_stack) > 0):
                 last_operator = operator_stack[-1]
             #print(quad.operator, quad.operand1, quad.operand2, quad.result)
             
+def create_quad(op, op2, op1, res):
+    quad = Quad()
+    quad.operator = op
+    quad.operand2 = op2
+    quad.operand1 = op1
+    if(op2 == None):
+        res[1][0] = sem.get_type(op, op1, res)
+        quad.result = res
+    else:
+        quad.result = [res, [sem.get_type(op, op1, op2)]]
+    return quad
+            
+def clear_stacks():
+    global operator_stack, operand_stack, last_operator
+    del(operator_stack[:])
+    del(operand_stack[:])
+    last_operator = None
