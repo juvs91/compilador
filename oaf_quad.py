@@ -4,4 +4,3 @@ class Quad:
         self.operand1 = None
         self.operand2 = None
         self.result = None
-        
