@@ -386,9 +386,9 @@ def get_variable(var):
         return [var, var_table[global_str].get(var)]
         
 def get_type(op, op1, op2):
-    print op, op1, op2
+    #print op, op1, op2
     type = semantic_cube[op][op1[1][0]][op2[1][0]]
     if(type != None):
         return type
     else:
-        raise NameError("Incompatible types '{0}' and '{1}'".format(op1[1], op2[1]))
+        raise NameError("Incompatible types '{0}' and '{1}'".format(op1[1][0], op2[1][0]))

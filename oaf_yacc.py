@@ -3,8 +3,10 @@ import ply.yacc as yacc
 # debug
 import sys
 
-# Math module
-import oaf_math as math
+import oaf_state as state
+
+# Expressions module
+import oaf_expr as expr
 
 # Get semantic variables
 import oaf_sem as sem
@@ -58,23 +60,23 @@ def p_else(p):
             | empty'''
 
 def p_superexpr(p):
-    '''SuperExpr : Expression SuperExpr1'''
+    '''SuperExpr : Expression Gen_Quad4 SuperExpr1'''
 
 def p_superexpr_1(p):
-    '''SuperExpr1 : AND SuperExpr
-                  | OR SuperExpr
+    '''SuperExpr1 : AND Seen_Operator SuperExpr
+                  | OR Seen_Operator SuperExpr
                   | empty'''
 
 def p_expression(p):
-    '''Expression : Expr Expression1'''
+    '''Expression : Expr Expression1 Gen_Quad3'''
 
 def p_expression_1(p):
-    '''Expression1 : LESSTHAN Expr
-                   | GREATHAN Expr
-                   | DIFFERENT Expr
-                   | TWOEQUAL Expr
-                   | GREATEQUAL Expr
-                   | LESSEQUAL Expr
+    '''Expression1 : LESSTHAN Seen_Operator Expr
+                   | GREATHAN Seen_Operator Expr
+                   | DIFFERENT Seen_Operator Expr
+                   | TWOEQUAL Seen_Operator Expr
+                   | GREATEQUAL Seen_Operator Expr
+                   | LESSEQUAL Seen_Operator Expr
                    | empty'''
 
 def p_expr(p):
@@ -236,36 +238,49 @@ def p_constant(p):
 def p_seen_operand(p):
     '''Seen_Operand : '''
     if(sem.is_declared(p[-1])):
-        math.add_operand(sem.get_variable(p[-1]))
+        expr.add_operand(sem.get_variable(p[-1]))
     
 def p_seen_operator(p):
     '''Seen_Operator : '''
-    math.add_operator(p[-1])
+    expr.add_operator(p[-1])
     p[0] = p[-1]
     
 def p_push_expr(p):
     '''Push_Expr : '''
-    math.push_expr()
+    expr.push_expr()
     
 def p_pop_expr(p):
     '''Pop_Expr : '''
-    math.pop_expr()
+    expr.pop_expr()
     
+# Unary operators
 def p_gen_quad_0(p):
     '''Gen_Quad0 : '''
     
-# * or /
+# *, /
 def p_gen_quad_1(p):
     '''Gen_Quad1 : '''
-    math.generate_quad(1)
+    expr.generate_quad(1)
     
+# +, -
 def p_gen_quad_2(p):
     '''Gen_Quad2 : '''
-    math.generate_quad(2)
+    expr.generate_quad(2)
     
+# Logical operators
+def p_gen_quad_3(p):
+    '''Gen_Quad3 : '''
+    expr.generate_quad(3)
+    
+# &&, ||    
+def p_gen_quad_4(p):
+    '''Gen_Quad4 : '''
+    expr.generate_quad(4)
+    
+# Assign
 def p_gen_quad_5(p):
     '''Gen_Quad5 : '''
-    math.generate_quad(5)
+    expr.generate_quad(5)
                 
 # Update variable table
 def p_seen_variable(p):
@@ -274,7 +289,7 @@ def p_seen_variable(p):
     
 def p_seen_semi(p):
     '''Seen_Semi : '''
-    math.clear_stacks()
+    expr.clear_stacks()
 
 def p_push_scope(p):
     '''Push_Scope : '''
@@ -347,7 +362,7 @@ with open(raw_input('filename > '), 'r') as f:
     result = parser.parse(input,0,0)
     var_table = sem.var_table
     print result
-    for quad in math.quads:
+    for quad in state.quads:
         print(quad.operator, quad.operand1, quad.operand2, quad.result)
     print "Scope\t|Id\t|Type"
     print "--------|-------|--------"

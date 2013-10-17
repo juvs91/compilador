@@ -1,20 +1,9 @@
 import oaf_sem as sem
 from oaf_quad import *
+from oaf_state import *
 
 # Temp pool
 # TODO: Add a pool for each primitive
-
-# Operands stack
-operand_stack = []
-# Operator stack
-operator_stack = []
-last_operator = None
-
-# Temp counter
-temp_counter = 0
-
-# Quad list
-quads = []
 
 # ID found
 def add_operand(operand):
@@ -38,12 +27,18 @@ def pop_expr():
     operator_stack.pop()
     last_operator = operator_stack[-1]
         
-def generate_quad(level):
+def generate_quad(hierarchy):
     global last_operator, operand_stack, temp_counter, quads
+    print operator_stack, operand_stack, hierarchy
     quad = Quad()
-    if(level == 0):
-        pass
-    elif(level == 1):
+    if(hierarchy == 0):
+        if(last_operator == 'u+' or last_operator == 'u-'):
+            quad = create_quad(operator_stack.pop(), None, operand_stack.pop(), operand_stack.pop())
+            operand_stack.append(quad.result)
+            quads.append(quad)
+            if(len(operator_stack) > 0):
+                last_operator = operator_stack[-1]
+    elif(hierarchy == 1):
         if(last_operator == '*' or last_operator == '/'):
             quad = create_quad(operator_stack.pop(), operand_stack.pop(), operand_stack.pop(), "t" + str(temp_counter))
             operand_stack.append(quad.result)
@@ -51,8 +46,7 @@ def generate_quad(level):
             if(len(operator_stack) > 0):
                 last_operator = operator_stack[-1]
             temp_counter += 1
-            #print(quad.operator, quad.operand1, quad.operand2, quad.result)
-    elif(level == 2):
+    elif(hierarchy == 2):
         if(last_operator == '+' or last_operator == '-'):
             quad = create_quad(operator_stack.pop(), operand_stack.pop(), operand_stack.pop(), "t" + str(temp_counter))
             operand_stack.append(quad.result)
@@ -60,15 +54,29 @@ def generate_quad(level):
             if(len(operator_stack) > 0):
                 last_operator = operator_stack[-1]
             temp_counter += 1
-            #print(quad.operator, quad.operand1, quad.operand2, quad.result)
-    elif(level == 5):
+    elif(hierarchy == 3):
+        if(last_operator == '==' or last_operator == '<=' or last_operator == '>=' or last_operator == '<>'  or last_operator == '<'  or last_operator == '>'):
+            quad = create_quad(operator_stack.pop(), operand_stack.pop(), operand_stack.pop(), "t" + str(temp_counter))
+            operand_stack.append(quad.result)
+            quads.append(quad)
+            if(len(operator_stack) > 0):
+                last_operator = operator_stack[-1]
+            temp_counter += 1
+    elif(hierarchy == 4):
+        if(last_operator == '&&' or last_operator == '||'):
+            quad = create_quad(operator_stack.pop(), operand_stack.pop(), operand_stack.pop(), "t" + str(temp_counter))
+            operand_stack.append(quad.result)
+            quads.append(quad)
+            if(len(operator_stack) > 0):
+                last_operator = operator_stack[-1]
+            temp_counter += 1
+    elif(hierarchy == 5):
         if(last_operator == '='):
             quad = create_quad(operator_stack.pop(), None, operand_stack.pop(), operand_stack.pop())
             operand_stack.append(quad.result)
             quads.append(quad)
             if(len(operator_stack) > 0):
                 last_operator = operator_stack[-1]
-            #print(quad.operator, quad.operand1, quad.operand2, quad.result)
             
 def create_quad(op, op2, op1, res):
     quad = Quad()
