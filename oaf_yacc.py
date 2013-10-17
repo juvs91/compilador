@@ -340,11 +340,11 @@ with open(raw_input('filename > '), 'r') as f:
     var_table = sem.var_table
     print result
     for quad in math.quads:
-        print(quad.operator, quad.operand1, quad.operand2, quad.result)
-    # print "Scope\t|Id\t|Type"
-    # print "--------|-------|--------"
-    # for k in var_table:
-        # sys.stdout.write(k)
-        # for k1 in var_table[k]:
-            # print("\t|" + k1 + "\t|" + var_table[k][k1][0])
-        # print "--------|-------|--------"
+     print(quad.operator, quad.operand1, quad.operand2, quad.result)
+     #print "Scope\t|Id\t|Type"
+     #print "--------|-------|--------"
+     #for k in var_table:
+     #    sys.stdout.write(k)
+     #    for k1 in var_table[k]:
+     #        print("\t|" + k1 + "\t|" + var_table[k][k1][0])
+     #    print "--------|-------|--------"
