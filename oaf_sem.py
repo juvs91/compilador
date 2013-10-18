@@ -371,13 +371,14 @@ def validate_redeclaration_function(validate_scope):
 def validate_variable_is_declared(var):
 	if(var_table[scope][var] == None): raise NameError('la variable {0} no se a declarado'.var)
     
-def is_declared(var):
-    if(var_table.get(scope) == None):
-        raise NameError("Undeclared variable '{0}'".format(var))
-    elif(var_table[scope].get(var) == None and var_table[global_str].get(var) == None):
-        raise NameError("Undeclared variable '{0}'".format(var))
-    else:
-        return True
+def is_declared(var): 
+	if(not isinstance( var, ( int, long,float ) )):
+		if(var_table.get(scope) == None):
+			raise NameError("Undeclared variable '{0}'".format(var))
+		elif(var_table[scope].get(var) == None and var_table[global_str].get(var) == None):
+			raise NameError("Undeclared variable '{0}'".format(var))
+		else:
+			return True
 
 def get_variable(var):
     if(var_table[scope].get(var) != None):
