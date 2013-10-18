@@ -228,11 +228,12 @@ def p_instruccion(p):
 
 def p_constant(p):
     '''Constant : ID
-                | FCONST
-                | ICONST
+                | FCONST Seen_Float
+                | ICONST Seen_Int
                 | FALSE
                 | TRUE'''
     p[0] = p[1]
+    
 
 # Math rules
 def p_seen_operand(p):
@@ -286,6 +287,14 @@ def p_gen_quad_5(p):
 def p_seen_variable(p):
     '''Seen_Variable : '''      
     sem.fill_symbol_table_variable(p[-3], p[-4])
+    
+def p_seen_float(p):
+    '''Seen_Float : '''
+    print p[-1]
+    
+def p_seen_int(p):
+    '''Seen_Int : '''
+    sem.fill_symbol_table_constant(p[-1], "int")
     
 def p_seen_semi(p):
     '''Seen_Semi : '''
@@ -369,5 +378,5 @@ with open(raw_input('filename > '), 'r') as f:
     for k in var_table:
         sys.stdout.write(k)
         for k1 in var_table[k]:
-            print("\t|" + k1 + "\t|" + var_table[k][k1][0])
+            print("\t|" + str(k1) + "\t|" + var_table[k][k1][0])
         print "--------|-------|--------"

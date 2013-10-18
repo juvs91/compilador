@@ -29,7 +29,6 @@ def pop_expr():
         
 def generate_quad(hierarchy):
     global last_operator, operand_stack, temp_counter, quads
-    print operator_stack, operand_stack, hierarchy
     quad = Quad()
     if(hierarchy == 0):
         if(last_operator == 'u+' or last_operator == 'u-'):
