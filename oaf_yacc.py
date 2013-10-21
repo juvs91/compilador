@@ -6,7 +6,10 @@ import sys
 import oaf_state as state
 
 # Expressions module
-import oaf_expr as expr
+import oaf_expr as expr  
+
+#read write module
+import oaf_read_write as rw
 
 # Get semantic variables
 import oaf_sem as sem
@@ -133,21 +136,36 @@ def p_assign(p):
 def p_assign_1(p):
     '''Assign1 : SuperExpr Gen_Quad5
                | Call
-               | STRING
-               | CCONST'''
+               | STRING Check_Char Seen_Char_Operand Gen_Quad5  
+               | CCONST
+               | CHARWORD Check_Char Seen_Char_Operand Gen_Quad5'''
+
+
+def p_check_char(p):
+	'''Check_Char : '''
+	sem.is_char(p[-1])
+	
 
 def p_call(p):
     '''Call : ID LPAREN Params RPAREN'''
 
 def p_read(p):
-    '''Read : READ LPAREN Type COMMA ID RPAREN'''
+    '''Read : READ LPAREN Type COMMA ID Generate_Read RPAREN''' 
+
+def p_generate_read(p):
+	'''Generate_Read : '''            
+	rw.read_quad("char",p[-1],sem.scope)
+	
+def p_generate_print(p):
+	'''Generate_Print :''' 
+
 
 def p_type(p):
     '''Type : Primitive
             | STRING'''
 
 def p_print(p):
-    '''Print : PRINT LPAREN Params1 RPAREN'''
+    '''Print : PRINT LPAREN Params1 Generate_Print RPAREN'''
 
 def p_brush(p):
     '''Brush : BRUSH LPAREN Color COMMA SuperExpr RPAREN'''
@@ -228,11 +246,15 @@ def p_instruccion(p):
 
 def p_constant(p):
     '''Constant : ID
-                | FCONST
-                | ICONST
+                | FCONST Seen_Float
+                | ICONST Seen_Int
                 | FALSE
                 | TRUE'''
     p[0] = p[1]
+    
+def p_seen_char_operand(p):
+    '''Seen_Char_Operand :'''
+    expr.add_operand(p[-2])
 
 # Math rules
 def p_seen_operand(p):
@@ -287,6 +309,14 @@ def p_seen_variable(p):
     '''Seen_Variable : '''      
     sem.fill_symbol_table_variable(p[-3], p[-4])
     
+def p_seen_float(p):
+    '''Seen_Float : '''
+    print p[-1]
+    
+def p_seen_int(p):
+    '''Seen_Int : '''
+    sem.fill_symbol_table_constant(p[-1], "int")
+    
 def p_seen_semi(p):
     '''Seen_Semi : '''
     expr.clear_stacks()
@@ -334,7 +364,7 @@ def p_term_error(p):
 # Error rule for syntax errors
 def p_error(p):
     try:
-        print("Syntax error at line {0} col {1}, unexpected '{2}'".format(p.lineno, find_column(input, p), p.value))
+        print("Syntax error at line {0} col {1}, unexpected '{2}'".format(p.lineno, find_column(input, p), p.value)) 
     except:
         print("Syntax error")
     lexer.push_state("err")
@@ -361,13 +391,13 @@ with open(raw_input('filename > '), 'r') as f:
     input = f.read()
     result = parser.parse(input,0,0)
     var_table = sem.var_table
-    print result
+    #print result
     for quad in state.quads:
-        print(quad.operator, quad.operand1, quad.operand2, quad.result)
+        print (quad.operator, quad.operand1, quad.operand2, quad.result)
     print "Scope\t|Id\t|Type"
     print "--------|-------|--------"
     for k in var_table:
         sys.stdout.write(k)
         for k1 in var_table[k]:
-            print("\t|" + k1 + "\t|" + var_table[k][k1][0])
+            print("\t|" + str(k1) + "\t|" + var_table[k][k1][0])
         print "--------|-------|--------"
