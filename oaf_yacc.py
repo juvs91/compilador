@@ -153,7 +153,8 @@ def p_read(p):
     '''Read : READ LPAREN Type COMMA ID Generate_Read RPAREN''' 
 
 def p_generate_read(p):
-	'''Generate_Read : '''            
+	'''Generate_Read : ''' 
+	print p[-3]           
 	rw.read_quad("char",p[-1],sem.scope)
 	
 def p_generate_print(p):
