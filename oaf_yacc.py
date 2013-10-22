@@ -154,7 +154,7 @@ def p_read(p):
 
 def p_generate_read(p):
 	'''Generate_Read : '''            
-	rw.read_quad("char",p[-1],sem.scope)
+	rw.read_quad(p[-3], p[-1], sem.scope)
 	
 def p_generate_print(p):
 	'''Generate_Print :''' 
@@ -163,6 +163,7 @@ def p_generate_print(p):
 def p_type(p):
     '''Type : Primitive
             | STRING'''
+    p[0] = p[1]
 
 def p_print(p):
     '''Print : PRINT LPAREN Params1 Generate_Print RPAREN'''
@@ -319,7 +320,8 @@ def p_seen_int(p):
     
 def p_seen_semi(p):
     '''Seen_Semi : '''
-    expr.clear_stacks()
+    pass
+    #state.clear_stacks()
 
 def p_push_scope(p):
     '''Push_Scope : '''

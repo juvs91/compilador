@@ -23,7 +23,7 @@ semantic_cube = {
 		"bool":None,
 	},
 	"float":{
-		"int":None,
+		"int":"float",
 		"char":None,
 		"float":"float",
 		"bool":None,
