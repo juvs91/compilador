@@ -6,7 +6,7 @@ import sys
 import oaf_state as state
 
 # Expressions module
-import oaf_expr as expr  
+import oaf_expr as expr
 
 #read write module
 import oaf_read_write as rw
@@ -34,6 +34,7 @@ def p_declaration(p):
 def p_array(p):
     '''Array : LBRACKET ICONST RBRACKET
              | empty'''
+    p[0] = p[1]
 
 def p_function(p):
     '''Function : Function1
@@ -41,10 +42,10 @@ def p_function(p):
                 | empty'''
 
 def p_function_1(p):
-    '''Function1 : VOID ID Push_Scope LPAREN ParamList RPAREN FBlock Pop_Scope Function'''
+    '''Function1 : VOID ID Push_Scope LPAREN ParamList RPAREN Seen_Function FBlock Pop_Scope Function'''
 
 def p_rfunction(p):
-    '''RFunction : Primitive ID Push_Scope LPAREN ParamList RPAREN RFBlock Pop_Scope Function'''
+    '''RFunction : Primitive ID Push_Scope LPAREN ParamList RPAREN Seen_Function RFBlock Pop_Scope Function'''
 
 def p_block(p):
     '''Block : LBRACE Instruction RBRACE'''
@@ -106,7 +107,7 @@ def p_factor_1(p):
     '''Factor1 : Factor2
                | Constant'''
     p[0] = p[1]
-               
+
 def p_factor_2(p):
     '''Factor2 : MINUS Gen_Quad0 Constant
                | PLUS Gen_Quad0 Constant'''
@@ -136,7 +137,7 @@ def p_assign(p):
 def p_assign_1(p):
     '''Assign1 : SuperExpr Gen_Quad5
                | Call
-               | STRING Check_Char Seen_Char_Operand Gen_Quad5  
+               | STRING Check_Char Seen_Char_Operand Gen_Quad5
                | CCONST
                | CHARWORD Check_Char Seen_Char_Operand Gen_Quad5'''
 
@@ -144,20 +145,20 @@ def p_assign_1(p):
 def p_check_char(p):
 	'''Check_Char : '''
 	sem.is_char(p[-1])
-	
+
 
 def p_call(p):
     '''Call : ID LPAREN Params RPAREN'''
 
 def p_read(p):
-    '''Read : READ LPAREN Type COMMA ID Generate_Read RPAREN''' 
+    '''Read : READ LPAREN Type COMMA ID Generate_Read RPAREN'''
 
 def p_generate_read(p):
-	'''Generate_Read : '''            
+	'''Generate_Read : '''
 	rw.read_quad(p[-3], p[-1], sem.scope)
-	
+
 def p_generate_print(p):
-	'''Generate_Print :''' 
+	'''Generate_Print :'''
 
 
 def p_type(p):
@@ -199,11 +200,12 @@ def p_square(p):
     '''Square : SQUARE LPAREN SuperExpr RPAREN'''
 
 def p_param(p):
-    '''Param : Primitive ID Array1 Array1 Seen_Variable'''
+    '''Param : Primitive ID Array1 Array1 Seen_Variable Update_Signature_Size'''
 
 def p_array_1(p):
     '''Array1 : LBRACKET RBRACKET
               | empty'''
+    p[0] = p[1]
 
 def p_primitive(p):
     '''Primitive : INT
@@ -226,7 +228,7 @@ def p_paramlist_2(p):
 def p_instruction(p):
     '''Instruction : Instruction1 SEMI Seen_Semi Instruction
                    | empty'''
-                  
+
 def p_instruccion(p):
     '''Instruction1 : Loop
                     | Conditional
@@ -252,72 +254,92 @@ def p_constant(p):
                 | FALSE
                 | TRUE'''
     p[0] = p[1]
-    
+
 def p_seen_char_operand(p):
     '''Seen_Char_Operand :'''
     expr.add_operand(p[-2])
+
+
+# Function rules
+def p_seen_function(p):
+    '''Seen_Function : '''
+    sem.fill_symbol_table_function(p[-5], [p[-6], sem.get_signature(), sem.get_function_size()])
+    sem.clear_signature()
+    sem.clear_function_size
+    
+def p_update_signature_size(p):
+    '''Update_Signature_Size : '''
+    sem.update_signature(p[-1])
+    sem.update_function_size(p[-1])
+
 
 # Math rules
 def p_seen_operand(p):
     '''Seen_Operand : '''
     if(sem.is_declared(p[-1])):
         expr.add_operand(sem.get_variable(p[-1]))
-    
+
 def p_seen_operator(p):
     '''Seen_Operator : '''
     expr.add_operator(p[-1])
     p[0] = p[-1]
-    
+
 def p_push_expr(p):
     '''Push_Expr : '''
     expr.push_expr()
-    
+
 def p_pop_expr(p):
     '''Pop_Expr : '''
     expr.pop_expr()
-    
+
 # Unary operators
 def p_gen_quad_0(p):
     '''Gen_Quad0 : '''
-    
+
 # *, /
 def p_gen_quad_1(p):
     '''Gen_Quad1 : '''
     expr.generate_quad(1)
-    
+
 # +, -
 def p_gen_quad_2(p):
     '''Gen_Quad2 : '''
     expr.generate_quad(2)
-    
+
 # Logical operators
 def p_gen_quad_3(p):
     '''Gen_Quad3 : '''
     expr.generate_quad(3)
-    
-# &&, ||    
+
+# &&, ||
 def p_gen_quad_4(p):
     '''Gen_Quad4 : '''
     expr.generate_quad(4)
-    
+
 # Assign
 def p_gen_quad_5(p):
     '''Gen_Quad5 : '''
     expr.generate_quad(5)
-                
+
 # Update variable table
 def p_seen_variable(p):
-    '''Seen_Variable : '''      
-    sem.fill_symbol_table_variable(p[-3], p[-4])
-    
+    '''Seen_Variable : '''
+    type = p[-4]
+    if(p[-2] != None):
+        type += "[]"
+    if(p[-1] != None):
+        type += "[]"
+    sem.fill_symbol_table_variable(p[-3], type)
+    p[0] = type
+
 def p_seen_float(p):
     '''Seen_Float : '''
     print p[-1]
-    
+
 def p_seen_int(p):
     '''Seen_Int : '''
     sem.fill_symbol_table_constant(p[-1], "int")
-    
+
 def p_seen_semi(p):
     '''Seen_Semi : '''
     pass
@@ -325,7 +347,7 @@ def p_seen_semi(p):
 
 def p_push_scope(p):
     '''Push_Scope : '''
-    sem.scope = p[-1] 
+    sem.scope = p[-1]
     sem.validate_redeclaration_function(p[-1])
 
 def p_pop_scope(p):
@@ -366,7 +388,7 @@ def p_term_error(p):
 # Error rule for syntax errors
 def p_error(p):
     try:
-        print("Syntax error at line {0} col {1}, unexpected '{2}'".format(p.lineno, find_column(input, p), p.value)) 
+        print("Syntax error at line {0} col {1}, unexpected '{2}'".format(p.lineno, find_column(input, p), p.value))
     except:
         print("Syntax error")
     lexer.push_state("err")
