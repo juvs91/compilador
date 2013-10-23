@@ -7,7 +7,16 @@ constant_str = "constant"
 scope = global_str
 var_table = {scope:{}, constant_str:{}}
 
+func_table = {}
+
 operation = None
+
+# Functions signature
+signature = []
+
+# Functions size(bytes)
+f_size = 0
+
 semantic_cube = {
 "=":{
 	"int":{
@@ -350,15 +359,21 @@ semantic_cube = {
 }
 
 
-def fill_symbol_table_variable(symbol, type):
-     #verifica si existe el scope dado
-     if(var_table.get(scope) == None):
-         var_table[scope] = {}
+def fill_symbol_table_function(symbol, attributes):
+    if(func_table.get(symbol) == None):
+         func_table[symbol] = attributes
+    else:
+        raise NameError("Function redeclaration, '{0}' already exists".format(symbol))
 
-     if(symbol == scope or var_table[scope].get(symbol) != None):
-         raise NameError("Variable redeclaration, '{0}' already exists".format(symbol))
-     else:
-         var_table[scope][symbol] = [type]
+def fill_symbol_table_variable(symbol, type):
+    #verifica si existe el scope dado
+    if(var_table.get(scope) == None):
+        var_table[scope] = {}
+
+    if(symbol == scope or var_table[scope].get(symbol) != None):
+        raise NameError("Variable redeclaration, '{0}' already exists".format(symbol))
+    else:
+        var_table[scope][symbol] = [type]
     #print("{0} {1} {2} {3} {4}".format(p[-4], p[-3], p[-2], p[-1], p[0]))
 
 def fill_symbol_table_constant(symbol, type):
@@ -367,7 +382,36 @@ def fill_symbol_table_constant(symbol, type):
     else:
         var_table[constant_str][symbol] = [type]
     #print var_table
-  
+
+    
+# Signature of function
+def update_signature(type):
+    global signature
+    signature.append(type)
+    
+def get_signature():
+    return signature
+    
+def clear_signature():
+    global signature
+    signature = []
+    
+    
+# Size of function
+def update_function_size(type):
+    global f_size
+    if(type[0] == "i" or type[0] == "f"):
+        f_size += 4
+    else:
+        f_size += 1
+    
+def get_function_size():
+    return f_size
+    
+def clear_function_size():
+    global size
+    f_size = 0
+    
 
 def get_scope():
 	return scope
@@ -408,7 +452,6 @@ def get_type(op, op1, op2):
         return type
     else:
         raise NameError("Incompatible types '{0}' and '{1}'".format(op1[1][0], op2[1][0]))  
-
 
 def is_char(char):
 	if(len(char) != 3):
