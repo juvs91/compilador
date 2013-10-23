@@ -15,6 +15,12 @@ temp_counter = 0
 # Quad list
 quads = []
 
+def clear_stacks():
+    global operator_stack, operand_stack, last_operator
+    del(operator_stack[:])
+    del(operand_stack[:])
+    last_operator = None
+
 # def push_expr():
     # global operator_stack, last_operator
     # operator_stack.append('#')
@@ -38,11 +44,3 @@ quads = []
     # global last_operator
     # operator_stack.append(operator)
     # last_operator = operator_stack[-1]
-
-# def generate_quad(type):
-    # global operator_stack, last_operator, operand_stack, quads
-    # if(type == "math"):
-        # quad, operator_stack, operand_stack = math.generate_quad(operator_stack, operand_stack)
-        # quads.append(quad)
-        # if(len(operator_stack) > 0):
-            # last_operator = operator_stack[-1]
