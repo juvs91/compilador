@@ -9,7 +9,10 @@ import oaf_state as state
 import oaf_expr as expr
 
 #read write module
-import oaf_read_write as rw
+import oaf_read_write as rw  
+
+#if while module
+import oaf_if_loop as il
 
 # Get semantic variables
 import oaf_sem as sem
@@ -19,6 +22,9 @@ from oaf_lex import tokens
 # Get the lexer
 from oaf_lex import lexer
 from oaf_lex import find_column
+                
+
+is_in_print = False
 
 
 def p_program(p):
@@ -57,14 +63,32 @@ def p_rfblock(p):
     '''RFBlock : LBRACE Declaration Instruction RETURN SuperExpr SEMI RBRACE'''
 
 def p_conditional(p):
-    '''Conditional : IF LPAREN SuperExpr RPAREN Block Else'''
+    '''Conditional : IF LPAREN SuperExpr RPAREN Push_Label_Stack Block Else'''
+
+def p_push_label_stack(p):
+	'''Push_Label_Stack : '''                       
+	state.label_stack.append(state.label)
+	il.generate_if_goto_F(state.operand_stack.pop())
+	
+def p_pop_label_stack(p):
+	'''Pop_Label_Stack :'''
+	il.put_label_to_goto_F(state.label_stack.pop())
 
 def p_else(p):
-    '''Else : ELSE Block
-            | empty'''
+    '''Else : ELSE Push_Else Pop_Label_Stack Block Pop_Label_Stack
+            | Pop_Label_Stack empty'''  
+
+def p_push_else(p):
+	'''Push_Else :'''
+	temp = state.label_stack.pop()
+	state.label_stack.append(state.label)
+	state.label_stack.append(temp)
+	il.generate_else_goto()
+	
 
 def p_superexpr(p):
     '''SuperExpr : Expression Gen_Quad4 SuperExpr1'''
+    p[0] = p[1]
 
 def p_superexpr_1(p):
     '''SuperExpr1 : AND Seen_Operator SuperExpr
@@ -73,6 +97,7 @@ def p_superexpr_1(p):
 
 def p_expression(p):
     '''Expression : Expr Expression1 Gen_Quad3'''
+    p[0] = p[1]
 
 def p_expression_1(p):
     '''Expression1 : LESSTHAN Seen_Operator Expr
@@ -85,6 +110,8 @@ def p_expression_1(p):
 
 def p_expr(p):
     '''Expr : Term Gen_Quad2 Expr1'''
+    p[0] = p[1]
+    #print +str(p[1])+"\n"
 
 def p_expr_1(p):
     '''Expr1 : MINUS Seen_Operator Expr
@@ -93,6 +120,7 @@ def p_expr_1(p):
 
 def p_term(p):
     '''Term : Factor Gen_Quad1 Term1'''
+    p[0] = p[1]
 
 def p_term_1(p):
     '''Term1 : DIVIDE Seen_Operator Term
@@ -102,6 +130,7 @@ def p_term_1(p):
 def p_factor(p):
     '''Factor : LPAREN Push_Expr SuperExpr RPAREN Pop_Expr
               | Factor1 Seen_Operand'''
+    p[0] = p[1]
 
 def p_factor_1(p):
     '''Factor1 : Factor2
@@ -119,17 +148,42 @@ def p_params(p):
 
 def p_params_1(p):
     '''Params1 : Params2'''
+    p[0] = p[1]
 
 def p_params_2(p):
-    '''Params2 : SuperExpr Params3
-               | STRING Params3'''
+    '''Params2 : SuperExpr Pop_Operand_to_Param_List Params3 
+               | CHARWORD Push_Param_List Params3'''
+    p[0] = p[1]
+
+def p_push_param_list(p):
+	'''Push_Param_List : '''    
+	state.params_list.append(p[-1])
+
+def p_pop_operand_to_param_list(p):
+	'''Pop_Operand_to_Param_List : ''' 
+	state.params_list.append(state.operand_stack.pop())
+	
+	
+
 
 def p_params_3(p):
     '''Params3 : COMMA Params2
                | empty'''
 
 def p_loop(p):
-    '''Loop : LOOP LPAREN SuperExpr RPAREN Block'''
+    '''Loop : LOOP LPAREN Save_Label SuperExpr RPAREN Push_Label_Stack Block Go_Back_To_Validate Pop_Label_Stack'''
+
+def p_save_label(p):
+	'''Save_Label : '''
+	state.label_stack.append(state.label)
+	
+def p_go_back_to_validate(p):
+	'''Go_Back_To_Validate :'''
+	temp = state.label_stack.pop()
+	il.generate_loop_goto(state.label_stack.pop())
+	state.label_stack.append(temp)
+	
+	
 
 def p_assign(p):
     '''Assign : ID Seen_Operand EQUAL Seen_Operator Assign1'''
@@ -158,8 +212,13 @@ def p_generate_read(p):
 	rw.read_quad(p[-3], p[-1], sem.scope)
 
 def p_generate_print(p):
-	'''Generate_Print :'''
-
+	'''Generate_Print :''' 
+	global is_on_print
+	for e in state.params_list:
+		rw.print_quad(e)
+	state.params_list = []
+	is_on_print = False
+	
 
 def p_type(p):
     '''Type : Primitive
@@ -167,7 +226,12 @@ def p_type(p):
     p[0] = p[1]
 
 def p_print(p):
-    '''Print : PRINT LPAREN Params1 Generate_Print RPAREN'''
+    '''Print : PRINT LPAREN Is_On_Print Params1 Generate_Print RPAREN'''
+
+def p_is_on_print(p):
+	'''Is_On_Print :'''
+	global is_on_print    
+	is_on_print = True
 
 def p_brush(p):
     '''Brush : BRUSH LPAREN Color COMMA SuperExpr RPAREN'''
@@ -225,11 +289,11 @@ def p_paramlist_2(p):
     '''ParamList2 : COMMA ParamList1
                   | empty'''
 
-def p_instruction(p):
+def p_instruction(p):  #que pedo con la regla esta y la de abaj
     '''Instruction : Instruction1 SEMI Seen_Semi Instruction
                    | empty'''
 
-def p_instruccion(p):
+def p_instruction_1(p):
     '''Instruction1 : Loop
                     | Conditional
                     | Assign
