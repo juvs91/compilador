@@ -7,6 +7,8 @@ import oaf_state as state
 
 # Expressions module
 import oaf_expr as expr
+# Functions module
+import oaf_func as func
 
 #read write module
 import oaf_read_write as rw
@@ -101,17 +103,22 @@ def p_term_1(p):
 
 def p_factor(p):
     '''Factor : LPAREN Push_Expr SuperExpr RPAREN Pop_Expr
-              | Factor1 Seen_Operand'''
+              | Factor1'''
 
 def p_factor_1(p):
     '''Factor1 : Factor2
-               | Constant'''
+               | Factor3'''
     p[0] = p[1]
 
 def p_factor_2(p):
-    '''Factor2 : MINUS Gen_Quad0 Constant
-               | PLUS Gen_Quad0 Constant'''
-    p[0] = p[3]
+    '''Factor2 : MINUS Factor3 Gen_Quad0
+               | PLUS Factor3 Gen_Quad0'''
+    p[0] = p[2]
+    
+def p_factor_3(p):
+    '''Factor3 : Constant Seen_Operand
+               | Call Seen_Call'''
+    p[0] = p[1]
 
 def p_params(p):
     '''Params : Params2
@@ -149,6 +156,7 @@ def p_check_char(p):
 
 def p_call(p):
     '''Call : ID LPAREN Params RPAREN'''
+    p[0] = p[1]
 
 def p_read(p):
     '''Read : READ LPAREN Type COMMA ID Generate_Read RPAREN'''
@@ -259,6 +267,9 @@ def p_seen_char_operand(p):
     '''Seen_Char_Operand :'''
     expr.add_operand(p[-2])
 
+def p_seen_call(p):
+    '''Seen_Call : '''
+    pass
 
 # Function rules
 def p_seen_function(p):
