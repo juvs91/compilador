@@ -1,16 +1,30 @@
 # Module that keeps the state of the parser
 # Temp pool
 # TODO: Add a pool for each primitive
+            
+#list of al the params
+params_list = []
+
+#label stack 
+label_stack = []
+
 
 # Operands stack
 operand_stack = []
 
 # Operator stack
-operator_stack = []
+operator_stack = []  
+
 last_operator = None
 
+
+#label
+label = 0
 # Temp counter
-temp_counter = 0
+temp_counter = 0   
+
+
+
 
 # Quad list
 quads = []
