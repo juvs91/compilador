@@ -13,7 +13,7 @@ class Quad:
         self.operand2 = op2
         self.operand1 = op1
         if(op2 == None):
-            if((op != "read" and op != "print" and op != "goto")):
+            if(op != "read" and op != "print" and op != "goto" and op != "era" and op != "param" and op != "gosub"):
                 res[1][0] = sem.get_type(op, op1, res)
             self.result = res
         else:
