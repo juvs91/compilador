@@ -160,16 +160,16 @@ def p_params_2(p):
 
 def p_params_3(p):
     '''Params3 : SuperExpr Seen_Param_Print Params4
-               | CHARWORD Push_Param_List Params4'''
+               | STRING Seen_Param_Print Params4'''
     p[0] = p[1]
-
-def p_push_param_list(p):
-    '''Push_Param_List : '''
-    state.params_list.append(p[-1])
 
 def p_params_4(p):
     '''Params4 : COMMA Params3
                | empty'''
+
+def p_push_param_list(p):
+    '''Push_Param_List : '''
+    state.params_list.append(p[-1])
 #
 # revisar este pedo
 
@@ -195,10 +195,7 @@ def p_assign(p):
 def p_assign_1(p):
     '''Assign1 : SuperExpr Gen_Quad5
                | Call
-               | STRING Check_Char Seen_Char_Operand Gen_Quad5
-               | CCONST
-               | CHARWORD Check_Char Seen_Char_Operand Gen_Quad5'''
-
+               | STRING Check_Char Seen_Char_Operand Gen_Quad5'''
 
 def p_check_char(p):
     '''Check_Char : '''
@@ -306,6 +303,7 @@ def p_constant(p):
     '''Constant : ID
                 | FCONST Seen_Float
                 | ICONST Seen_Int
+                | CCONST Seen_Char
                 | FALSE
                 | TRUE'''
     p[0] = p[1]
@@ -332,7 +330,11 @@ def p_seen_param_call(p):
 
 def p_seen_param_print(p):
     '''Seen_Param_Print : '''
-    param = state.operand_stack.pop()
+    print p[-1]
+    if(p[-1][0] == '"'):
+        param = p[-1]
+    else:
+        param = state.operand_stack.pop()
     rw.print_quad(param)
 
 # Function rules
@@ -423,11 +425,15 @@ def p_seen_variable(p):
 
 def p_seen_float(p):
     '''Seen_Float : '''
-    print p[-1]
+    sem.fill_symbol_table_constant(p[-1], "float")
 
 def p_seen_int(p):
     '''Seen_Int : '''
     sem.fill_symbol_table_constant(p[-1], "int")
+
+def p_seen_char(p):
+    '''Seen_Char : '''
+    sem.fill_symbol_table_constant(p[-1], "char")
 
 def p_seen_semi(p):
     '''Seen_Semi : '''
