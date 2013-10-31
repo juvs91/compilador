@@ -26,7 +26,7 @@ from oaf_lex import lexer
 from oaf_lex import find_column
 
 def p_program(p):
-    '''Program : Declaration Function Main'''
+    '''Program : Declaration Function Main Seen_Program_End'''
 
 def p_main(p):
     '''Main : MAIN Push_Scope LPAREN RPAREN FBlock'''
@@ -46,10 +46,10 @@ def p_function(p):
                 | empty'''
 
 def p_function_1(p):
-    '''Function1 : VOID ID Push_Scope LPAREN ParamList RPAREN Seen_Function FBlock Pop_Scope Function'''
+    '''Function1 : VOID ID Push_Scope LPAREN ParamList RPAREN Seen_Function FBlock Seen_Function_End Pop_Scope Function'''
 
 def p_rfunction(p):
-    '''RFunction : Primitive ID Push_Scope LPAREN ParamList RPAREN Seen_Function RFBlock Pop_Scope Function'''
+    '''RFunction : Primitive ID Push_Scope LPAREN ParamList RPAREN Seen_Function RFBlock Seen_Function_End Pop_Scope Function'''
 
 def p_block(p):
     '''Block : LBRACE Instruction RBRACE'''
@@ -341,6 +341,14 @@ def p_seen_function(p):
     sem.fill_symbol_table_function(p[-5], [p[-6], state.signature, state.f_size])
     state.signature = []
     state.f_size = 0
+
+def p_seen_function_end(p):
+    '''Seen_Function_End : '''
+    func.generate_end(p[-7])
+
+def p_seen_program_end(p):
+    '''Seen_Program_End : '''
+    func.generate_end("main")
 
 def p_update_signature_size(p):
     '''Update_Signature_Size : '''

@@ -21,3 +21,8 @@ def generate_gosub(func_name):
     q = quad.Quad()
     q.set_quad("gosub", None, func_name, None)
     state.quads.append(q)
+
+def generate_end(func_name):
+    q = quad.Quad()
+    q.set_quad("end", None, func_name, None)
+    state.quads.append(q)
