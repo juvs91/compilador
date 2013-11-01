@@ -5,6 +5,8 @@ import sys
 
 import oaf_state as state
 
+import oaf_main as main
+
 # Expressions module
 import oaf_expr as expr
 # Functions module
@@ -26,10 +28,10 @@ from oaf_lex import lexer
 from oaf_lex import find_column
 
 def p_program(p):
-    '''Program : Declaration Function Main Seen_Program_End'''
+    '''Program : Seen_Program Declaration Function Main Seen_Program_End'''
 
 def p_main(p):
-    '''Main : MAIN Push_Scope LPAREN RPAREN FBlock'''
+    '''Main : MAIN Seen_Main Push_Scope LPAREN RPAREN FBlock'''
 
 def p_declaration(p):
     '''Declaration : Primitive ID Array Array Seen_Variable SEMI Declaration
@@ -347,9 +349,17 @@ def p_seen_function_end(p):
     '''Seen_Function_End : '''
     func.generate_end(p[-7])
 
+def p_seen_program(p):
+    '''Seen_Program : '''
+    main.generate_main()
+
 def p_seen_program_end(p):
     '''Seen_Program_End : '''
     func.generate_end("main")
+
+def p_seen_main(p):
+    '''Seen_Main : '''
+    main.update_goto(len(state.quads) + 1)
 
 def p_update_signature_size(p):
     '''Update_Signature_Size : '''
