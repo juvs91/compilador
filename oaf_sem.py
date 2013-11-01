@@ -455,6 +455,6 @@ def get_type(op, op1, op2):
 
 def is_char(char):
 	if(len(char) != 3):
-		print len(char)
+		#print len(char)
 		raise NameError("its not a char ")  
 		
