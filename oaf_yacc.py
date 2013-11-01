@@ -94,7 +94,7 @@ def p_superexpr_1(p):
                   | empty'''
 
 def p_expression(p):
-    '''Expression : Expr Gen_Quad3 Expression1'''
+    '''Expression : Expr Expression1 Gen_Quad3'''
     p[0] = p[1]
 
 def p_expression_1(p):
@@ -145,7 +145,7 @@ def p_factor_3(p):
     p[0] = p[1]
 
 # revisar este pedo
-#
+# Agregar tipo STRING para variables y funciones
 def p_params(p):
     '''Params : Params1
               | empty'''
@@ -186,7 +186,6 @@ def p_go_back_to_validate(p):
     temp = state.label_stack.pop()
     il.generate_loop_goto(state.label_stack.pop())
     state.label_stack.append(temp)
-
 
 
 def p_assign(p):
@@ -511,8 +510,8 @@ with open(raw_input('filename > '), 'r') as f:
     result = parser.parse(input,0,0)
     var_table = sem.var_table
     #print result
-    for quad in state.quads:
-        print (quad.operator, quad.operand1, quad.operand2, quad.result)
+    for idx, quad in enumerate(state.quads):
+        print idx + 1, (quad.operator, quad.operand1, quad.operand2, quad.result)
     # print "Scope\t|Id\t|Type"
     # print "--------|-------|--------"
     # for k in var_table:
