@@ -1,4 +1,4 @@
-import ply.yacc as yacc
+cimport ply.yacc as yacc
 
 # debug
 import sys
