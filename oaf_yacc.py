@@ -31,7 +31,7 @@ def p_program(p):
     '''Program : Seen_Program Declaration Function Main Seen_Program_End'''
 
 def p_main(p):
-    '''Main : MAIN Seen_Main Push_Scope LPAREN RPAREN FBlock'''
+    '''Main : MAIN Push_Scope Seen_Main LPAREN RPAREN FBlock'''
 
 def p_declaration(p):
     '''Declaration : Primitive ID Array Array Seen_Variable SEMI Declaration
@@ -456,7 +456,7 @@ def p_push_scope(p):
 
 def p_pop_scope(p):
     '''Pop_Scope : '''
-    sem.scope = 'global'
+    sem.scope = "global"
 
 # Empty production
 def p_empty(p):

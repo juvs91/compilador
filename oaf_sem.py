@@ -395,14 +395,12 @@ def validate_variable_is_declared(var):
 def is_declared(var):
     if(var_table[constant_str].get(var) != None):
         return True
-    elif(var_table.get(scope) == None):
-        raise NameError("Undeclared function '{0}'".format(var)) 
-    elif(isinstance(var,str)): 
+    elif(var_table.get(scope) != None and var_table[scope].get(var) != None):
         return True
-    elif(var_table[scope].get(var) == None and var_table[global_str].get(var) == None and var_table[constant_str].get(var) == None):
-        raise NameError("Undeclared variable '{0}'".format(var))
+    elif(var_table[global_str].get(var) != None):
+        return True
     else: 
-        return True
+        raise NameError("Undeclared variable '{0}'".format(var))
 
 def get_variable(var):
     if(var_table.get(scope) != None and var_table[scope].get(var) != None):

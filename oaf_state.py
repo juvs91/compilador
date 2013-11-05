@@ -43,17 +43,11 @@ def clear_stacks():
     del(operand_stack[:])
     last_operator = None
 
-def reset_param_counter():
-    global param_counter
-    param_counter = 0
-
-def reset_param_types():
-    global param_types
-    param_types = []
-
 def reset_call():
-    reset_param_counter()
-    reset_param_types()
+    global param_counter, param_types, signature
+    param_counter = 0
+    param_types = []
+    signature = []
 
 # def push_expr():
     # global operator_stack, last_operator
