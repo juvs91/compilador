@@ -23,8 +23,16 @@ label = 0
 # Temp counter
 temp_counter = 0   
 
+# Function signature
+signature = []
 
+# Function size(bytes)
+f_size = 0
 
+# Param counter
+param_counter = 0
+# Param types of function call
+param_types = []
 
 # Quad list
 quads = []
@@ -34,6 +42,12 @@ def clear_stacks():
     del(operator_stack[:])
     del(operand_stack[:])
     last_operator = None
+
+def reset_call():
+    global param_counter, param_types, signature
+    param_counter = 0
+    param_types = []
+    signature = []
 
 # def push_expr():
     # global operator_stack, last_operator

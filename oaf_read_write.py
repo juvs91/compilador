@@ -7,10 +7,10 @@ def print_quad(printable):
     if(isinstance(printable,list)):
        printable = printable[0]
     q = quad.Quad()
-    q.set_quad("print", None, printable, "t" + str(state.temp_counter))
+    q.set_quad("print", None, printable, None)
     #state.operand_stack.append(q.result)
     state.quads.append(q)
-    state.temp_counter += 1
+    #state.temp_counter += 1
     state.label += 1
 
 def read_quad(type, var, scope):

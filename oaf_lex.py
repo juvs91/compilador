@@ -2,41 +2,41 @@ import ply.lex as lex
 
 # Lexer states
 states = (
-   ('err','inclusive'),
+   ('err', 'inclusive'),
 )
 
 # Reserved words
 reserved = {
-    'arc' : 'ARC',
-    'bool' : 'BOOL',
-    'brush' : 'BRUSH',
-    'char' : 'CHAR',
-    'circle' : 'CIRCLE',
-    'color' : 'COLOR',
-    'else' : 'ELSE',
-    'false' : 'FALSE',
-    'fd' : 'FD',
-    'float' : 'FLOAT',
-    'home' : 'HOME',
-    'if' : 'IF',
-    'int' : 'INT',
-    'loop' : 'LOOP',
-    'main' : 'MAIN',
-    'pd' : 'PD',
-    'print' : 'PRINT',
-    'pu' : 'PU',
-    'read' : 'READ',
-    'return' : 'RETURN',
-    'rt' : 'RT',
-    'square' : 'SQUARE',
-    'true' : 'TRUE',
-    'void' : 'VOID'
+    'arc': 'ARC',
+    'bool': 'BOOL',
+    'brush': 'BRUSH',
+    'char': 'CHAR',
+    'circle': 'CIRCLE',
+    'color': 'COLOR',
+    'else': 'ELSE',
+    'false': 'FALSE',
+    'fd': 'FD',
+    'float': 'FLOAT',
+    'home': 'HOME',
+    'if': 'IF',
+    'int': 'INT',
+    'loop': 'LOOP',
+    'main': 'MAIN',
+    'pd': 'PD',
+    'print': 'PRINT',
+    'pu': 'PU',
+    'read': 'READ',
+    'return': 'RETURN',
+    'rt': 'RT',
+    'square': 'SQUARE',
+    'true': 'TRUE',
+    'void': 'VOID'
 }
 
 # List of token names
 tokens = [
     # Literals
-    'ID', 'ICONST', 'FCONST', 'CCONST', 'STRING','CHARWORD',
+    'ID', 'ICONST', 'FCONST', 'CCONST', 'STRING',
     # Operators
     'PLUS', 'MINUS', 'TIMES', 'DIVIDE',
     # Separators
@@ -78,8 +78,7 @@ def t_COMMENT(t):
     pass
 
 # Literals
-t_STRING    = r'".*"'  
-t_CHARWORD  = r"\'[^']*\'" 
+t_STRING    = r'".*"'
 t_CCONST    = r'\'[ -~]\''
 # Operators
 t_PLUS      = r'\+'

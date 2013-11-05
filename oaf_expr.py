@@ -61,4 +61,6 @@ def generate_quad(hierarchy):
     else:
         del(q)
     if(len(state.operator_stack) > 0):
-                state.last_operator = state.operator_stack[-1]
+        state.last_operator = state.operator_stack[-1]
+    else:
+        state.last_operator = None

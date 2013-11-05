@@ -5,8 +5,12 @@ import sys
 
 import oaf_state as state
 
+import oaf_main as main
+
 # Expressions module
 import oaf_expr as expr
+# Functions module
+import oaf_func as func
 
 #read write module
 import oaf_read_write as rw  
@@ -22,16 +26,12 @@ from oaf_lex import tokens
 # Get the lexer
 from oaf_lex import lexer
 from oaf_lex import find_column
-                
-
-is_in_print = False
-
 
 def p_program(p):
-    '''Program : Declaration Function Main'''
+    '''Program : Seen_Program Declaration Function Main Seen_Program_End'''
 
 def p_main(p):
-    '''Main : MAIN Push_Scope LPAREN RPAREN FBlock'''
+    '''Main : MAIN Push_Scope Seen_Main LPAREN RPAREN FBlock'''
 
 def p_declaration(p):
     '''Declaration : Primitive ID Array Array Seen_Variable SEMI Declaration
@@ -48,10 +48,10 @@ def p_function(p):
                 | empty'''
 
 def p_function_1(p):
-    '''Function1 : VOID ID Push_Scope LPAREN ParamList RPAREN Seen_Function FBlock Pop_Scope Function'''
+    '''Function1 : VOID ID Push_Scope LPAREN ParamList RPAREN Seen_Function FBlock Seen_Function_End Pop_Scope Function'''
 
 def p_rfunction(p):
-    '''RFunction : Primitive ID Push_Scope LPAREN ParamList RPAREN Seen_Function RFBlock Pop_Scope Function'''
+    '''RFunction : Primitive ID Push_Scope LPAREN ParamList RPAREN Seen_Function RFBlock Seen_Function_End Pop_Scope Function'''
 
 def p_block(p):
     '''Block : LBRACE Instruction RBRACE'''
@@ -66,25 +66,25 @@ def p_conditional(p):
     '''Conditional : IF LPAREN SuperExpr RPAREN Push_Label_Stack Block Else'''
 
 def p_push_label_stack(p):
-	'''Push_Label_Stack : '''                       
-	state.label_stack.append(state.label)
-	il.generate_if_goto_F(state.operand_stack.pop())
-	
+    '''Push_Label_Stack : '''
+    state.label_stack.append(state.label)
+    il.generate_if_goto_F(state.operand_stack.pop())
+
 def p_pop_label_stack(p):
-	'''Pop_Label_Stack :'''
-	il.put_label_to_goto_F(state.label_stack.pop())
+    '''Pop_Label_Stack :'''
+    il.put_label_to_goto_F(state.label_stack.pop())
 
 def p_else(p):
     '''Else : ELSE Push_Else Pop_Label_Stack Block Pop_Label_Stack
             | Pop_Label_Stack empty'''  
 
 def p_push_else(p):
-	'''Push_Else :'''
-	temp = state.label_stack.pop()
-	state.label_stack.append(state.label)
-	state.label_stack.append(temp)
-	il.generate_else_goto()
-	
+    '''Push_Else :'''
+    temp = state.label_stack.pop()
+    state.label_stack.append(state.label)
+    state.label_stack.append(temp)
+    il.generate_else_goto()
+
 
 def p_superexpr(p):
     '''SuperExpr : Expression Gen_Quad4 SuperExpr1'''
@@ -111,7 +111,6 @@ def p_expression_1(p):
 def p_expr(p):
     '''Expr : Term Gen_Quad2 Expr1'''
     p[0] = p[1]
-    #print +str(p[1])+"\n"
 
 def p_expr_1(p):
     '''Expr1 : MINUS Seen_Operator Expr
@@ -134,56 +133,62 @@ def p_factor(p):
 
 def p_factor_1(p):
     '''Factor1 : Factor2
-               | Constant'''
+               | Factor3'''
     p[0] = p[1]
 
 def p_factor_2(p):
-    '''Factor2 : MINUS Gen_Quad0 Constant
-               | PLUS Gen_Quad0 Constant'''
-    p[0] = p[3]
+    '''Factor2 : MINUS Factor3 Gen_Quad0
+               | PLUS Factor3 Gen_Quad0'''
+    p[0] = p[2]
 
+def p_factor_3(p):
+    '''Factor3 : Constant
+               | Call'''
+    p[0] = p[1]
+
+# revisar este pedo
+# Agregar tipo STRING para variables y funciones
 def p_params(p):
-    '''Params : Params2
+    '''Params : Params1
               | empty'''
 
 def p_params_1(p):
-    '''Params1 : Params2'''
+    '''Params1 : SuperExpr Seen_Param_Call Params2'''
     p[0] = p[1]
 
 def p_params_2(p):
-    '''Params2 : SuperExpr Pop_Operand_to_Param_List Params3 
-               | CHARWORD Push_Param_List Params3'''
-    p[0] = p[1]
-
-def p_push_param_list(p):
-	'''Push_Param_List : '''    
-	state.params_list.append(p[-1])
-
-def p_pop_operand_to_param_list(p):
-	'''Pop_Operand_to_Param_List : ''' 
-	state.params_list.append(state.operand_stack.pop())
-	
-	
-
+    '''Params2 : COMMA Params1
+               | empty'''
 
 def p_params_3(p):
-    '''Params3 : COMMA Params2
+    '''Params3 : SuperExpr Seen_Param_Print Params4
+               | STRING Seen_Param_Print Params4'''
+    p[0] = p[1]
+
+def p_params_4(p):
+    '''Params4 : COMMA Params3
                | empty'''
+
+def p_push_param_list(p):
+    '''Push_Param_List : '''
+    state.params_list.append(p[-1])
+#
+# revisar este pedo
+
 
 def p_loop(p):
     '''Loop : LOOP LPAREN Save_Label SuperExpr RPAREN Push_Label_Stack Block Go_Back_To_Validate Pop_Label_Stack'''
 
 def p_save_label(p):
-	'''Save_Label : '''
-	state.label_stack.append(state.label)
-	
+    '''Save_Label : '''
+    state.label_stack.append(state.label)
+
 def p_go_back_to_validate(p):
-	'''Go_Back_To_Validate :'''
-	temp = state.label_stack.pop()
-	il.generate_loop_goto(state.label_stack.pop())
-	state.label_stack.append(temp)
-	
-	
+    '''Go_Back_To_Validate :'''
+    temp = state.label_stack.pop()
+    il.generate_loop_goto(state.label_stack.pop())
+    state.label_stack.append(temp)
+
 
 def p_assign(p):
     '''Assign : ID Seen_Operand EQUAL Seen_Operator Assign1'''
@@ -191,34 +196,23 @@ def p_assign(p):
 def p_assign_1(p):
     '''Assign1 : SuperExpr Gen_Quad5
                | Call
-               | STRING Check_Char Seen_Char_Operand Gen_Quad5
-               | CCONST
-               | CHARWORD Check_Char Seen_Char_Operand Gen_Quad5'''
-
+               | STRING Check_Char Seen_Char_Operand Gen_Quad5'''
 
 def p_check_char(p):
-	'''Check_Char : '''
-	sem.is_char(p[-1])
+    '''Check_Char : '''
+    sem.is_char(p[-1])
 
 
 def p_call(p):
-    '''Call : ID LPAREN Params RPAREN'''
+    '''Call : ID LPAREN Seen_Call Params RPAREN Check_Signature Seen_Call_End'''
+    p[0] = p[1]
 
 def p_read(p):
     '''Read : READ LPAREN Type COMMA ID Generate_Read RPAREN'''
 
 def p_generate_read(p):
-	'''Generate_Read : '''
-	rw.read_quad(p[-3], p[-1], sem.scope)
-
-def p_generate_print(p):
-	'''Generate_Print :''' 
-	global is_on_print
-	for e in state.params_list:
-		rw.print_quad(e)
-	state.params_list = []
-	is_on_print = False
-	
+    '''Generate_Read : '''
+    rw.read_quad(p[-3], p[-1], sem.scope)
 
 def p_type(p):
     '''Type : Primitive
@@ -226,12 +220,7 @@ def p_type(p):
     p[0] = p[1]
 
 def p_print(p):
-    '''Print : PRINT LPAREN Is_On_Print Params1 Generate_Print RPAREN'''
-
-def p_is_on_print(p):
-	'''Is_On_Print :'''
-	global is_on_print    
-	is_on_print = True
+    '''Print : PRINT LPAREN Params3 RPAREN'''
 
 def p_brush(p):
     '''Brush : BRUSH LPAREN Color COMMA SuperExpr RPAREN'''
@@ -289,7 +278,7 @@ def p_paramlist_2(p):
     '''ParamList2 : COMMA ParamList1
                   | empty'''
 
-def p_instruction(p):  #que pedo con la regla esta y la de abaj
+def p_instruction(p):
     '''Instruction : Instruction1 SEMI Seen_Semi Instruction
                    | empty'''
 
@@ -315,6 +304,7 @@ def p_constant(p):
     '''Constant : ID
                 | FCONST Seen_Float
                 | ICONST Seen_Int
+                | CCONST Seen_Char
                 | FALSE
                 | TRUE'''
     p[0] = p[1]
@@ -322,20 +312,66 @@ def p_constant(p):
 def p_seen_char_operand(p):
     '''Seen_Char_Operand :'''
     expr.add_operand(p[-2])
+    print "CHAR"
 
+def p_seen_call(p):
+    '''Seen_Call : '''
+    func.generate_era(p[-2])
+
+def p_seen_call_end(p):
+    '''Seen_Call_End : '''
+    func.generate_gosub(p[-6])
+    state.reset_call()
+
+def p_seen_param_call(p):
+    '''Seen_Param_Call : '''
+    param = state.operand_stack.pop()
+    func.generate_param(param)
+    state.signature.append(param[1][0])
+
+def p_seen_param_print(p):
+    '''Seen_Param_Print : '''
+    print p[-1]
+    if(p[-1][0] == '"'):
+        param = p[-1]
+    else:
+        param = state.operand_stack.pop()
+    rw.print_quad(param)
 
 # Function rules
 def p_seen_function(p):
     '''Seen_Function : '''
-    sem.fill_symbol_table_function(p[-5], [p[-6], sem.get_signature(), sem.get_function_size()])
-    sem.clear_signature()
-    sem.clear_function_size
-    
+    sem.fill_symbol_table_function(p[-5], [p[-6], state.signature, state.f_size])
+    state.signature = []
+    state.f_size = 0
+
+def p_seen_function_end(p):
+    '''Seen_Function_End : '''
+    func.generate_end(p[-7])
+
+def p_seen_program(p):
+    '''Seen_Program : '''
+    main.generate_main()
+
+def p_seen_program_end(p):
+    '''Seen_Program_End : '''
+    func.generate_end("main")
+
+def p_seen_main(p):
+    '''Seen_Main : '''
+    main.update_goto(len(state.quads) + 1)
+
 def p_update_signature_size(p):
     '''Update_Signature_Size : '''
-    sem.update_signature(p[-1])
-    sem.update_function_size(p[-1])
+    state.signature.append(p[-1])
+    if(p[-1][0] == "i" or p[-1][0] == "f"):
+        state.f_size += 4
+    else:
+        state.f_size += 1
 
+def p_check_signature(p):
+    '''Check_Signature : '''
+    sem.is_signature_valid(p[-5], state.signature)
 
 # Math rules
 def p_seen_operand(p):
@@ -398,11 +434,15 @@ def p_seen_variable(p):
 
 def p_seen_float(p):
     '''Seen_Float : '''
-    print p[-1]
+    sem.fill_symbol_table_constant(p[-1], "float")
 
 def p_seen_int(p):
     '''Seen_Int : '''
     sem.fill_symbol_table_constant(p[-1], "int")
+
+def p_seen_char(p):
+    '''Seen_Char : '''
+    sem.fill_symbol_table_constant(p[-1], "char")
 
 def p_seen_semi(p):
     '''Seen_Semi : '''
@@ -416,7 +456,7 @@ def p_push_scope(p):
 
 def p_pop_scope(p):
     '''Pop_Scope : '''
-    sem.scope = 'global'
+    sem.scope = "global"
 
 # Empty production
 def p_empty(p):
@@ -480,12 +520,13 @@ with open(raw_input('filename > '), 'r') as f:
     result = parser.parse(input,0,0)
     var_table = sem.var_table
     #print result
-    for quad in state.quads:
-        print (quad.operator, quad.operand1, quad.operand2, quad.result)
-    print "Scope\t|Id\t|Type"
-    print "--------|-------|--------"
-    for k in var_table:
-        sys.stdout.write(k)
-        for k1 in var_table[k]:
-            print("\t|" + str(k1) + "\t|" + var_table[k][k1][0])
-        print "--------|-------|--------"
+    for idx, quad in enumerate(state.quads):
+        print idx + 1, (quad.operator, quad.operand1, quad.operand2, quad.result)
+    # print "Scope\t|Id\t|Type"
+    # print "--------|-------|--------"
+    # for k in var_table:
+        # sys.stdout.write(k)
+        # for k1 in var_table[k]:
+            # print("\t|" + str(k1) + "\t|" + var_table[k][k1][0])
+        # print "--------|-------|--------"
+    print sem.func_table
