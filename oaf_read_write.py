@@ -11,7 +11,6 @@ def print_quad(printable):
     #state.operand_stack.append(q.result)
     state.quads.append(q)
     #state.temp_counter += 1
-    state.label += 1
 
 def read_quad(type, var, scope):
     print type, var, scope
@@ -21,6 +20,5 @@ def read_quad(type, var, scope):
         #state.operand_stack.append(q.result)
         state.quads.append(q)
         state.temp_counter += 1
-        state.label += 1
     else:
         print "error tipos incompatiblee"

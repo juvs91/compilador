@@ -67,11 +67,11 @@ def p_conditional(p):
 
 def p_push_label_stack(p):
     '''Push_Label_Stack : '''
-    state.label_stack.append(state.label)
+    state.label_stack.append(len(state.quads))
     il.generate_if_goto_F(state.operand_stack.pop())
 
 def p_pop_label_stack(p):
-    '''Pop_Label_Stack :'''
+    '''Pop_Label_Stack : '''
     il.put_label_to_goto_F(state.label_stack.pop())
 
 def p_else(p):
@@ -79,12 +79,11 @@ def p_else(p):
             | Pop_Label_Stack empty'''  
 
 def p_push_else(p):
-    '''Push_Else :'''
+    '''Push_Else : '''
     temp = state.label_stack.pop()
-    state.label_stack.append(state.label)
+    state.label_stack.append(len(state.quads))
     state.label_stack.append(temp)
     il.generate_else_goto()
-
 
 def p_superexpr(p):
     '''SuperExpr : Expression Gen_Quad4 SuperExpr1'''
@@ -181,7 +180,7 @@ def p_loop(p):
 
 def p_save_label(p):
     '''Save_Label : '''
-    state.label_stack.append(state.label)
+    state.label_stack.append(len(state.quads))
 
 def p_go_back_to_validate(p):
     '''Go_Back_To_Validate :'''
@@ -331,7 +330,6 @@ def p_seen_param_call(p):
 
 def p_seen_param_print(p):
     '''Seen_Param_Print : '''
-    print p[-1]
     if(p[-1][0] == '"'):
         param = p[-1]
     else:
