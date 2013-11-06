@@ -355,7 +355,7 @@ semantic_cube = {
 
 def fill_symbol_table_function(symbol, attributes): 
     if(func_table.get(symbol) == None): 
-         func_table[symbol] = attributes
+        func_table[symbol] = attributes
     else: 
         raise NameError("Function redeclaration, '{0}' already exists".format(symbol))
 
@@ -363,7 +363,6 @@ def fill_symbol_table_variable(symbol, type):
     #verifica si existe el scope dado
     if(var_table.get(scope) == None): 
         var_table[scope] = {}
-
     if(symbol == scope or var_table[scope].get(symbol) != None): 
         raise NameError("Variable redeclaration, '{0}' already exists".format(symbol))
     else: 
@@ -378,8 +377,12 @@ def fill_symbol_table_constant(symbol, type):
     #print var_table
 
 
-def get_function(func_name): 
-    return func_table.get(func_name)
+def get_function(func_name):
+    function = func_table.get(func_name)
+    if(function != None):
+        return function
+    else:
+        raise NameError("Undeclared function '{0}'".format(func_name))
 
 def get_scope(): 
     return scope

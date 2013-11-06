@@ -2,7 +2,7 @@ import ply.lex as lex
 
 # Lexer states
 states = (
-   ('err', 'inclusive'),
+    ('err', 'inclusive'),
 )
 
 # Reserved words

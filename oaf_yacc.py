@@ -3,9 +3,6 @@ import ply.yacc as yacc
 #he hash table to pass to the 
 import oaf_data_to_vm as vm
 
-# debug
-import sys
-
 import oaf_state as state
 
 import oaf_main as main
@@ -518,7 +515,7 @@ parser = yacc.yacc()
 
 with open(raw_input('filename > '), 'r') as f:
     input = f.read()
-    result = parser.parse(input,0,0)
+    result = parser.parse(input, 0,0)
     var_table = sem.var_table
     #print result
     #for idx, quad in enumerate(state.quads):
@@ -530,15 +527,15 @@ with open(raw_input('filename > '), 'r') as f:
        #     for k1 in var_table[k]:
        #         print("\t|" + str(k1) + "\t|" + var_table[k][k1][0])
        #     print "--------|-------|--------"                          
-i = 1        
+i = 1
 for e in state.quads:
-	vm.vm["quads"][i]=str(i) + "("+ str(e.operator) + " " +  str(e.operand1) + " " +str(e.operand2) + " " + str(e.result) + ")"
-	i += 1  
+    vm.vm["quads"][i] = "(" + str(e.operator) + " " + str(e.operand1) + " " + str(e.operand2) + " " + str(e.result) + ")"
+    i += 1
 #for e in sem.func_table
 vm.vm["functions"] = sem.func_table 
 
 vm.vm["constants"] = sem.var_table[sem.constant_str] 
 
-target = open("object.txt", 'a+')
+target = open("object.txt", 'w+')
 
 target.write(str(vm.vm))

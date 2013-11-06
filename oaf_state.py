@@ -1,7 +1,7 @@
 # Module that keeps the state of the parser
 # Temp pool
 # TODO: Add a pool for each primitive
-            
+
 #list of al the params
 params_list = []
 
