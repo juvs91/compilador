@@ -1,4 +1,7 @@
-import ply.yacc as yacc
+import ply.yacc as yacc 
+
+#he hash table to pass to the 
+import oaf_data_to_vm as vm
 
 # debug
 import sys
@@ -67,7 +70,7 @@ def p_conditional(p):
 
 def p_push_label_stack(p):
     '''Push_Label_Stack : '''
-    state.label_stack.append(state.label)
+    state.label_stack.append(len(state.quads))
     il.generate_if_goto_F(state.operand_stack.pop())
 
 def p_pop_label_stack(p):
@@ -520,13 +523,24 @@ with open(raw_input('filename > '), 'r') as f:
     result = parser.parse(input,0,0)
     var_table = sem.var_table
     #print result
-    for idx, quad in enumerate(state.quads):
-        print idx + 1, (quad.operator, quad.operand1, quad.operand2, quad.result)
-    # print "Scope\t|Id\t|Type"
-    # print "--------|-------|--------"
-    # for k in var_table:
-        # sys.stdout.write(k)
-        # for k1 in var_table[k]:
-            # print("\t|" + str(k1) + "\t|" + var_table[k][k1][0])
-        # print "--------|-------|--------"
-    print sem.func_table
+    #for idx, quad in enumerate(state.quads):
+        #print idx + 1, (quad.operator, quad.operand1, quad.operand2, quad.result)
+       # print "Scope\t|Id\t|Type"
+       # print "--------|-------|--------"
+       # for k in var_table:
+       #     sys.stdout.write(k)
+       #     for k1 in var_table[k]:
+       #         print("\t|" + str(k1) + "\t|" + var_table[k][k1][0])
+       #     print "--------|-------|--------"                          
+i = 1        
+for e in state.quads:
+	vm.vm["quads"][i]=str(i) + "("+ str(e.operator) + " " +  str(e.operand1) + " " +str(e.operand2) + " " + str(e.result) + ")"
+	i += 1  
+#for e in sem.func_table
+vm.vm["functions"] = sem.func_table 
+
+vm.vm["constants"] = sem.var_table[sem.constant_str] 
+
+target = open("object.txt", 'a+')
+
+target.write(str(vm.vm))

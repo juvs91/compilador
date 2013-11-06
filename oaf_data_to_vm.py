@@ -1,0 +1,6 @@
+vm = {
+	"quads": {},
+	"functions": {},
+	"constants": {}
+
+}
