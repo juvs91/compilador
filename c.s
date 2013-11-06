@@ -1,26 +1,28 @@
-int hurr;
+int a;
+int b;
+float f;
 
-void yeah(float f) {
+void uno(int a) {
+    a = a + b * a;
+    print(a, b, a + b);
+}
 
-    int alo; 
-    int a;
-	char ch;
-	
-	alo =(3-1*4*(5-(2-3)));
-    a =  alo;
-    ch = "j";
-    fd(3+2);
-    read(char,ch);
-    #print("hola",a);
-	
-}  
+void dos(int a, int b, float g) {
+    int i;
+    i = b;
+    loop(i > 0) {
+        a = a + b * i + b;
+        uno(i * 2);
+        print(a);
+        i = i - 1;
+    };
+}
 
-
-
-
-main(){
-    char ch;
-	int a; 
-	char f;
-	
+main() {
+    a = 3;
+    b = a + 1;
+    print(a, b);
+    f = 3.14;
+    dos(a + b * 2, b, f * 3);
+    print(a, b, f * 2 + 1);
 }

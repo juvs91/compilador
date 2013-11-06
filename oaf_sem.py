@@ -421,6 +421,7 @@ def get_type(op, op1, op2):
     else: 
         raise NameError("Incompatible types '{0}' and '{1}'".format(op1[1][0], op2[1][0]))
 
+
 def is_char(char): 
     if(len(char) != 3): 
         print len(char)
