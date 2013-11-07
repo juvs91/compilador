@@ -1,5 +1,6 @@
 import ply.yacc as yacc 
 import oaf_vm as vm
+from collections import OrderedDict
 # Module to serialize objects
 import cPickle as pickle
 
@@ -349,9 +350,7 @@ def p_seen_param_print(p):
 # Function rules
 def p_seen_function(p):
     '''Seen_Function : '''
-    #sem.fill_symbol_table_function(p[-5], [p[-6], state.signature, state.f_size])
-    #state.signature = []
-    #state.f_size = 0
+    sem.func_table[p[-5]].append(len(state.quads))
 
 def p_seen_function_end(p):
     '''Seen_Function_End : '''
@@ -551,8 +550,11 @@ with open(raw_input('filename > '), 'r') as f:
     var_table = sem.var_table
     #for idx, quad in enumerate(state.quads):
         #print idx, (quad.operator, quad.operand1, quad.operand2, quad.result)
+    for e in sem.var_table[sem.constant_str].items():
+        e[1][1] += state.global_dir
     for idx, quad in enumerate(state.quads):
-        quad.transform(0, state.global_dir, 9000, 43000)
+        quad.transform(0, 0, 9000, 43000)
+        #quad.add_offset(0, state.global_dir, 9000, 43000)
         print idx, (quad.operator, quad.operand1, quad.operand2, quad.result)
 #i = 1
 #for e in state.quads:
@@ -573,7 +575,7 @@ with open("o.af", "wb") as out:
     obj = {
         "quads": state.quads,
         "functions": sem.func_table,
-        "globals": dict(sorted(map(sort, sem.var_table[sem.constant_str].items()), key=lambda e: e[0]))
+        "mem": OrderedDict(sorted(map(sort, sem.var_table[sem.constant_str].items()) + map(sort, sem.var_table[sem.global_str].items()), key=lambda e: e[0]))
     }
     pickle.dump(obj, out, -1)
 
