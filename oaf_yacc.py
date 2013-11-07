@@ -1,7 +1,13 @@
 import ply.yacc as yacc 
+import oaf_vm as vm
+# Module to serialize objects
+import cPickle as pickle
+
+# Funcions preparser
+import oaf_yacc_func as func_parser
 
 #he hash table to pass to the 
-import oaf_data_to_vm as vm
+#import oaf_data_to_vm as vm
 
 import oaf_state as state
 
@@ -28,19 +34,27 @@ from oaf_lex import lexer
 from oaf_lex import find_column
 
 def p_program(p):
-    '''Program : Seen_Program Declaration Function Main Seen_Program_End'''
+    '''Program : Seen_Program Global_Declaration Function Main Seen_Program_End'''
 
 def p_main(p):
     '''Main : MAIN Push_Scope Seen_Main LPAREN RPAREN FBlock'''
 
-def p_declaration(p):
-    '''Declaration : Primitive ID Array Array Seen_Variable SEMI Declaration
+def p_global_declaration(p):
+    '''Global_Declaration : Primitive ID Array Array Seen_Global_Variable SEMI Global_Declaration
+                   | empty'''
+
+def p_local_declaration(p):
+    '''Local_Declaration : Primitive ID Array Array Seen_Local_Variable SEMI Local_Declaration
                    | empty'''
 
 def p_array(p):
-    '''Array : LBRACKET ICONST RBRACKET
+    '''Array : Array1
              | empty'''
     p[0] = p[1]
+
+def p_array_1(p):
+    '''Array1 : LBRACKET ICONST RBRACKET'''
+    p[0] = p[2]
 
 def p_function(p):
     '''Function : Function1
@@ -57,10 +71,10 @@ def p_block(p):
     '''Block : LBRACE Instruction RBRACE'''
 
 def p_fblock(p):
-    '''FBlock : LBRACE Declaration Instruction RBRACE'''
+    '''FBlock : LBRACE Local_Declaration Instruction RBRACE'''
 
 def p_rfblock(p):
-    '''RFBlock : LBRACE Declaration Instruction RETURN SuperExpr SEMI RBRACE'''
+    '''RFBlock : LBRACE Local_Declaration Instruction RETURN SuperExpr SEMI RBRACE'''
 
 def p_conditional(p):
     '''Conditional : IF LPAREN SuperExpr RPAREN Push_Label_Stack Block Else'''
@@ -81,7 +95,7 @@ def p_else(p):
 def p_push_else(p):
     '''Push_Else : '''
     temp = state.label_stack.pop()
-    state.label_stack.append(len(state.quads))
+    state.label_stack.append(len(state.quads) - 1)
     state.label_stack.append(temp)
     il.generate_else_goto()
 
@@ -167,10 +181,6 @@ def p_params_3(p):
 def p_params_4(p):
     '''Params4 : COMMA Params3
                | empty'''
-
-def p_push_param_list(p):
-    '''Push_Param_List : '''
-    state.params_list.append(p[-1])
 #
 # revisar este pedo
 
@@ -180,7 +190,7 @@ def p_loop(p):
 
 def p_save_label(p):
     '''Save_Label : '''
-    state.label_stack.append(len(state.quads))
+    state.label_stack.append(len(state.quads) - 1)
 
 def p_go_back_to_validate(p):
     '''Go_Back_To_Validate :'''
@@ -252,10 +262,10 @@ def p_square(p):
     '''Square : SQUARE LPAREN SuperExpr RPAREN'''
 
 def p_param(p):
-    '''Param : Primitive ID Array1 Array1 Seen_Variable Update_Signature_Size'''
+    '''Param : Primitive ID Array2 Array2 Seen_Local_Variable Update_Signature_Size'''
 
-def p_array_1(p):
-    '''Array1 : LBRACKET RBRACKET
+def p_array_2(p):
+    '''Array2 : LBRACKET RBRACKET
               | empty'''
     p[0] = p[1]
 
@@ -339,9 +349,9 @@ def p_seen_param_print(p):
 # Function rules
 def p_seen_function(p):
     '''Seen_Function : '''
-    sem.fill_symbol_table_function(p[-5], [p[-6], state.signature, state.f_size])
-    state.signature = []
-    state.f_size = 0
+    #sem.fill_symbol_table_function(p[-5], [p[-6], state.signature, state.f_size])
+    #state.signature = []
+    #state.f_size = 0
 
 def p_seen_function_end(p):
     '''Seen_Function_End : '''
@@ -357,15 +367,15 @@ def p_seen_program_end(p):
 
 def p_seen_main(p):
     '''Seen_Main : '''
-    main.update_goto(len(state.quads) + 1)
+    main.update_goto(len(state.quads))
 
 def p_update_signature_size(p):
     '''Update_Signature_Size : '''
-    state.signature.append(p[-1])
-    if(p[-1][0] == "i" or p[-1][0] == "f"):
-        state.f_size += 4
-    else:
-        state.f_size += 1
+    #state.signature.append(p[-1])
+    #if(p[-1][0] == "i" or p[-1][0] == "f"):
+    #    state.f_size += 4
+    #else:
+    #    state.f_size += 1
 
 def p_check_signature(p):
     '''Check_Signature : '''
@@ -420,27 +430,45 @@ def p_gen_quad_5(p):
     expr.generate_quad(5)
 
 # Update variable table
-def p_seen_variable(p):
-    '''Seen_Variable : '''
+def p_seen_global_variable(p):
+    '''Seen_Global_Variable : '''
     type = p[-4]
+    d1 = 1
+    d2 = 1
     if(p[-2] != None):
         type += "[]"
+        d1 = p[-2]
     if(p[-1] != None):
         type += "[]"
-    sem.fill_symbol_table_variable(p[-3], type)
+        d2 = p[-2]
+    sem.fill_global_variables_table(p[-3], type, d1 * d2)
+    p[0] = type
+
+def p_seen_local_variable(p):
+    '''Seen_Local_Variable : '''
+    type = p[-4]
+    d1 = 1
+    d2 = 1
+    if(p[-2] != None):
+        type += "[]"
+        d1 = p[-2]
+    if(p[-1] != None):
+        type += "[]"
+        d2 = p[-2]
+    sem.fill_local_variables_table(p[-3], type, d1 * d2)
     p[0] = type
 
 def p_seen_float(p):
     '''Seen_Float : '''
-    sem.fill_symbol_table_constant(p[-1], "float")
+    sem.fill_symbol_table_constant(p[-1], "float", 4)
 
 def p_seen_int(p):
     '''Seen_Int : '''
-    sem.fill_symbol_table_constant(p[-1], "int")
+    sem.fill_symbol_table_constant(p[-1], "int", 4)
 
 def p_seen_char(p):
     '''Seen_Char : '''
-    sem.fill_symbol_table_constant(p[-1], "char")
+    sem.fill_symbol_table_constant(p[-1], "char", 1)
 
 def p_seen_semi(p):
     '''Seen_Semi : '''
@@ -451,6 +479,8 @@ def p_push_scope(p):
     '''Push_Scope : '''
     sem.scope = p[-1]
     sem.validate_redeclaration_function(p[-1])
+    state.temp_counter = 0
+    state.temp_dir = 0
 
 def p_pop_scope(p):
     '''Pop_Scope : '''
@@ -469,10 +499,10 @@ def p_block_error(p):
     '''Block : LBRACE error RBRACE'''
 
 def p_fblock_error(p):
-    '''FBlock : LBRACE Declaration error RBRACE'''
+    '''FBlock : LBRACE Local_Declaration error RBRACE'''
 
 def p_rfblock_error(p):
-    '''RFBlock : LBRACE Declaration error RETURN SuperExpr SEMI RBRACE'''
+    '''RFBlock : LBRACE Local_Declaration error RETURN SuperExpr SEMI RBRACE'''
 
 def p_circle_error(p):
     '''Circle : CIRCLE LPAREN error RPAREN'''
@@ -511,31 +541,43 @@ def p_error(p):
         print("Abrupt file termination")
 
 # Build the parser
+f_parser = func_parser.parser
 parser = yacc.yacc()
 
 with open(raw_input('filename > '), 'r') as f:
     input = f.read()
-    result = parser.parse(input, 0,0)
+    preparsing = f_parser.parse(input, 0, 0)
+    result = parser.parse(input, 0, 0)
     var_table = sem.var_table
-    #print result
     #for idx, quad in enumerate(state.quads):
-        #print idx + 1, (quad.operator, quad.operand1, quad.operand2, quad.result)
-       # print "Scope\t|Id\t|Type"
-       # print "--------|-------|--------"
-       # for k in var_table:
-       #     sys.stdout.write(k)
-       #     for k1 in var_table[k]:
-       #         print("\t|" + str(k1) + "\t|" + var_table[k][k1][0])
-       #     print "--------|-------|--------"                          
-i = 1
-for e in state.quads:
-    vm.vm["quads"][i] = "(" + str(e.operator) + " " + str(e.operand1) + " " + str(e.operand2) + " " + str(e.result) + ")"
-    i += 1
-#for e in sem.func_table
-vm.vm["functions"] = sem.func_table 
+        #print idx, (quad.operator, quad.operand1, quad.operand2, quad.result)
+    for idx, quad in enumerate(state.quads):
+        quad.transform(0, state.global_dir, 9000, 43000)
+        print idx, (quad.operator, quad.operand1, quad.operand2, quad.result)
+#i = 1
+#for e in state.quads:
+#    vm.vm["quads"][i] = "(" + str(e.operator) + " " + str(e.operand1) + " " + str(e.operand2) + " " + str(e.result) + ")"
+#    i += 1
+##for e in sem.func_table
+#vm.vm["functions"] = sem.func_table
+#
+#vm.vm["constants"] = sem.var_table[sem.constant_str]
 
-vm.vm["constants"] = sem.var_table[sem.constant_str] 
+#target = open("object.txt", 'w+')
 
-target = open("object.txt", 'w+')
+# Sorting function
+def sort(element):
+    return element[1][1], element[0]
 
-target.write(str(vm.vm))
+with open("o.af", "wb") as out:
+    obj = {
+        "quads": state.quads,
+        "functions": sem.func_table,
+        "globals": dict(sorted(map(sort, sem.var_table[sem.constant_str].items()), key=lambda e: e[0]))
+    }
+    pickle.dump(obj, out, -1)
+
+machine = vm.VirtualMachine("o.af")
+machine.run()
+
+#target.write(str(vm.vm))

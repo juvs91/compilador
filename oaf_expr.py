@@ -32,6 +32,7 @@ def generate_quad(hierarchy):
             state.temp_counter += 1
     elif(hierarchy == 1):
         if((state.last_operator == '*' or state.last_operator == '/')and state.operator_stack):
+            # id, [type, address, size]
             q.set_quad(state.operator_stack.pop(), state.operand_stack.pop(), state.operand_stack.pop(), "t" + str(state.temp_counter))
             state.temp_counter += 1
     elif(hierarchy == 2):
@@ -39,7 +40,7 @@ def generate_quad(hierarchy):
             q.set_quad(state.operator_stack.pop(), state.operand_stack.pop(), state.operand_stack.pop(), "t" + str(state.temp_counter))
             state.temp_counter += 1
     elif(hierarchy == 3):
-        if((state.last_operator == '==' or state.last_operator == '<=' or state.last_operator == '>=' or state.last_operator == '<>'  or state.last_operator == '<'  or state.last_operator == '>') and state.operator_stack):
+        if((state.last_operator == '==' or state.last_operator == '<=' or state.last_operator == '>=' or state.last_operator == '<>' or state.last_operator == '<' or state.last_operator == '>') and state.operator_stack):
             q.set_quad(state.operator_stack.pop(), state.operand_stack.pop(), state.operand_stack.pop(), "t" + str(state.temp_counter))
             state.temp_counter += 1
     elif(hierarchy == 4):

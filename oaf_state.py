@@ -17,7 +17,13 @@ operator_stack = []
 last_operator = None
 
 # Temp counter
-temp_counter = 0   
+temp_counter = 0
+
+# Memory address (bytes)
+global_dir = 0
+constant_dir = 0
+local_dir = 0
+temp_dir = 0
 
 # Function signature
 signature = []

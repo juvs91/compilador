@@ -329,18 +329,4 @@ def p_error(p):
         print("Abrupt file termination")
 
 # Build the parser
-parser = yacc.yacc()
-
-with open(raw_input('filename > '), 'r') as f:
-    input = f.read()
-    result = parser.parse(input, 0,0)
-    print sem.func_table
-    #for idx, quad in enumerate(state.quads):
-        #print idx + 1, (quad.operator, quad.operand1, quad.operand2, quad.result)
-       # print "Scope\t|Id\t|Type"
-       # print "--------|-------|--------"
-       # for k in var_table:
-       #     sys.stdout.write(k)
-       #     for k1 in var_table[k]:
-       #         print("\t|" + str(k1) + "\t|" + var_table[k][k1][0])
-       #     print "--------|-------|--------"
+parser = yacc.yacc(tabmodule="preparser")

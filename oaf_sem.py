@@ -1,6 +1,7 @@
 #import the funcTable to create a new one every time a scope is needed
 # import func_table as func_table
 #import the quad to maque the quadric more generic
+import oaf_state as state
 
 global_str = "global"
 constant_str = "constant"
@@ -359,22 +360,41 @@ def fill_symbol_table_function(symbol, attributes):
     else: 
         raise NameError("Function redeclaration, '{0}' already exists".format(symbol))
 
-def fill_symbol_table_variable(symbol, type): 
+def fill_local_variables_table(var, type, size):
     #verifica si existe el scope dado
-    if(var_table.get(scope) == None): 
+    if(var_table.get(scope) == None):
         var_table[scope] = {}
-    if(symbol == scope or var_table[scope].get(symbol) != None): 
-        raise NameError("Variable redeclaration, '{0}' already exists".format(symbol))
-    else: 
-        var_table[scope][symbol] = [type]
-    #print("{0} {1} {2} {3} {4}".format(p[-4], p[-3], p[-2], p[-1], p[0]))
+    if(var == scope or var_table[scope].get(var) != None):
+        raise NameError("Variable redeclaration, '{0}' already exists".format(var))
+    else:
+        var_table[scope][var] = [type, state.local_dir, size, 'l']
+        if(type[0] == "i" or type[0] == "f"):
+            state.local_dir += 4 * size
+        else:
+            state.local_dir += 1 * size
 
-def fill_symbol_table_constant(symbol, type): 
-    if(var_table[constant_str].get(symbol) != None): 
-        return
-    else: 
-        var_table[constant_str][symbol] = [type]
-    #print var_table
+def fill_global_variables_table(var, type, size):
+    #verifica si existe el scope dado
+    if(var_table.get(scope) == None):
+        var_table[scope] = {}
+    if(var == scope or var_table[scope].get(var) != None):
+        raise NameError("Variable redeclaration, '{0}' already exists".format(var))
+    else:
+        var_table[scope][var] = [type, state.global_dir, size, 'g']
+        if(type[0] == "i" or type[0] == "f"):
+            state.global_dir += 4 * size
+        else:
+            state.global_dir += 1 * size
+
+def fill_symbol_table_constant(symbol, type, size):
+    if(var_table[constant_str].get(symbol) != None):
+        pass
+    else:
+        var_table[constant_str][symbol] = [type, state.constant_dir, size, 'c']
+        if(type[0] == "i" or type[0] == "f"):
+            state.constant_dir += 4
+        else:
+            state.constant_dir += 1
 
 
 def get_function(func_name):
@@ -392,7 +412,7 @@ def validate_redeclaration_function(validate_scope):
     if(var_table.get(validate_scope) != None):  raise NameError('se declaro varias veces una misma funcion')
 
 def validate_variable_is_declared(var): 
-    if(var_table[scope][var] == None):  raise NameError('la variable {0} no se a declarado'.var)
+    if(var_table[scope][var] == None):  raise NameError('la variable {0} no se ha declarado'.var)
 
 # revisar este pedo
 def is_declared(var):
@@ -434,4 +454,4 @@ def is_signature_valid(func_name, signature):
     if(cmp(func_table.get(func_name)[1], signature) == 0):
         return True
     else:
-        raise NameError("Wrong signature")
+        raise NameError("Wrong signature '{0}', {1}".format(func_name, signature))
