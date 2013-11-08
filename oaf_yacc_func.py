@@ -193,7 +193,7 @@ def p_square(p):
     '''Square : SQUARE LPAREN SuperExpr RPAREN'''
 
 def p_param(p):
-    '''Param : Primitive ID Array1 Array1 Seen_Variable Update_Signature_Size'''
+    '''Param : Primitive ID Array1 Array1 Seen_Variable Update_Signature'''
 
 def p_array_1(p):
     '''Array1 : LBRACKET RBRACKET
@@ -252,17 +252,12 @@ def p_constant(p):
 # Function rules
 def p_seen_function(p):
     '''Seen_Function : '''
-    sem.fill_symbol_table_function(p[-4], [p[-5], state.signature, state.f_size])
+    sem.fill_symbol_table_function(p[-4], [p[-5], state.signature])
     state.signature = []
-    state.f_size = 0
 
 def p_update_signature_size(p):
-    '''Update_Signature_Size : '''
+    '''Update_Signature : '''
     state.signature.append(p[-1])
-    if(p[-1][0] == "i" or p[-1][0] == "f"):
-        state.f_size += 4
-    else:
-        state.f_size += 1
 
 # Update variable table
 def p_seen_variable(p):

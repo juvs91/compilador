@@ -31,13 +31,15 @@ class VirtualMachine:
                 self.mem[res] = str(self.mem[op1]) + "/" + str(self.mem[op2])
 
             # Function operations
-            if(op == "era")
+            if(op == "era"):
+                for var in self.functions[op1][4]:
+                    self.mem[var[0]] = var[1]
 
             # Operators that change the instruction pointer
             if(op == "goto"):
                 self.instr_ptr = res
             elif(op == "gosub"):
-                self.instr_ptr = self.functions[op1][3]
+                self.instr_ptr = self.functions[op1][2]
             else:
                 self.instr_ptr += 1
             quad = self.quads[self.instr_ptr]

@@ -1,6 +1,6 @@
 import ply.yacc as yacc 
 import oaf_vm as vm
-from collections import OrderedDict
+
 # Module to serialize objects
 import cPickle as pickle
 
@@ -42,11 +42,11 @@ def p_main(p):
 
 def p_global_declaration(p):
     '''Global_Declaration : Primitive ID Array Array Seen_Global_Variable SEMI Global_Declaration
-                   | empty'''
+                          | empty'''
 
 def p_local_declaration(p):
-    '''Local_Declaration : Primitive ID Array Array Seen_Local_Variable SEMI Local_Declaration
-                   | empty'''
+    '''Local_Declaration : Primitive ID Array Array Seen_Local_Variable Update_Signature_Size SEMI Local_Declaration
+                         | empty'''
 
 def p_array(p):
     '''Array : Array1
@@ -63,10 +63,10 @@ def p_function(p):
                 | empty'''
 
 def p_function_1(p):
-    '''Function1 : VOID ID Push_Scope LPAREN ParamList RPAREN Seen_Function FBlock Seen_Function_End Pop_Scope Function'''
+    '''Function1 : VOID ID Push_Scope Seen_Function LPAREN ParamList RPAREN FBlock Seen_Function_End Pop_Scope Function'''
 
 def p_rfunction(p):
-    '''RFunction : Primitive ID Push_Scope LPAREN ParamList RPAREN Seen_Function RFBlock Seen_Function_End Pop_Scope Function'''
+    '''RFunction : Primitive ID Push_Scope Seen_Function LPAREN ParamList RPAREN RFBlock Seen_Function_End Pop_Scope Function'''
 
 def p_block(p):
     '''Block : LBRACE Instruction RBRACE'''
@@ -350,11 +350,15 @@ def p_seen_param_print(p):
 # Function rules
 def p_seen_function(p):
     '''Seen_Function : '''
-    sem.func_table[p[-5]].append(len(state.quads))
+    state.local_dir = 0
+    sem.func_table[p[-2]].append(len(state.quads))
 
 def p_seen_function_end(p):
     '''Seen_Function_End : '''
-    func.generate_end(p[-7])
+    func_name = p[-7]
+    func.generate_end(func_name)
+    sem.func_table[func_name].append(state.f_size)
+    state.f_size = 0
 
 def p_seen_program(p):
     '''Seen_Program : '''
@@ -370,11 +374,17 @@ def p_seen_main(p):
 
 def p_update_signature_size(p):
     '''Update_Signature_Size : '''
-    #state.signature.append(p[-1])
-    #if(p[-1][0] == "i" or p[-1][0] == "f"):
-    #    state.f_size += 4
-    #else:
-    #    state.f_size += 1
+    d1 = 1
+    d2 = 1
+    if(p[-3] != None):
+        d1 = p[-3]
+    if(p[-2] != None):
+        d2 = p[-2]
+    type = p[-1]
+    if(type[0] == "i" or type[0] == "f"):
+        state.f_size += 4 * d1 * d2
+    else:
+        state.f_size += 1 * d1 * d2
 
 def p_check_signature(p):
     '''Check_Signature : '''
@@ -459,11 +469,11 @@ def p_seen_local_variable(p):
 
 def p_seen_float(p):
     '''Seen_Float : '''
-    sem.fill_symbol_table_constant(p[-1], "float", 4)
+    sem.fill_symbol_table_constant(p[-1], "float", 1)
 
 def p_seen_int(p):
     '''Seen_Int : '''
-    sem.fill_symbol_table_constant(p[-1], "int", 4)
+    sem.fill_symbol_table_constant(p[-1], "int", 1)
 
 def p_seen_char(p):
     '''Seen_Char : '''
@@ -550,32 +560,46 @@ with open(raw_input('filename > '), 'r') as f:
     var_table = sem.var_table
     #for idx, quad in enumerate(state.quads):
         #print idx, (quad.operator, quad.operand1, quad.operand2, quad.result)
-    for e in sem.var_table[sem.constant_str].items():
-        e[1][1] += state.global_dir
-    for idx, quad in enumerate(state.quads):
-        quad.transform(0, 0, 9000, 43000)
-        #quad.add_offset(0, state.global_dir, 9000, 43000)
-        print idx, (quad.operator, quad.operand1, quad.operand2, quad.result)
-#i = 1
-#for e in state.quads:
-#    vm.vm["quads"][i] = "(" + str(e.operator) + " " + str(e.operand1) + " " + str(e.operand2) + " " + str(e.result) + ")"
-#    i += 1
-##for e in sem.func_table
-#vm.vm["functions"] = sem.func_table
-#
-#vm.vm["constants"] = sem.var_table[sem.constant_str]
 
-#target = open("object.txt", 'w+')
+def add_offset(lst, g_offset, c_offset, l_offset):
+    if(lst[3] == 'g'):
+        lst[1] += + g_offset
+    elif(lst[3] == 'c'):
+        lst[1] += c_offset
+    else:
+        lst[1] += l_offset
+
+# Adds offset to global, local and constant variables
+for okey in sem.var_table:
+    for ikey in sem.var_table[okey].items():
+        add_offset(ikey[1], 0, state.global_dir, 9000)
+
+for func_name in sem.func_table:
+    if(sem.var_table[func_name] != None):
+        sem.func_table[func_name].append(sorted(map(lambda x: [x[1][1], x[0]], sem.var_table[func_name].items())))
+
+# Changes variables to memory addresses and adds temporal offset
+for idx, quad in enumerate(state.quads):
+    quad.transform(43000)
+    #quad.add_offset(0, state.global_dir, 9000, 43000)
+    print idx, (quad.operator, quad.operand1, quad.operand2, quad.result)
+
+#for e in sem.var_table[sem.constant_str].items():
+#    e[1][1] += state.global_dir
+#    for idx, quad in enumerate(state.quads):
+#        quad.transform()
+#        #quad.add_offset(0, state.global_dir, 9000, 43000)
+#        print idx, (quad.operator, quad.operand1, quad.operand2, quad.result)
 
 # Sorting function
-def sort(element):
+def swap(element):
     return element[1][1], element[0]
 
 with open("o.af", "wb") as out:
     obj = {
         "quads": state.quads,
         "functions": sem.func_table,
-        "mem": OrderedDict(sorted(map(sort, sem.var_table[sem.constant_str].items()) + map(sort, sem.var_table[sem.global_str].items()), key=lambda e: e[0]))
+        "mem": dict(map(swap, sem.var_table[sem.constant_str].items()) + map(swap, sem.var_table[sem.global_str].items()))
     }
     pickle.dump(obj, out, -1)
 
