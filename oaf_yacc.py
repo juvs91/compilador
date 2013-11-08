@@ -83,11 +83,11 @@ def p_conditional(p):
 def p_push_label_stack(p):
     '''Push_Label_Stack : '''
     state.label_stack.append(len(state.quads))
-    il.generate_if_goto_F(state.operand_stack.pop())
+    il.generate_if_goto_f(state.operand_stack.pop())
 
 def p_pop_label_stack(p):
     '''Pop_Label_Stack : '''
-    il.put_label_to_goto_F(state.label_stack.pop())
+    il.put_label_to_goto_f(state.label_stack.pop())
 
 def p_else(p):
     '''Else : ELSE Push_Else Pop_Label_Stack Block Pop_Label_Stack

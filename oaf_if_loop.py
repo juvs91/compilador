@@ -1,12 +1,12 @@
 import oaf_state as state
 import oaf_quad as quad
 
-def generate_if_goto_F(exp):
+def generate_if_goto_f(exp):
     q = quad.Quad()
     q.set_quad("gotoFalse", None, exp, None)
     state.quads.append(q)
 
-def put_label_to_goto_F(label):
+def put_label_to_goto_f(label):
     state.quads[label].result = len(state.quads)
 
 def generate_else_goto():
