@@ -3,9 +3,10 @@ import cPickle as pickle
 class VirtualMachine:
     def __init__(self, filename):
         self.instr_ptr = 0
+        self.instr_ptr_stack = []
+        self.function_call_stack = []
         self.obj = self.load_obj(filename)
         self.quads = self.obj["quads"]
-        #self.globals = self.obj["globals"]
         self.functions = self.obj["functions"]
         #self.heap = {}
         self.mem = self.obj["mem"]
@@ -32,14 +33,21 @@ class VirtualMachine:
 
             # Function operations
             if(op == "era"):
+                self.function_call_stack.append(op1)
                 for var in self.functions[op1][4]:
                     self.mem[var[0]] = var[1]
+            if(op == "param"):
+                dir = self.functions[self.function_call_stack[-1]][4][res][0]
+                self.mem[dir] = self.mem[op1]
 
             # Operators that change the instruction pointer
             if(op == "goto"):
                 self.instr_ptr = res
             elif(op == "gosub"):
+                self.instr_ptr_stack.append(self.instr_ptr + 1)
                 self.instr_ptr = self.functions[op1][2]
+            elif(op == "end"):
+                self.instr_ptr = self.instr_ptr_stack.pop()
             else:
                 self.instr_ptr += 1
             quad = self.quads[self.instr_ptr]

@@ -10,7 +10,7 @@ def generate_era(func_name):
     
 def generate_param(op1):
     q = quad.Quad()
-    q.set_quad("param", None, op1, "param" + str(state.param_counter))
+    q.set_quad("param", None, op1, state.param_counter)
     state.quads.append(q)
     state.param_counter += 1
     

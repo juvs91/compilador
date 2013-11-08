@@ -151,9 +151,9 @@ def p_factor_1(p):
     p[0] = p[1]
 
 def p_factor_2(p):
-    '''Factor2 : MINUS Factor3 Gen_Quad0
-               | PLUS Factor3 Gen_Quad0'''
-    p[0] = p[2]
+    '''Factor2 : MINUS Seen_Unary_Operator Factor3 Gen_Quad0
+               | PLUS Seen_Unary_Operator Factor3 Gen_Quad0'''
+    p[0] = p[3]
 
 def p_factor_3(p):
     '''Factor3 : Constant
@@ -396,6 +396,11 @@ def p_seen_operand(p):
     if(sem.is_declared(p[-1])):
         expr.add_operand(sem.get_variable(p[-1]))
 
+def p_seen_unary_operator(p):
+    '''Seen_Unary_Operator : '''
+    expr.add_operator("u" + str(p[-1]))
+    p[0] = p[-1]
+
 def p_seen_operator(p):
     '''Seen_Operator : '''
     expr.add_operator(p[-1])
@@ -412,6 +417,7 @@ def p_pop_expr(p):
 # Unary operators
 def p_gen_quad_0(p):
     '''Gen_Quad0 : '''
+    expr.generate_quad(0)
 
 # *, /
 def p_gen_quad_1(p):
@@ -572,7 +578,7 @@ def add_offset(lst, g_offset, c_offset, l_offset):
 # Adds offset to global, local and constant variables
 for okey in sem.var_table:
     for ikey in sem.var_table[okey].items():
-        add_offset(ikey[1], 0, state.global_dir, 9000)
+        add_offset(ikey[1], state.g_offset, state.c_offset + state.global_dir, state.l_offset)
 
 for func_name in sem.func_table:
     if(sem.var_table[func_name] != None):
@@ -580,7 +586,7 @@ for func_name in sem.func_table:
 
 # Changes variables to memory addresses and adds temporal offset
 for idx, quad in enumerate(state.quads):
-    quad.transform(43000)
+    quad.transform(state.t_offset)
     #quad.add_offset(0, state.global_dir, 9000, 43000)
     print idx, (quad.operator, quad.operand1, quad.operand2, quad.result)
 

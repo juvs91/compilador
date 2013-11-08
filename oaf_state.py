@@ -39,6 +39,13 @@ param_types = []
 # Quad list
 quads = []
 
+# Offsets
+g_offset = 0      # Global
+c_offset = 0      # Constant
+l_offset = 3000   # Local
+t_offset = 40000  # Temporal
+s_offset = 0      # Stack
+
 def clear_stacks():
     global operator_stack, operand_stack, last_operator
     del(operator_stack[:])
