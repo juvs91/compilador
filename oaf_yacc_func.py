@@ -17,9 +17,17 @@ def p_program(p):
 
 def p_main(p):
     '''Main : MAIN LPAREN RPAREN FBlock'''
-
+    
 def p_declaration(p):
-    '''Declaration : Primitive ID Array Array Seen_Variable SEMI Declaration
+    '''Declaration : Primitive ID Declaration1
+                   | empty'''
+    
+def p_declaration_1(p):
+    '''Declaration1 : Array Array Seen_Variable SEMI Declaration
+                    | LPAREN ParamList RPAREN Seen_Function RFBlock'''
+
+def p_local_declaration(p):
+    '''Local_Declaration : Primitive ID Array Array Seen_Variable SEMI Local_Declaration
                    | empty'''
 
 def p_array(p):
@@ -42,10 +50,10 @@ def p_block(p):
     '''Block : LBRACE Instruction RBRACE'''
 
 def p_fblock(p):
-    '''FBlock : LBRACE Declaration Instruction RBRACE'''
+    '''FBlock : LBRACE Local_Declaration Instruction RBRACE'''
 
 def p_rfblock(p):
-    '''RFBlock : LBRACE Declaration Instruction RETURN SuperExpr SEMI RBRACE'''
+    '''RFBlock : LBRACE Local_Declaration Instruction RETURN SuperExpr SEMI RBRACE'''
 
 def p_conditional(p):
     '''Conditional : IF LPAREN SuperExpr RPAREN Block Else'''
@@ -252,7 +260,7 @@ def p_constant(p):
 # Function rules
 def p_seen_function(p):
     '''Seen_Function : '''
-    sem.fill_symbol_table_function(p[-4], [p[-5], state.signature])
+    sem.fill_symbol_table_function(p[-4], [[p[-5]], state.signature])
     state.signature = []
 
 def p_update_signature_size(p):
@@ -282,10 +290,10 @@ def p_block_error(p):
     '''Block : LBRACE error RBRACE'''
 
 def p_fblock_error(p):
-    '''FBlock : LBRACE Declaration error RBRACE'''
+    '''FBlock : LBRACE Local_Declaration error RBRACE'''
 
 def p_rfblock_error(p):
-    '''RFBlock : LBRACE Declaration error RETURN SuperExpr SEMI RBRACE'''
+    '''RFBlock : LBRACE Local_Declaration error RETURN SuperExpr SEMI RBRACE'''
 
 def p_circle_error(p):
     '''Circle : CIRCLE LPAREN error RPAREN'''
@@ -296,7 +304,7 @@ def p_superexpr_error(p):
     print("Malformed expression")
 
 def p_term_error(p):
-    '''Term1 : DIVIDE error Term
+    '''Term1 : DIVIDE error Term 
              | TIMES error Term'''
     print("Malformed expression")
 
@@ -305,7 +313,7 @@ def p_error(p):
     try:
         print("Syntax error at line {0} col {1}, unexpected '{2}'".format(p.lineno, find_column(input, p), p.value))
     except:
-        print("Syntax error")
+        print("Preparser syntax error")
     lexer.push_state("err")
     #print(tok, p.type)
     #print(p)
