@@ -421,6 +421,8 @@ def is_declared(var):
     elif(var_table.get(scope) != None and var_table[scope].get(var) != None):
         return True
     elif(var_table[global_str].get(var) != None):
+        return True 
+    elif(func_table.get(var) != None):
         return True
     else: 
         raise NameError("Undeclared variable '{0}'".format(var))
