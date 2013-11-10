@@ -23,6 +23,7 @@ main() {
     b = a + 1;
     print(a, b);
     f = 3.14;
-    dos(a + b * 2, b, f * 3);
+    dos(a + b * 2, b, f * 3); 
+	a = uno(1) + uno(1);
     print(a, b, f * 2 + 1);
 }

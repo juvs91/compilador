@@ -1,6 +1,4 @@
 # Module that keeps the state of the parser
-# Temp pool
-# TODO: Add a pool for each primitive
 
 #list of al the params
 params_list = []
@@ -8,12 +6,17 @@ params_list = []
 #label stack 
 label_stack = []
 
+# Maintains the addresses references when changing scopes
+#address_stack = []  # [global, constant, local, temp]
+
+# Return values of functions
+return_dir_stack = []
+return_var_stack = []
+
 # Operands stack
 operand_stack = []
-
 # Operator stack
-operator_stack = []  
-
+operator_stack = []
 last_operator = None
 
 # Temp counter
@@ -27,7 +30,6 @@ temp_dir = 0
 
 # Function signature
 signature = []
-
 # Function size(bytes)
 f_size = 0
 

@@ -1,5 +1,3 @@
-#import the funcTable to create a new one every time a scope is needed
-# import func_table as func_table
 #import the quad to maque the quadric more generic
 import oaf_state as state
 
@@ -368,10 +366,7 @@ def fill_local_variables_table(var, type, size):
         raise NameError("Variable redeclaration, '{0}' already exists".format(var))
     else:
         var_table[scope][var] = [type, state.local_dir, size, 'l']
-        if(type[0] == "i" or type[0] == "f"):
-            state.local_dir += 4 * size
-        else:
-            state.local_dir += 1 * size
+        state.local_dir += size
 
 def fill_global_variables_table(var, type, size):
     #verifica si existe el scope dado
@@ -381,10 +376,7 @@ def fill_global_variables_table(var, type, size):
         raise NameError("Variable redeclaration, '{0}' already exists".format(var))
     else:
         var_table[scope][var] = [type, state.global_dir, size, 'g']
-        if(type[0] == "i" or type[0] == "f"):
-            state.global_dir += 4 * size
-        else:
-            state.global_dir += 1 * size
+        state.global_dir += size
 
 def fill_symbol_table_constant(symbol, type, size):
     if(var_table[constant_str].get(symbol) != None):
@@ -424,6 +416,8 @@ def is_declared(var):
         return True 
     elif(func_table.get(var) != None):
         return True
+    elif(func_table.get(var) != None):
+        return True
     else: 
         raise NameError("Undeclared variable '{0}'".format(var))
 
@@ -432,15 +426,28 @@ def get_variable(var):
         return [var, var_table[scope].get(var)]
     elif(var_table[constant_str].get(var) != None):
         return [var, var_table[constant_str].get(var)]
+    elif(func_table.get(var) != None):
+        info = func_table[var][0][:]  # Function return value information
+        info[1] = state.return_dir_stack.pop()  # Gets the last return address
+        info[3] = 't'  # Changes its type to temporal
+        return [var, info]
     else:
         return [var, var_table[global_str].get(var)]
 
 def get_type(op, op1, op2): 
     #print op, op1, op2 
-    if(isinstance(op1,str)): 
+    if(isinstance(op1, str)):
         type = semantic_cube[op]["char"][op2[1][0]]
-    else: 
-        type = semantic_cube[op][op1[1][0]][op2[1][0]]
+    else:
+        if(op1[1] == None):
+            type1 = func_table[op1[0]][0]
+        else:
+            type1 = op1[1][0]
+        if(op2[1] == None):
+            type2 = func_table[op2[0]][0]
+        else:
+            type2 = op2[1][0]
+        type = semantic_cube[op][type1][type2]
     if(type != None): 
         return type
     else: 

@@ -35,14 +35,18 @@ from oaf_lex import lexer
 from oaf_lex import find_column
 
 def p_program(p):
-    '''Program : Seen_Program Global_Declaration Function Main Seen_Program_End'''
+    '''Program : Seen_Program Declaration Function Main Seen_Program_End'''
 
 def p_main(p):
-    '''Main : MAIN Push_Scope Seen_Main LPAREN RPAREN FBlock'''
+    '''Main : MAIN Seen_Main Push_Scope LPAREN RPAREN FBlock'''
 
-def p_global_declaration(p):
-    '''Global_Declaration : Primitive ID Array Array Seen_Global_Variable SEMI Global_Declaration
-                          | empty'''
+def p_declaration(p):
+    '''Declaration : Primitive ID Declaration1
+                   | empty'''
+
+def p_declaration_1(p):
+    '''Declaration1 : Array Array Seen_Global_Variable SEMI Declaration
+                    | Seen_Return_Function Push_Scope LPAREN ParamList RPAREN RFBlock Seen_Return_Function_End Pop_Scope'''
 
 def p_local_declaration(p):
     '''Local_Declaration : Primitive ID Array Array Seen_Local_Variable Update_Signature_Size SEMI Local_Declaration
@@ -63,10 +67,10 @@ def p_function(p):
                 | empty'''
 
 def p_function_1(p):
-    '''Function1 : VOID ID Push_Scope Seen_Function LPAREN ParamList RPAREN FBlock Seen_Function_End Pop_Scope Function'''
+    '''Function1 : VOID ID Seen_Function Push_Scope LPAREN ParamList RPAREN FBlock Seen_Function_End Pop_Scope Function'''
 
 def p_rfunction(p):
-    '''RFunction : Primitive ID Push_Scope Seen_Function LPAREN ParamList RPAREN RFBlock Seen_Function_End Pop_Scope Function'''
+    '''RFunction : Primitive ID Seen_Return_Function Push_Scope LPAREN ParamList RPAREN RFBlock Seen_Return_Function_End Pop_Scope Function'''
 
 def p_block(p):
     '''Block : LBRACE Instruction RBRACE'''
@@ -159,6 +163,10 @@ def p_factor_3(p):
     '''Factor3 : Constant
                | Call'''
     p[0] = p[1]
+    if(p[0] == "uno"):
+        pass
+    if(p[0] == 7):
+        pass
 
 # revisar este pedo
 # Agregar tipo STRING para variables y funciones
@@ -205,7 +213,6 @@ def p_assign(p):
 
 def p_assign_1(p):
     '''Assign1 : SuperExpr Gen_Quad5
-               | Call
                | STRING Check_Char Seen_Char_Operand Gen_Quad5'''
 
 def p_check_char(p):
@@ -315,8 +322,12 @@ def p_constant(p):
                 | FCONST Seen_Float
                 | ICONST Seen_Int
                 | CCONST Seen_Char
-                | FALSE
-                | TRUE'''
+                | Constant1 Seen_Bool'''
+    p[0] = p[1]
+
+def p_constant_1(p):
+    '''Constant1 : TRUE
+                 | FALSE'''
     p[0] = p[1]
 
 def p_seen_char_operand(p):
@@ -326,10 +337,24 @@ def p_seen_char_operand(p):
 
 def p_seen_call(p):
     '''Seen_Call : '''
-    func.generate_era(p[-2])
+    expr.add_operator("#")
+    state.return_dir_stack.append(state.temp_dir)
+    func_name = p[-2]
+    type = sem.func_table[func_name][0][0]  # [[primitive, dir, size, scope], dir, size]
+    if(type != "void"):  # Function has a return value
+        if(type[0] == "i" or type[0] == "f"):
+            size = 4
+        else:
+            size = 1
+        # Creates a temporal to save return value
+        func.generate_era(func_name, [func_name, [type, state.temp_dir, size, 't']])
+        state.temp_dir += size
+    else:
+        func.generate_era(func_name, None)
 
 def p_seen_call_end(p):
     '''Seen_Call_End : '''
+    state.operator_stack.pop()
     func.generate_gosub(p[-6])
     state.reset_call()
 
@@ -351,13 +376,31 @@ def p_seen_param_print(p):
 def p_seen_function(p):
     '''Seen_Function : '''
     state.local_dir = 0
-    sem.func_table[p[-2]].append(len(state.quads))
+    sem.func_table[p[-1]].append(len(state.quads))
 
 def p_seen_function_end(p):
     '''Seen_Function_End : '''
     func_name = p[-7]
     func.generate_end(func_name)
     sem.func_table[func_name].append(state.f_size)
+    state.f_size = 0
+
+def p_seen_return_function(p):
+    '''Seen_Return_Function : '''
+    state.local_dir = 0
+    #state.return_dir_stack.append(state.temp_dir)
+    sem.func_table[p[-1]].append(len(state.quads))
+
+def p_seen_return_function_end(p):
+    '''Seen_Return_Function_End : '''
+    func_name = p[-7]
+    return_var = state.operand_stack.pop()
+    func.generate_return(func_name, return_var)
+    func.generate_end(func_name)
+    sem.func_table[func_name].append(state.f_size)
+    sem.func_table[func_name][0] = return_var[1]
+    #state.return_dir_stack.pop()
+    #state.return_var_stack.pop()
     state.f_size = 0
 
 def p_seen_program(p):
@@ -456,7 +499,11 @@ def p_seen_global_variable(p):
     if(p[-1] != None):
         type += "[]"
         d2 = p[-2]
-    sem.fill_global_variables_table(p[-3], type, d1 * d2)
+    if(type[0] == "i" or type[0] == "f"):
+        size = 4
+    else:
+        size = 1
+    sem.fill_global_variables_table(p[-3], type, d1 * d2 * size)
     p[0] = type
 
 def p_seen_local_variable(p):
@@ -470,20 +517,28 @@ def p_seen_local_variable(p):
     if(p[-1] != None):
         type += "[]"
         d2 = p[-2]
-    sem.fill_local_variables_table(p[-3], type, d1 * d2)
+    if(type[0] == "i" or type[0] == "f"):
+        size = 4
+    else:
+        size = 1
+    sem.fill_local_variables_table(p[-3], type, d1 * d2 * size)
     p[0] = type
 
 def p_seen_float(p):
     '''Seen_Float : '''
-    sem.fill_symbol_table_constant(p[-1], "float", 1)
+    sem.fill_symbol_table_constant(p[-1], "float", 4)
 
 def p_seen_int(p):
     '''Seen_Int : '''
-    sem.fill_symbol_table_constant(p[-1], "int", 1)
+    sem.fill_symbol_table_constant(p[-1], "int", 4)
 
 def p_seen_char(p):
     '''Seen_Char : '''
     sem.fill_symbol_table_constant(p[-1], "char", 1)
+
+def p_seen_bool(p):
+    '''Seen_Bool : '''
+    sem.fill_symbol_table_constant(p[-1], "bool", 1)
 
 def p_seen_semi(p):
     '''Seen_Semi : '''
@@ -492,14 +547,20 @@ def p_seen_semi(p):
 
 def p_push_scope(p):
     '''Push_Scope : '''
-    sem.scope = p[-1]
-    sem.validate_redeclaration_function(p[-1])
+    sem.scope = p[-2]
+    sem.validate_redeclaration_function(p[-2])
+    #state.address_stack.append([state.global_dir, state.constant_dir, state.local_dir, state.temp_dir])
     state.temp_counter = 0
     state.temp_dir = 0
 
 def p_pop_scope(p):
     '''Pop_Scope : '''
     sem.scope = "global"
+    #addresses = state.address_stack.pop()
+    #state.global_dir = addresses[0]
+    #state.constant_dir = addresses[1]
+    #state.local_dir = addresses[2]
+    #state.temp_dir = addresses[3]
 
 # Empty production
 def p_empty(p):
@@ -564,8 +625,8 @@ with open(raw_input('filename > '), 'r') as f:
     preparsing = f_parser.parse(input, 0, 0)
     result = parser.parse(input, 0, 0)
     var_table = sem.var_table
-    #for idx, quad in enumerate(state.quads):
-        #print idx, (quad.operator, quad.operand1, quad.operand2, quad.result)
+    for idx, quad in enumerate(state.quads):
+        print idx, (quad.operator, quad.operand1, quad.operand2, quad.result)
 
 def add_offset(lst, g_offset, c_offset, l_offset):
     if(lst[3] == 'g'):
@@ -580,11 +641,19 @@ for okey in sem.var_table:
     for ikey in sem.var_table[okey].items():
         add_offset(ikey[1], state.g_offset, state.c_offset + state.global_dir, state.l_offset)
 
+# Counts global and constant variables to pass the starting stack address to the VM
+stack_dir = 0
+for var in sem.var_table[sem.global_str].items():
+    stack_dir += var[1][2]
+for var in sem.var_table[sem.constant_str].items():
+    stack_dir += var[1][2]
+
+# Appends memory map to VM function list
 for func_name in sem.func_table:
     if(sem.var_table[func_name] != None):
         sem.func_table[func_name].append(sorted(map(lambda x: [x[1][1], x[0]], sem.var_table[func_name].items())))
 
-# Changes variables to memory addresses and adds temporal offset
+# Changes variables to memory addresses and adds temporal address offset
 for idx, quad in enumerate(state.quads):
     quad.transform(state.t_offset)
     #quad.add_offset(0, state.global_dir, 9000, 43000)
@@ -609,7 +678,7 @@ with open("o.af", "wb") as out:
     }
     pickle.dump(obj, out, -1)
 
-machine = vm.VirtualMachine("o.af")
+machine = vm.VirtualMachine("o.af", stack_dir)
 machine.run()
 
 #target.write(str(vm.vm))
