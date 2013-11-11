@@ -46,7 +46,7 @@ def p_declaration(p):
 
 def p_declaration_1(p):
     '''Declaration1 : Array Array Seen_Global_Variable SEMI Declaration
-                    | Seen_Return_Function Push_Scope LPAREN ParamList RPAREN RFBlock Seen_Return_Function_End Pop_Scope'''
+                    | Seen_Return_Function Push_Scope LPAREN ParamList RPAREN FBlock Seen_Return_Function_End Pop_Scope'''
 
 def p_local_declaration(p):
     '''Local_Declaration : Primitive ID Array Array Seen_Local_Variable Update_Signature_Size SEMI Local_Declaration
@@ -70,7 +70,7 @@ def p_function_1(p):
     '''Function1 : VOID ID Seen_Function Push_Scope LPAREN ParamList RPAREN FBlock Seen_Function_End Pop_Scope Function'''
 
 def p_rfunction(p):
-    '''RFunction : Primitive ID Seen_Return_Function Push_Scope LPAREN ParamList RPAREN RFBlock Seen_Return_Function_End Pop_Scope Function'''
+    '''RFunction : Primitive ID Seen_Return_Function Push_Scope LPAREN ParamList RPAREN FBlock Seen_Return_Function_End Pop_Scope Function'''
 
 def p_block(p):
     '''Block : LBRACE Instruction RBRACE'''
@@ -78,8 +78,8 @@ def p_block(p):
 def p_fblock(p):
     '''FBlock : LBRACE Local_Declaration Instruction RBRACE'''
 
-def p_rfblock(p):
-    '''RFBlock : LBRACE Local_Declaration Instruction RETURN SuperExpr SEMI RBRACE'''
+
+
 
 def p_conditional(p):
     '''Conditional : IF LPAREN SuperExpr RPAREN Push_Label_Stack Block Else'''
@@ -298,6 +298,7 @@ def p_paramlist_2(p):
 def p_instruction(p):
     '''Instruction : Instruction1 SEMI Seen_Semi Instruction
                    | empty'''
+    p[0] = p[1]
 
 def p_instruction_1(p):
     '''Instruction1 : Loop
@@ -315,7 +316,19 @@ def p_instruction_1(p):
                     | Color
                     | Circle
                     | Arc
-                    | Square'''
+                    | Square
+                    | Return'''
+    p[0] = p[1] 
+
+def p_return(p):
+	'''Return : RETURN RType'''  
+	sem.validate_return_funtion(p[2])
+	
+	
+def p_rtype(p):
+	'''RType : SuperExpr
+			 | empty'''
+	p[0] = p[1]
 
 def p_constant(p):
     '''Constant : ID
@@ -577,8 +590,6 @@ def p_block_error(p):
 def p_fblock_error(p):
     '''FBlock : LBRACE Local_Declaration error RBRACE'''
 
-def p_rfblock_error(p):
-    '''RFBlock : LBRACE Local_Declaration error RETURN SuperExpr SEMI RBRACE'''
 
 def p_circle_error(p):
     '''Circle : CIRCLE LPAREN error RPAREN'''
@@ -630,11 +641,8 @@ with open(raw_input('filename > '), 'r') as f:
 
 def add_offset(lst, g_offset, c_offset, l_offset):
     if(lst[3] == 'g'):
-<<<<<<< HEAD
         lst[1] +=  g_offset
-=======
         lst[1] += g_offset
->>>>>>> 6d7495d4031390865f65901e861a5f73b1bfb0f4
     elif(lst[3] == 'c'):
         lst[1] += c_offset
     else:

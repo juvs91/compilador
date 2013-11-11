@@ -463,4 +463,9 @@ def is_signature_valid(func_name, signature):
     if(cmp(func_table.get(func_name)[1], signature) == 0):
         return True
     else:
-        raise NameError("Wrong signature '{0}', {1}".format(func_name, signature))
+        raise NameError("Wrong signature '{0}', {1}".format(func_name, signature))     
+
+
+def validate_return_funtion(var):
+	if((func_table[scope][0][0] != "void" and var == None) or (func_table[scope][0][0] == "void" and var_table[scope][var] != None)):
+		raise NameError(" wrond return type on function '{0}'".scope)
