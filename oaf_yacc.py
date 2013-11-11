@@ -630,7 +630,7 @@ with open(raw_input('filename > '), 'r') as f:
 
 def add_offset(lst, g_offset, c_offset, l_offset):
     if(lst[3] == 'g'):
-        lst[1] += + g_offset
+        lst[1] += g_offset
     elif(lst[3] == 'c'):
         lst[1] += c_offset
     else:
