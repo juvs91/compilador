@@ -15,15 +15,24 @@ def add_operator(operator):
     else:
         state.last_operator = state.operator_stack[-1]
 
+def pop_operator():
+    state.operator_stack.pop()
+    if(len(state.operator_stack) > 0):
+        state.last_operator = state.operator_stack[-1]
+    else:
+        state.last_operator = None
+
 def push_expr():
     state.operator_stack.append('#')
     state.last_operator = None
 
 def pop_expr():
     state.operator_stack.pop()
-    if(state.operator_stack):
-       state.last_operator = state.operator_stack[-1]
-        
+    if(len(state.operator_stack) > 0):
+        state.last_operator = state.operator_stack[-1]
+    else:
+        state.last_operator = None
+
 def generate_quad(hierarchy):
     q = quad.Quad()
     if(hierarchy == 0):

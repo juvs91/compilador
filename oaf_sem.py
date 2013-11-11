@@ -425,10 +425,12 @@ def get_variable(var):
     elif(var_table[constant_str].get(var) != None):
         return [var, var_table[constant_str].get(var)]
     elif(func_table.get(var) != None):
-        info = func_table[var][0][:]  # Function return value information
-        info[1] = state.return_dir_stack.pop()  # Gets the last return address
-        info[3] = 't'  # Changes its type to temporal
-        return [var, info]
+        type = func_table[var][0][0]  # Function return value information
+        if(type[0] == "i" or type[0] == "f"):
+            size = 4
+        else:
+            size = 1
+        return [var, [type, state.return_dir_stack[-1], size, 't']]
     else:
         return [var, var_table[global_str].get(var)]
 

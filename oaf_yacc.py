@@ -100,9 +100,9 @@ def p_else(p):
 def p_push_else(p):
     '''Push_Else : '''
     temp = state.label_stack.pop()
+    il.generate_else_goto()
     state.label_stack.append(len(state.quads) - 1)
     state.label_stack.append(temp)
-    il.generate_else_goto()
 
 def p_superexpr(p):
     '''SuperExpr : Expression Gen_Quad4 SuperExpr1'''
@@ -354,7 +354,7 @@ def p_seen_call(p):
 
 def p_seen_call_end(p):
     '''Seen_Call_End : '''
-    state.operator_stack.pop()
+    expr.pop_operator()
     func.generate_gosub(p[-6])
     state.reset_call()
 
