@@ -78,9 +78,12 @@ def p_block(p):
 def p_fblock(p):
     '''FBlock : LBRACE Local_Declaration Instruction RBRACE'''
 
+<<<<<<< HEAD
 
 
 
+=======
+>>>>>>> be48e639d879533d8d9c4db84c0f4bb897794e4b
 def p_conditional(p):
     '''Conditional : IF LPAREN SuperExpr RPAREN Push_Label_Stack Block Else'''
 
@@ -323,6 +326,8 @@ def p_instruction_1(p):
 def p_return(p):
 	'''Return : RETURN RType '''    
 	#print state.operand_stack[-1][1][0]
+	return_var = state.operand_stack.pop()
+	func.generate_return(return_var)
 	if(p[2] != None):
 		sem.validate_return_funtion(state.operand_stack[-1][1][0])
 	else:
@@ -332,6 +337,7 @@ def p_rtype(p):
 	'''RType : SuperExpr
 			 | empty'''
 	p[0] = p[1]
+
 
 def p_constant(p):
     '''Constant : ID
@@ -410,11 +416,11 @@ def p_seen_return_function(p):
 def p_seen_return_function_end(p):
     '''Seen_Return_Function_End : '''
     func_name = p[-7]
-    return_var = state.operand_stack.pop()
-    func.generate_return(func_name, return_var)
+    #return_var = state.operand_stack.pop()
+    #func.generate_return(func_name, return_var)
     func.generate_end(func_name)
     sem.func_table[func_name].append(state.f_size)
-    sem.func_table[func_name][0] = return_var[1]
+    #sem.func_table[func_name][0] = return_var[1]
     #state.return_dir_stack.pop()
     #state.return_var_stack.pop()
     state.f_size = 0
@@ -593,7 +599,10 @@ def p_block_error(p):
 def p_fblock_error(p):
     '''FBlock : LBRACE Local_Declaration error RBRACE'''
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> be48e639d879533d8d9c4db84c0f4bb897794e4b
 def p_circle_error(p):
     '''Circle : CIRCLE LPAREN error RPAREN'''
     print("Missing parameter(s)")
