@@ -421,6 +421,7 @@ def p_seen_program_end(p):
 
 def p_seen_main(p):
     '''Seen_Main : '''
+    state.local_dir = 0
     main.update_goto(len(state.quads))
 
 def p_update_signature_size(p):
