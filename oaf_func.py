@@ -20,7 +20,7 @@ def generate_gosub(func_name):
     q.set_quad("gosub", None, func_name, sem.get_function(func_name)[2])
     state.quads.append(q)
 
-def generate_return(func_name, op1):
+def generate_return(op1):
     q = quad.Quad()
     #type = op1[1][0]
     #if(type[0] == "i" or type[0] == "f"):

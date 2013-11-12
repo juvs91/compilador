@@ -46,7 +46,7 @@ def p_declaration(p):
 
 def p_declaration_1(p):
     '''Declaration1 : Array Array Seen_Global_Variable SEMI Declaration
-                    | Seen_Return_Function Push_Scope LPAREN ParamList RPAREN RFBlock Seen_Return_Function_End Pop_Scope'''
+                    | Seen_Return_Function Push_Scope LPAREN ParamList RPAREN FBlock Seen_Return_Function_End Pop_Scope'''
 
 def p_local_declaration(p):
     '''Local_Declaration : Primitive ID Array Array Seen_Local_Variable Update_Signature_Size SEMI Local_Declaration
@@ -70,16 +70,13 @@ def p_function_1(p):
     '''Function1 : VOID ID Seen_Function Push_Scope LPAREN ParamList RPAREN FBlock Seen_Function_End Pop_Scope Function'''
 
 def p_rfunction(p):
-    '''RFunction : Primitive ID Seen_Return_Function Push_Scope LPAREN ParamList RPAREN RFBlock Seen_Return_Function_End Pop_Scope Function'''
+    '''RFunction : Primitive ID Seen_Return_Function Push_Scope LPAREN ParamList RPAREN FBlock Seen_Return_Function_End Pop_Scope Function'''
 
 def p_block(p):
     '''Block : LBRACE Instruction RBRACE'''
 
 def p_fblock(p):
     '''FBlock : LBRACE Local_Declaration Instruction RBRACE'''
-
-def p_rfblock(p):
-    '''RFBlock : LBRACE Local_Declaration Instruction RETURN SuperExpr SEMI RBRACE'''
 
 def p_conditional(p):
     '''Conditional : IF LPAREN SuperExpr RPAREN Push_Label_Stack Block Else'''
@@ -315,7 +312,18 @@ def p_instruction_1(p):
                     | Color
                     | Circle
                     | Arc
-                    | Square'''
+                    | Square
+                    | Return'''
+
+def p_return(p):
+    '''Return : RETURN RType'''
+    return_var = state.operand_stack.pop()
+    func.generate_return(return_var)
+
+def p_rtype(p):
+    '''RType : SuperExpr
+             | empty'''
+    p[0] = p[1]
 
 def p_constant(p):
     '''Constant : ID
@@ -394,11 +402,11 @@ def p_seen_return_function(p):
 def p_seen_return_function_end(p):
     '''Seen_Return_Function_End : '''
     func_name = p[-7]
-    return_var = state.operand_stack.pop()
-    func.generate_return(func_name, return_var)
+    #return_var = state.operand_stack.pop()
+    #func.generate_return(func_name, return_var)
     func.generate_end(func_name)
     sem.func_table[func_name].append(state.f_size)
-    sem.func_table[func_name][0] = return_var[1]
+    #sem.func_table[func_name][0] = return_var[1]
     #state.return_dir_stack.pop()
     #state.return_var_stack.pop()
     state.f_size = 0
@@ -577,9 +585,6 @@ def p_block_error(p):
 def p_fblock_error(p):
     '''FBlock : LBRACE Local_Declaration error RBRACE'''
 
-def p_rfblock_error(p):
-    '''RFBlock : LBRACE Local_Declaration error RETURN SuperExpr SEMI RBRACE'''
-
 def p_circle_error(p):
     '''Circle : CIRCLE LPAREN error RPAREN'''
     print("Missing parameter(s)")
@@ -650,7 +655,7 @@ for var in sem.var_table[sem.constant_str].items():
 
 # Appends memory map to VM function list
 for func_name in sem.func_table:
-    if(sem.var_table[func_name] != None):
+    if(sem.var_table.get(func_name) != None and sem.var_table[func_name] != None):
         sem.func_table[func_name].append(sorted(map(lambda x: [x[1][1], x[0]], sem.var_table[func_name].items())))
 
 # Changes variables to memory addresses and adds temporal address offset

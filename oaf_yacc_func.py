@@ -24,7 +24,7 @@ def p_declaration(p):
     
 def p_declaration_1(p):
     '''Declaration1 : Array Array Seen_Variable SEMI Declaration
-                    | LPAREN ParamList RPAREN Seen_Function RFBlock'''
+                    | LPAREN ParamList RPAREN Seen_Function FBlock'''
 
 def p_local_declaration(p):
     '''Local_Declaration : Primitive ID Array Array Seen_Variable SEMI Local_Declaration
@@ -44,16 +44,13 @@ def p_function_1(p):
     '''Function1 : VOID ID LPAREN ParamList RPAREN Seen_Function FBlock Function'''
 
 def p_rfunction(p):
-    '''RFunction : Primitive ID LPAREN ParamList RPAREN Seen_Function RFBlock Function'''
+    '''RFunction : Primitive ID LPAREN ParamList RPAREN Seen_Function FBlock Function'''
 
 def p_block(p):
     '''Block : LBRACE Instruction RBRACE'''
 
 def p_fblock(p):
     '''FBlock : LBRACE Local_Declaration Instruction RBRACE'''
-
-def p_rfblock(p):
-    '''RFBlock : LBRACE Local_Declaration Instruction RETURN SuperExpr SEMI RBRACE'''
 
 def p_conditional(p):
     '''Conditional : IF LPAREN SuperExpr RPAREN Block Else'''
@@ -246,7 +243,15 @@ def p_instruction_1(p):
                     | Color
                     | Circle
                     | Arc
-                    | Square'''
+                    | Square
+                    | Return'''
+
+def p_return(p):
+    '''Return : RETURN RType'''
+
+def p_rtype(p):
+    '''RType : SuperExpr
+             | empty'''
 
 def p_constant(p):
     '''Constant : ID
@@ -291,9 +296,6 @@ def p_block_error(p):
 
 def p_fblock_error(p):
     '''FBlock : LBRACE Local_Declaration error RBRACE'''
-
-def p_rfblock_error(p):
-    '''RFBlock : LBRACE Local_Declaration error RETURN SuperExpr SEMI RBRACE'''
 
 def p_circle_error(p):
     '''Circle : CIRCLE LPAREN error RPAREN'''
