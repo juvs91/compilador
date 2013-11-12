@@ -247,11 +247,11 @@ def p_instruction_1(p):
                     | Return'''
 
 def p_return(p):
-    '''Return : RETURN RType'''
+	'''Return : RETURN RType'''
 
 def p_rtype(p):
-    '''RType : SuperExpr
-             | empty'''
+	'''RType : SuperExpr
+			 | empty'''
 
 def p_constant(p):
     '''Constant : ID

@@ -295,6 +295,7 @@ def p_paramlist_2(p):
 def p_instruction(p):
     '''Instruction : Instruction1 SEMI Seen_Semi Instruction
                    | empty'''
+    p[0] = p[1]
 
 def p_instruction_1(p):
     '''Instruction1 : Loop
@@ -314,16 +315,23 @@ def p_instruction_1(p):
                     | Arc
                     | Square
                     | Return'''
+    p[0] = p[1] 
 
 def p_return(p):
-    '''Return : RETURN RType'''
-    return_var = state.operand_stack.pop()
-    func.generate_return(return_var)
-
+	'''Return : RETURN RType '''    
+	#print state.operand_stack[-1][1][0]
+	return_var = state.operand_stack.pop()
+	func.generate_return(return_var)
+	if(p[2] != None):
+		sem.validate_return_funtion(state.operand_stack[-1][1][0])
+	else:
+		sem.validate_return_funtion("void")
+	
 def p_rtype(p):
-    '''RType : SuperExpr
-             | empty'''
-    p[0] = p[1]
+	'''RType : SuperExpr
+			 | empty'''
+	p[0] = p[1]
+
 
 def p_constant(p):
     '''Constant : ID
@@ -341,7 +349,7 @@ def p_constant_1(p):
 def p_seen_char_operand(p):
     '''Seen_Char_Operand :'''
     expr.add_operand(p[-2])
-    print "CHAR"
+
 
 def p_seen_call(p):
     '''Seen_Call : '''
@@ -636,6 +644,7 @@ with open(raw_input('filename > '), 'r') as f:
 
 def add_offset(lst, g_offset, c_offset, l_offset):
     if(lst[3] == 'g'):
+        lst[1] +=  g_offset
         lst[1] += g_offset
     elif(lst[3] == 'c'):
         lst[1] += c_offset
