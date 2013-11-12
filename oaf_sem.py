@@ -1,5 +1,6 @@
 #import the quad to maque the quadric more generic
-import oaf_state as state
+import oaf_state as state    
+import re
 
 global_str = "global"
 constant_str = "constant"
@@ -427,10 +428,12 @@ def get_variable(var):
     elif(var_table[constant_str].get(var) != None):
         return [var, var_table[constant_str].get(var)]
     elif(func_table.get(var) != None):
-        info = func_table[var][0][:]  # Function return value information
-        info[1] = state.return_dir_stack.pop()  # Gets the last return address
-        info[3] = 't'  # Changes its type to temporal
-        return [var, info]
+        type = func_table[var][0][0]  # Function return value information
+        if(type[0] == "i" or type[0] == "f"):
+            size = 4
+        else:
+            size = 1
+        return [var, [type, state.return_dir_stack[-1], size, 't']]
     else:
         return [var, var_table[global_str].get(var)]
 
@@ -465,7 +468,64 @@ def is_signature_valid(func_name, signature):
     else:
         raise NameError("Wrong signature '{0}', {1}".format(func_name, signature))     
 
-
+#validate if the return function returns a value if its not void  and if the type of return is equal to the var it returns
 def validate_return_funtion(var):
-	if((func_table[scope][0][0] != "void" and var == None) or (func_table[scope][0][0] == "void" and var_table[scope][var] != None)):
-		raise NameError(" wrond return type on function '{0}'".scope)
+	if(func_table[scope][0][0] != var):
+		raise NameError(" wrong return type in function '{0}'".format(scope))
+		
+#	if(isinstance(var,int)):
+#		var_exist = True
+#	elif(var_table.get(scope) == None):
+#		var_exist = False
+#	elif(var_table.get(scope).get(var) == None):
+#		var_exist = False
+#	else:
+#		var_exist = True
+#	if((func_table[scope][0][0] != "void" and var == None) or (func_table[scope][0][0] == "void" and var_exist)):
+#		raise NameError(" wrong return type in function '{0}'".format(scope))
+	#check if the return returns the type of the scope
+#	if(func_table[scope][0][0] != "void"):
+#		if(func_table[scope][0][0] == "int"):
+#			if(not isinstance(var,str)):
+#				if(not isinstance(var,int)):
+#					raise NameError(" wrong return type in function '{0}'".format(scope)) 
+#			else:
+#				if(var_table.get("global").get(var) != None):
+#					if(var_table.get("global").get(var)[0] != "int"):
+#						raise NameError(" wrong return type in function '{0}'".format(scope))
+#				else:
+#					if(var_table.get(scope).get(var)[0] != "int"):
+#						raise NameError(" wrong return type in function '{0}'".format(scope))
+#		elif(func_table[scope][0][0] == "float"):
+#			if(not isinstance(var,str)):
+#				if(not isinstance(var,float)):
+#					raise NameError(" wrong return type in function '{0}'".format(scope))
+#			else:
+#				if(var_table.get("global").get(var) != None):
+#					if(var_table.get("global").get(var)[0] != "float"):
+#						raise NameError(" wrong return type in function '{0}'".format(scope))
+#				else:
+#					if(var_table.get(scope).get(var)[0] != "float"):
+#						raise NameError(" wrong return type in function '{0}'".format(scope))
+#		elif(func_table[scope][0][0] == "char"):
+#			if(is_var_char(var)):
+#				if(isinstance(var,int) or isinstance(var,float)):#check if the var is not a number
+#					raise NameError(" wrong return type in function '{0}'".format(scope))
+#				else:
+#					if(var_table.get("global").get(var) != None):
+#						if(var_table.get("global").get(var)[0] != "char"):
+#							raise NameError(" wrong return type in function '{0}'".format(scope))
+#					else:
+#						if(var_table.get(scope).get(var)[0] != "char"):
+#							raise NameError(" wrong return type in function '{0}'".format(scope))
+				
+				
+#def is_var_char(char):#no es la mejor forma de codear pero YOLO jala 
+#	if(isinstance(char,int) or isinstance(char,float)):
+#		return True
+#	is_variable=re.findall(r"\'(.+?)\'",char)
+#	if(is_variable):
+#		return False
+#	else:
+#		return True
+	

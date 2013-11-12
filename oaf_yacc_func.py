@@ -246,7 +246,15 @@ def p_instruction_1(p):
                     | Color
                     | Circle
                     | Arc
-                    | Square'''
+                    | Square
+                    | Return'''
+
+def p_return(p):
+	'''Return : RETURN RType'''
+
+def p_rtype(p):
+	'''RType : SuperExpr
+			 | empty'''
 
 def p_constant(p):
     '''Constant : ID

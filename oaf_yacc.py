@@ -100,9 +100,9 @@ def p_else(p):
 def p_push_else(p):
     '''Push_Else : '''
     temp = state.label_stack.pop()
+    il.generate_else_goto()
     state.label_stack.append(len(state.quads) - 1)
     state.label_stack.append(temp)
-    il.generate_else_goto()
 
 def p_superexpr(p):
     '''SuperExpr : Expression Gen_Quad4 SuperExpr1'''
@@ -321,9 +321,12 @@ def p_instruction_1(p):
     p[0] = p[1] 
 
 def p_return(p):
-	'''Return : RETURN RType'''  
-	sem.validate_return_funtion(p[2])
-	
+	'''Return : RETURN RType '''    
+	#print state.operand_stack[-1][1][0]
+	if(p[2] != None):
+		sem.validate_return_funtion(state.operand_stack[-1][1][0])
+	else:
+		sem.validate_return_funtion("void")
 	
 def p_rtype(p):
 	'''RType : SuperExpr
@@ -346,7 +349,7 @@ def p_constant_1(p):
 def p_seen_char_operand(p):
     '''Seen_Char_Operand :'''
     expr.add_operand(p[-2])
-    print "CHAR"
+
 
 def p_seen_call(p):
     '''Seen_Call : '''
@@ -367,7 +370,7 @@ def p_seen_call(p):
 
 def p_seen_call_end(p):
     '''Seen_Call_End : '''
-    state.operator_stack.pop()
+    expr.pop_operator()
     func.generate_gosub(p[-6])
     state.reset_call()
 
@@ -662,7 +665,7 @@ for var in sem.var_table[sem.constant_str].items():
 
 # Appends memory map to VM function list
 for func_name in sem.func_table:
-    if(sem.var_table[func_name] != None):
+    if(sem.var_table.get(func_name) != None and sem.var_table[func_name] != None):
         sem.func_table[func_name].append(sorted(map(lambda x: [x[1][1], x[0]], sem.var_table[func_name].items())))
 
 # Changes variables to memory addresses and adds temporal address offset
