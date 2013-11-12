@@ -1,3 +1,10 @@
+# PLY
+o.af
+object.txt
+parser.out
+preparser.py
+parsetab.py
+
 *.py[cod]
 
 # C extensions
