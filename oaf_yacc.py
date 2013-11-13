@@ -78,12 +78,6 @@ def p_block(p):
 def p_fblock(p):
     '''FBlock : LBRACE Local_Declaration Instruction RBRACE'''
 
-<<<<<<< HEAD
-
-
-
-=======
->>>>>>> be48e639d879533d8d9c4db84c0f4bb897794e4b
 def p_conditional(p):
     '''Conditional : IF LPAREN SuperExpr RPAREN Push_Label_Stack Block Else'''
 
@@ -325,11 +319,10 @@ def p_instruction_1(p):
 
 def p_return(p):
 	'''Return : RETURN RType '''    
-	#print state.operand_stack[-1][1][0]
-	return_var = state.operand_stack.pop()
+	return_var = state.operand_stack.pop() 
 	func.generate_return(return_var)
 	if(p[2] != None):
-		sem.validate_return_funtion(state.operand_stack[-1][1][0])
+		sem.validate_return_funtion(return_var[1][0])
 	else:
 		sem.validate_return_funtion("void")
 	
@@ -435,6 +428,7 @@ def p_seen_program_end(p):
 
 def p_seen_main(p):
     '''Seen_Main : '''
+    state.local_dir = 0
     main.update_goto(len(state.quads))
 
 def p_update_signature_size(p):
@@ -599,10 +593,6 @@ def p_block_error(p):
 def p_fblock_error(p):
     '''FBlock : LBRACE Local_Declaration error RBRACE'''
 
-<<<<<<< HEAD
-
-=======
->>>>>>> be48e639d879533d8d9c4db84c0f4bb897794e4b
 def p_circle_error(p):
     '''Circle : CIRCLE LPAREN error RPAREN'''
     print("Missing parameter(s)")

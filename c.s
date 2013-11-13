@@ -1,13 +1,15 @@
-int a;
-float b;  
-char c;
+int fact(int n) {
+    if(n == 1) {
+        return n;
+    } else {
+        return n * fact(n - 1);
+    };
+}
 
-int uno(){  
-	return a+8;
-
-}            
-main(){
-
-	a=2;
-	print(a);
+main() {
+    int a;
+    a = fact(12);  
+	rt(30+5);
+	fw(a);
+    print(a);
 }

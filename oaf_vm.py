@@ -5,8 +5,8 @@ class VirtualMachine:
         self.instr_ptr = 0  # Current quad
         self.instr_ptr_stack = []  # Stack used when returning to previous instruction
         self.function_call_stack = []  # Stack of function calls
-        self.return_dir = -1  # Address to save value to
-        self.return_stack = []  # Hold values returned by functions
+        self.return_dir_stack = []  # Address to save value to
+        self.return_value_stack = []  # Value to save at address
         self.stack_dir = stack_address  # Address to start the stack
         self.obj = self.load_obj(filename)
         self.quads = self.obj["quads"]
@@ -62,9 +62,13 @@ class VirtualMachine:
                     self.mem[res] = 1
                 else:
                     self.mem[res] = 0
+            elif(op == "=="):
+                if(self.mem[op1] == self.mem[op2]):
+                    self.mem[res] = 1
+                else:
+                    self.mem[res] = 0
             elif(op == "return"):
-                #self.mem[self.return_dir] = self.mem[op1]
-                self.return_stack.append([self.return_dir, self.mem[op1]])
+                self.return_value_stack.append(self.mem[op1])
 
             # Function operations
             if(op == "era"):
@@ -75,8 +79,8 @@ class VirtualMachine:
                     self.function_call_stack.append([op1, self.stack_dir, copy_dir - 4])
                 self.stack_dir = copy_dir
                 if(res):  # Checks if function returns a value
-                    self.mem[res] = 'ret'
-                    self.return_dir = res
+                    self.mem[res] = None
+                    self.return_dir_stack.append(res)
             if(op == "param"):
                 func_name = self.function_call_stack[-1][0]
                 dir = self.functions[func_name][4][res][0]
@@ -95,15 +99,14 @@ class VirtualMachine:
                 else:
                     self.instr_ptr += 1
             elif(op == "gosub"):
-                ## Map function memory address to VM
+                # Map function's memory address to VM
                 #for var in self.functions[op1][4]:
                 #    self.mem[var[0]] = var[1]
                 self.instr_ptr_stack.append(self.instr_ptr + 1)
                 self.instr_ptr = res
             elif(op == "end"):
                 self.restore_state()  # Reloads previous values
-                ret = self.return_stack.pop()
-                self.mem[ret[0]] = ret[1]  # Saves value returned by function
+                self.mem[self.return_dir_stack.pop()] = self.return_value_stack.pop()  # Saves value returned by function
                 self.instr_ptr = self.instr_ptr_stack.pop()
             else:
                 self.instr_ptr += 1
