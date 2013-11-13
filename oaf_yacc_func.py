@@ -17,11 +17,11 @@ def p_program(p):
 
 def p_main(p):
     '''Main : MAIN LPAREN RPAREN FBlock'''
-    
+
 def p_declaration(p):
     '''Declaration : Primitive ID Declaration1
                    | empty'''
-    
+
 def p_declaration_1(p):
     '''Declaration1 : Array Array Seen_Variable SEMI Declaration
                     | LPAREN ParamList RPAREN Seen_Function FBlock'''
@@ -247,11 +247,11 @@ def p_instruction_1(p):
                     | Return'''
 
 def p_return(p):
-	'''Return : RETURN RType'''
+    '''Return : RETURN RType'''
 
 def p_rtype(p):
-	'''RType : SuperExpr
-			 | empty'''
+    '''RType : SuperExpr
+             | empty'''
 
 def p_constant(p):
     '''Constant : ID

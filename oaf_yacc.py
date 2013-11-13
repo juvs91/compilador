@@ -318,19 +318,19 @@ def p_instruction_1(p):
     p[0] = p[1] 
 
 def p_return(p):
-	'''Return : RETURN RType '''    
-	#print state.operand_stack[-1][1][0]
-	return_var = state.operand_stack.pop()
-	func.generate_return(return_var)
-	if(p[2] != None):
-		sem.validate_return_funtion(state.operand_stack[-1][1][0])
-	else:
-		sem.validate_return_funtion("void")
-	
+    '''Return : RETURN RType '''
+    #print state.operand_stack[-1][1][0]
+    return_var = state.operand_stack.pop()
+    func.generate_return(return_var)
+    if(p[2] != None):
+        sem.validate_return_funtion(return_var[1][0])
+    else:
+        sem.validate_return_funtion("void")
+
 def p_rtype(p):
-	'''RType : SuperExpr
-			 | empty'''
-	p[0] = p[1]
+    '''RType : SuperExpr
+             | empty'''
+    p[0] = p[1]
 
 
 def p_constant(p):
@@ -364,7 +364,7 @@ def p_seen_call(p):
             size = 1
         # Creates a temporal to save return value
         func.generate_era(func_name, [func_name, [type, state.temp_dir, size, 't']])
-        state.temp_dir += size
+        state.temp_dir -= size
     else:
         func.generate_era(func_name, None)
 
@@ -644,7 +644,6 @@ with open(raw_input('filename > '), 'r') as f:
 
 def add_offset(lst, g_offset, c_offset, l_offset):
     if(lst[3] == 'g'):
-        lst[1] +=  g_offset
         lst[1] += g_offset
     elif(lst[3] == 'c'):
         lst[1] += c_offset
@@ -652,18 +651,23 @@ def add_offset(lst, g_offset, c_offset, l_offset):
         lst[1] += l_offset
 
 # Adds offset to global, local and constant variables
+state.c_offset += state.global_dir  # Adds the count of global variables to constants
+state.l_offset += state.global_dir + state.constant_dir  # Adds the count of global and constant variables to locals
 for okey in sem.var_table:
     for ikey in sem.var_table[okey].items():
-        add_offset(ikey[1], state.g_offset, state.c_offset + state.global_dir, state.l_offset)
+        add_offset(ikey[1], state.g_offset, state.c_offset, state.l_offset)
 
-# Counts global and constant variables to pass the starting stack address to the VM
-stack_dir = 0
-for var in sem.var_table[sem.global_str].items():
-    stack_dir += var[1][2]
-for var in sem.var_table[sem.constant_str].items():
-    stack_dir += var[1][2]
+# Pass the starting stack address to the VM as the biggest function size plus the global and constant variables
+func_max_size = max(map(lambda x: x[1][3], sem.func_table.items()))
+main_size = sum(map(lambda x: x[1][2], var_table["main"].items()))
+state.stack_dir += state.global_dir + state.constant_dir + max(func_max_size, main_size)
+#stack_dir = 0
+#for var in sem.var_table[sem.global_str].items():
+#    stack_dir += var[1][2]
+#for var in sem.var_table[sem.constant_str].items():
+#    stack_dir += var[1][2]
 
-# Appends memory map to VM function list
+# Appends memory map to functions
 for func_name in sem.func_table:
     if(sem.var_table.get(func_name) != None and sem.var_table[func_name] != None):
         sem.func_table[func_name].append(sorted(map(lambda x: [x[1][1], x[0]], sem.var_table[func_name].items())))
@@ -693,7 +697,7 @@ with open("o.af", "wb") as out:
     }
     pickle.dump(obj, out, -1)
 
-machine = vm.VirtualMachine("o.af", stack_dir)
+machine = vm.VirtualMachine("o.af", state.l_offset, state.stack_dir)
 machine.run()
 
 #target.write(str(vm.vm))
