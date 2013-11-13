@@ -7,6 +7,8 @@ constant_str = "constant"
 scope = global_str
 var_table = {scope: {}, constant_str: {}}
 
+# Stores the functions information
+# [[return type], [signature], starting quad, function size, [memory map (optional)]]
 func_table = {}
 
 operation = None
