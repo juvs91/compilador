@@ -22,7 +22,7 @@ class Quad:
                 size = 4
             else:
                 size = 1
-            self.result = [res, [type, state.temp_dir, size, 't']]
+            self.result = [res, [type, state.temp_dir, [size, 1], 't']]
             state.temp_dir -= size
 
     def add_offset(self, g_offset, c_offset, l_offset, t_offset):

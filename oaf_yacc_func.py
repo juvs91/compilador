@@ -23,17 +23,16 @@ def p_declaration(p):
                    | empty'''
 
 def p_declaration_1(p):
-    '''Declaration1 : Array Array Seen_Variable SEMI Declaration
+    '''Declaration1 : Array SEMI Declaration
                     | LPAREN ParamList RPAREN Seen_Function FBlock'''
 
 def p_local_declaration(p):
-    '''Local_Declaration : Primitive ID Array Array Seen_Variable SEMI Local_Declaration
+    '''Local_Declaration : Primitive ID Array SEMI Local_Declaration
                    | empty'''
 
 def p_array(p):
-    '''Array : LBRACKET ICONST RBRACKET
+    '''Array : LBRACKET ICONST RBRACKET Array
              | empty'''
-    p[0] = p[1]
 
 def p_function(p):
     '''Function : Function1
@@ -145,7 +144,7 @@ def p_loop(p):
     '''Loop : LOOP LPAREN SuperExpr RPAREN Block'''
 
 def p_assign(p):
-    '''Assign : ID EQUAL Assign1'''
+    '''Assign : ID Array EQUAL Assign1'''
 
 def p_assign_1(p):
     '''Assign1 : SuperExpr
@@ -198,12 +197,15 @@ def p_square(p):
     '''Square : SQUARE LPAREN SuperExpr RPAREN'''
 
 def p_param(p):
-    '''Param : Primitive ID Array1 Array1 Seen_Variable Update_Signature'''
+    '''Param : Primitive ID Array1 Update_Signature'''
 
 def p_array_1(p):
-    '''Array1 : LBRACKET RBRACKET
+    '''Array1 : LBRACKET RBRACKET Add_Dimension Array1
               | empty'''
-    p[0] = p[1]
+
+def p_add_dimension(p):
+    '''Add_Dimension : '''
+    state.arr_dim_str += "[]"
 
 def p_primitive(p):
     '''Primitive : INT
@@ -265,22 +267,15 @@ def p_constant(p):
 # Function rules
 def p_seen_function(p):
     '''Seen_Function : '''
-    sem.fill_symbol_table_function(p[-4], [[p[-5]], state.signature])
+    sem.fill_symbol_table_function(p[-4], [[p[-5]], state.signature, state.f_param_list])
+    state.f_param_list = []
     state.signature = []
 
 def p_update_signature_size(p):
     '''Update_Signature : '''
-    state.signature.append(p[-1])
-
-# Update variable table
-def p_seen_variable(p):
-    '''Seen_Variable : '''
-    type = p[-4]
-    if(p[-2] != None):
-        type += "[]"
-    if(p[-1] != None):
-        type += "[]"
-    p[0] = type
+    state.signature.append(p[-3] + state.arr_dim_str)
+    state.f_param_list.append(p[-2])
+    state.arr_dim_str = ""
 
 # Empty production
 def p_empty(p):

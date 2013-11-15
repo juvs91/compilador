@@ -4,11 +4,8 @@ import oaf_vm as vm
 # Module to serialize objects
 import cPickle as pickle
 
-# Funcions preparser
+# Functions preparser
 import oaf_yacc_func as func_parser
-
-#he hash table to pass to the 
-#import oaf_data_to_vm as vm
 
 import oaf_state as state
 
@@ -18,10 +15,11 @@ import oaf_main as main
 import oaf_expr as expr
 # Functions module
 import oaf_func as func
+# Arrays module
+import oaf_array as arr
 
 #read write module
-import oaf_read_write as rw  
-
+import oaf_read_write as rw
 #if while module
 import oaf_if_loop as il
 
@@ -45,21 +43,32 @@ def p_declaration(p):
                    | empty'''
 
 def p_declaration_1(p):
-    '''Declaration1 : Array Array Seen_Global_Variable SEMI Declaration
+    '''Declaration1 : Array Seen_Array Seen_Global_Variable SEMI Declaration
                     | Seen_Return_Function Push_Scope LPAREN ParamList RPAREN FBlock Seen_Return_Function_End Pop_Scope'''
 
 def p_local_declaration(p):
-    '''Local_Declaration : Primitive ID Array Array Seen_Local_Variable Update_Signature_Size SEMI Local_Declaration
+    '''Local_Declaration : Primitive ID Array Seen_Array Seen_Local_Variable SEMI Local_Declaration
                          | empty'''
 
 def p_array(p):
-    '''Array : Array1
+    '''Array : LBRACKET ICONST RBRACKET Seen_Dimension Array
              | empty'''
-    p[0] = p[1]
 
-def p_array_1(p):
-    '''Array1 : LBRACKET ICONST RBRACKET'''
-    p[0] = p[2]
+def p_seen_array(p):
+    '''Seen_Array : '''
+    for dim in state.arr_dim:
+        mn = state.arr_r / dim
+        state.arr_m_list.append(mn)
+        state.arr_r = mn
+
+def p_seen_dimension(p):
+    '''Seen_Dimension : '''
+    state.arr_dim.append(p[-2])
+    state.arr_r *= p[-2]
+
+def p_seen_dimension_1(p):
+    '''Seen_Dimension1 : '''
+    state.arr_dim.append(p[-2])
 
 def p_function(p):
     '''Function : Function1
@@ -76,7 +85,7 @@ def p_block(p):
     '''Block : LBRACE Instruction RBRACE'''
 
 def p_fblock(p):
-    '''FBlock : LBRACE Local_Declaration Instruction RBRACE'''
+    '''FBlock : LBRACE Local_Declaration Update_Function_Size Instruction RBRACE'''
 
 def p_conditional(p):
     '''Conditional : IF LPAREN SuperExpr RPAREN Push_Label_Stack Block Else'''
@@ -206,7 +215,17 @@ def p_go_back_to_validate(p):
 
 
 def p_assign(p):
-    '''Assign : ID Seen_Operand EQUAL Seen_Operator Assign1'''
+    '''Assign : ID Array2 Seen_Operand1 EQUAL Seen_Operator Assign1'''
+
+def p_array_2(p):
+    '''Array2 : LBRACKET SuperExpr RBRACKET Verify_Limit Array
+              | empty'''
+
+def p_verify_limit(p):
+    '''Verify_Limit : '''
+    state.arr_current_dim += 1
+    var = sem.get_variable(p[-4])
+    arr.generate_verify(state.operand_stack[-1], var[1][2][state.arr_current_dim])
 
 def p_assign_1(p):
     '''Assign1 : SuperExpr Gen_Quad5
@@ -267,10 +286,10 @@ def p_square(p):
     '''Square : SQUARE LPAREN SuperExpr RPAREN'''
 
 def p_param(p):
-    '''Param : Primitive ID Array2 Array2 Seen_Local_Variable Update_Signature_Size'''
+    '''Param : Primitive ID Array1 Seen_Local_Variable1'''
 
-def p_array_2(p):
-    '''Array2 : LBRACKET RBRACKET
+def p_array_1(p):
+    '''Array1 : LBRACKET RBRACKET Seen_Dimension1 Array1
               | empty'''
     p[0] = p[1]
 
@@ -293,7 +312,7 @@ def p_paramlist_2(p):
                   | empty'''
 
 def p_instruction(p):
-    '''Instruction : Instruction1 SEMI Seen_Semi Instruction
+    '''Instruction : Instruction1 SEMI Instruction
                    | empty'''
     p[0] = p[1]
 
@@ -356,6 +375,7 @@ def p_seen_call(p):
     expr.add_operator("#")
     state.return_dir_stack.append(state.temp_dir)
     func_name = p[-2]
+    state.current_call = func_name
     type = sem.func_table[func_name][0][0]  # [[primitive, dir, size, scope], dir, size]
     if(type != "void"):  # Function has a return value
         if(type[0] == "i" or type[0] == "f"):
@@ -363,7 +383,7 @@ def p_seen_call(p):
         else:
             size = 1
         # Creates a temporal to save return value
-        func.generate_era(func_name, [func_name, [type, state.temp_dir, size, 't']])
+        func.generate_era(func_name, [func_name, [type, state.temp_dir, [size, 1], 't']])
         state.temp_dir -= size
     else:
         func.generate_era(func_name, None)
@@ -371,12 +391,19 @@ def p_seen_call(p):
 def p_seen_call_end(p):
     '''Seen_Call_End : '''
     expr.pop_operator()
-    func.generate_gosub(p[-6])
+    func_name = p[-6]
+    func.generate_gosub(func_name, sem.get_function(func_name)[3])
     state.reset_call()
 
 def p_seen_param_call(p):
     '''Seen_Param_Call : '''
     param = state.operand_stack.pop()
+    # Check if it's a dimentional parameter
+    if(param[1][2][0] > 4 or ((param[1][0][0] == "b" or param[1][0][0] == "c") and param[1][2][0] > 1)):
+        var = sem.func_table[state.current_call][2][state.param_counter]  # Gets variable to replace
+        dir = max(map(lambda x: x[1][1] + x[1][2][0], sem.var_table[state.current_call].items()))  # Gets the last available address
+        sem.var_table[state.current_call][var][2] = param[1][2]  # Replace the size and dimensions of the variable with the passed parameter
+        sem.var_table[state.current_call][var][1] = dir  # Updates the starting address
     func.generate_param(param)
     state.signature.append(param[1][0])
 
@@ -392,20 +419,24 @@ def p_seen_param_print(p):
 def p_seen_function(p):
     '''Seen_Function : '''
     state.local_dir = 0
+    # Appends the starting quad of the function
     sem.func_table[p[-1]].append(len(state.quads))
+    p[0] = p[-1]
 
 def p_seen_function_end(p):
     '''Seen_Function_End : '''
     func_name = p[-7]
     func.generate_end(func_name)
+    # Appends the function size
     sem.func_table[func_name].append(state.f_size)
     state.f_size = 0
 
 def p_seen_return_function(p):
     '''Seen_Return_Function : '''
     state.local_dir = 0
-    #state.return_dir_stack.append(state.temp_dir)
+    # Appends the starting quad of the function
     sem.func_table[p[-1]].append(len(state.quads))
+    p[0] = p[-1]
 
 def p_seen_return_function_end(p):
     '''Seen_Return_Function_End : '''
@@ -413,6 +444,7 @@ def p_seen_return_function_end(p):
     #return_var = state.operand_stack.pop()
     #func.generate_return(func_name, return_var)
     func.generate_end(func_name)
+    # Appends the function size
     sem.func_table[func_name].append(state.f_size)
     #sem.func_table[func_name][0] = return_var[1]
     #state.return_dir_stack.pop()
@@ -432,19 +464,10 @@ def p_seen_main(p):
     state.local_dir = 0
     main.update_goto(len(state.quads))
 
-def p_update_signature_size(p):
-    '''Update_Signature_Size : '''
-    d1 = 1
-    d2 = 1
-    if(p[-3] != None):
-        d1 = p[-3]
-    if(p[-2] != None):
-        d2 = p[-2]
-    type = p[-1]
-    if(type[0] == "i" or type[0] == "f"):
-        state.f_size += 4 * d1 * d2
-    else:
-        state.f_size += 1 * d1 * d2
+def p_update_function_size(p):
+    '''Update_Function_Size : '''
+    if(sem.var_table.get(p[-7]) != None):
+        state.f_size = sum(map(lambda x: x[1][2][0], sem.var_table[p[-7]].items()))
 
 def p_check_signature(p):
     '''Check_Signature : '''
@@ -455,6 +478,12 @@ def p_seen_operand(p):
     '''Seen_Operand : '''
     if(sem.is_declared(p[-1])):
         expr.add_operand(sem.get_variable(p[-1]))
+
+def p_seen_operand_1(p):
+    '''Seen_Operand1 : '''
+    print state.arr_dim
+    if(sem.is_declared(p[-2])):
+        expr.add_operand(sem.get_variable(p[-2]))
 
 def p_seen_unary_operator(p):
     '''Seen_Unary_Operator : '''
@@ -508,37 +537,63 @@ def p_gen_quad_5(p):
 def p_seen_global_variable(p):
     '''Seen_Global_Variable : '''
     type = p[-4]
-    d1 = 1
-    d2 = 1
-    if(p[-2] != None):
-        type += "[]"
-        d1 = p[-2]
-    if(p[-1] != None):
-        type += "[]"
-        d2 = p[-2]
     if(type[0] == "i" or type[0] == "f"):
         size = 4
     else:
         size = 1
-    sem.fill_global_variables_table(p[-3], type, d1 * d2 * size)
+    # Check if variable has dimensions
+    if(len(state.arr_dim) > 0):
+        # Multiplies all the items in the dimensions list
+        elements = reduce(lambda x, y: x * y, state.arr_dim)  # Number of elements in the array
+        for dim in state.arr_dim:
+            type += "[]"
+        sem.fill_global_variables_table(p[-3], type, [elements * size] + state.arr_dim, state.arr_m_list)
+        state.arr_dim = []
+        state.arr_r = 1
+        state.arr_m_list = []
+    else:
+        sem.fill_global_variables_table(p[-3], type, [size, 1], None)
     p[0] = type
 
+# Variables declared inside the function body
 def p_seen_local_variable(p):
     '''Seen_Local_Variable : '''
     type = p[-4]
-    d1 = 1
-    d2 = 1
-    if(p[-2] != None):
-        type += "[]"
-        d1 = p[-2]
-    if(p[-1] != None):
-        type += "[]"
-        d2 = p[-2]
     if(type[0] == "i" or type[0] == "f"):
         size = 4
     else:
         size = 1
-    sem.fill_local_variables_table(p[-3], type, d1 * d2 * size)
+    # Check if variable has dimensions
+    if(len(state.arr_dim) > 0):
+        # Multiplies all the items in the dimensions list
+        elements = reduce(lambda x, y: x * y, state.arr_dim)  # Number of elements in the array
+        for dim in state.arr_dim:
+            type += "[]"
+        sem.fill_local_variables_table(p[-3], type, [elements * size] + state.arr_dim, state.arr_m_list)
+        state.arr_dim = []
+        state.arr_r = 1
+        state.arr_m_list = []
+    else:
+        sem.fill_local_variables_table(p[-3], type, [size, 1], None)
+    p[0] = type
+
+# Variables declared as parameters
+def p_seen_local_variable_1(p):
+    '''Seen_Local_Variable1 : '''
+    type = p[-3]
+    if(type[0] == "i" or type[0] == "f"):
+        size = 4
+    else:
+        size = 1
+    # Check if variable has dimensions
+    if(len(state.arr_dim) > 0):
+        # Multiplies all the items in the dimensions list
+        for dim in state.arr_dim:
+            type += "[]"
+        sem.fill_local_variables_table(p[-2], type, [0, 0], [])  # Temporal values
+        state.arr_dim = []
+    else:
+        sem.fill_local_variables_table(p[-2], type, [size, 1], None)
     p[0] = type
 
 def p_seen_float(p):
@@ -557,11 +612,6 @@ def p_seen_bool(p):
     '''Seen_Bool : '''
     sem.fill_symbol_table_constant(p[-1], "bool", 1)
 
-def p_seen_semi(p):
-    '''Seen_Semi : '''
-    pass
-    #state.clear_stacks()
-
 def p_push_scope(p):
     '''Push_Scope : '''
     sem.scope = p[-2]
@@ -573,11 +623,6 @@ def p_push_scope(p):
 def p_pop_scope(p):
     '''Pop_Scope : '''
     sem.scope = "global"
-    #addresses = state.address_stack.pop()
-    #state.global_dir = addresses[0]
-    #state.constant_dir = addresses[1]
-    #state.local_dir = addresses[2]
-    #state.temp_dir = addresses[3]
 
 # Empty production
 def p_empty(p):
@@ -638,7 +683,6 @@ with open(raw_input('filename > '), 'r') as f:
     input = f.read()
     preparsing = f_parser.parse(input, 0, 0)
     result = parser.parse(input, 0, 0)
-    var_table = sem.var_table
     for idx, quad in enumerate(state.quads):
         print idx, (quad.operator, quad.operand1, quad.operand2, quad.result)
 
@@ -658,14 +702,13 @@ for okey in sem.var_table:
         add_offset(ikey[1], state.g_offset, state.c_offset, state.l_offset)
 
 # Pass the starting stack address to the VM as the biggest function size plus the global and constant variables
-func_max_size = max(map(lambda x: x[1][3], sem.func_table.items()))
-main_size = sum(map(lambda x: x[1][2], var_table["main"].items()))
+# Concatenates a list with 0 in it in case there's no functions
+func_max_size = max(map(lambda x: x[1][3], sem.func_table.items()) + [0])
+if(sem.var_table.get("main") != None):  # Main method has local variables declared
+    main_size = sum(map(lambda x: x[1][2][0], sem.var_table["main"].items()))  # [id, [type, address, [size, {dimensions}], scope]]
+else:  # Main has no local variables
+    main_size = 0
 state.stack_dir += state.global_dir + state.constant_dir + max(func_max_size, main_size)
-#stack_dir = 0
-#for var in sem.var_table[sem.global_str].items():
-#    stack_dir += var[1][2]
-#for var in sem.var_table[sem.constant_str].items():
-#    stack_dir += var[1][2]
 
 # Appends memory map to functions
 for func_name in sem.func_table:
@@ -677,13 +720,6 @@ for idx, quad in enumerate(state.quads):
     quad.transform(state.t_offset)
     #quad.add_offset(0, state.global_dir, 9000, 43000)
     print idx, (quad.operator, quad.operand1, quad.operand2, quad.result)
-
-#for e in sem.var_table[sem.constant_str].items():
-#    e[1][1] += state.global_dir
-#    for idx, quad in enumerate(state.quads):
-#        quad.transform()
-#        #quad.add_offset(0, state.global_dir, 9000, 43000)
-#        print idx, (quad.operator, quad.operand1, quad.operand2, quad.result)
 
 # Sorting function
 def swap(element):
