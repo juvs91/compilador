@@ -448,23 +448,33 @@ def get_variable(var):
         return [var, var_table[global_str].get(var)]
 
 def get_type(op, op1, op2): 
-    #print op, op1, op2 
+    type = None
     if(isinstance(op1, str)):
         type = semantic_cube[op]["char"][op2[1][0]]
     else:
         if(op1[1] == None):
             type1 = func_table[op1[0]][0]
         else:
-            type1 = op1[1][0]
+            type1 = op1[1][0][:]
+            if("[]" in type1):  # Checks if operand is an array
+                for x in range(state.arr_current_dim):
+                    type1 = type1[:-2]  # Removes pair of brackets
         if(op2[1] == None):
             type2 = func_table[op2[0]][0]
         else:
-            type2 = op2[1][0]
-        type = semantic_cube[op][type1][type2]
-    if(type != None): 
+            type2 = op2[1][0][:]
+            if("[]" in type2):  # Checks if operand is an array
+                for x in range(state.arr_current_dim):
+                    type2 = type2[:-2]  # Removes pair of brackets
+        try:
+            type = semantic_cube[op][type1][type2]
+        except(KeyError):  # Types weren't found in dictionary
+            if(cmp(type1, type2) == 0):  # Both variables have the same type and dimensions
+                type = type1
+    if(type != None):
         return type
-    else: 
-        raise NameError("Incompatible types '{0}' and '{1}'".format(op1[1][0], op2[1][0]))
+    else:
+        raise NameError("Incompatible types '{0}' and '{1}'".format(type1, type2))
 
 
 def is_char(char): 
@@ -480,9 +490,9 @@ def is_signature_valid(func_name, signature):
 
 #validate if the return function returns a value if its not void  and if the type of return is equal to the var it returns
 def validate_return_funtion(var):
-	if(func_table[scope][0][0] != var):
-		raise NameError(" wrong return type in function '{0}'".format(scope))
-		
+    if(func_table[scope][0][0] != var):
+        raise NameError(" wrong return type in function '{0}'".format(scope))
+
 #	if(isinstance(var,int)):
 #		var_exist = True
 #	elif(var_table.get(scope) == None):

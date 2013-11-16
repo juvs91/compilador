@@ -218,14 +218,34 @@ def p_assign(p):
     '''Assign : ID Array2 Seen_Operand1 EQUAL Seen_Operator Assign1'''
 
 def p_array_2(p):
-    '''Array2 : LBRACKET SuperExpr RBRACKET Verify_Limit Array
+    '''Array2 : Array3 Generate_Dir
               | empty'''
+
+def p_array_3(p):
+    '''Array3 : LBRACKET SuperExpr RBRACKET Verify_Limit Array4'''
+
+def p_array_4(p):
+    '''Array4 : LBRACKET SuperExpr RBRACKET Verify_Limit Array4
+              | empty'''
+
+def p_generate_dir(p):
+    '''Generate_Dir : '''
+    expr.add_operator("#")
+    for x in range(state.arr_current_dim - 1):
+        expr.add_operator("+")
+        expr.generate_quad(2)  # Generates quads to sum all the indices
+    expr.pop_operator()
+    var = sem.get_variable(p[-2])
+    arr.generate_dir(var[1][1])  # Starting address
 
 def p_verify_limit(p):
     '''Verify_Limit : '''
-    state.arr_current_dim += 1
+    state.arr_current_dim += 1  # First position holds the array size in bytes
+    index = state.operand_stack.pop()
     var = sem.get_variable(p[-4])
-    arr.generate_verify(state.operand_stack[-1], var[1][2][state.arr_current_dim])
+    arr.generate_verify(index, var[1][2][state.arr_current_dim])  # Gets dimension limits
+    arr.generate_multiply_m(index, var[1][4][state.arr_current_dim - 1])  # Gets mn
+    p[0] = p[-4]
 
 def p_assign_1(p):
     '''Assign1 : SuperExpr Gen_Quad5
@@ -399,7 +419,7 @@ def p_seen_param_call(p):
     '''Seen_Param_Call : '''
     param = state.operand_stack.pop()
     # Check if it's a dimentional parameter
-    if(param[1][2][0] > 4 or ((param[1][0][0] == "b" or param[1][0][0] == "c") and param[1][2][0] > 1)):
+    if("[]" in param[1][0]):  # Checks if the parameter is an array
         var = sem.func_table[state.current_call][2][state.param_counter]  # Gets variable to replace
         dir = max(map(lambda x: x[1][1] + x[1][2][0], sem.var_table[state.current_call].items()))  # Gets the last available address
         sem.var_table[state.current_call][var][2] = param[1][2]  # Replace the size and dimensions of the variable with the passed parameter
@@ -481,7 +501,6 @@ def p_seen_operand(p):
 
 def p_seen_operand_1(p):
     '''Seen_Operand1 : '''
-    print state.arr_dim
     if(sem.is_declared(p[-2])):
         expr.add_operand(sem.get_variable(p[-2]))
 
