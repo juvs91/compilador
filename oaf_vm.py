@@ -10,7 +10,7 @@ class VirtualMachine:
         self.local_dir_start = local_address  # Address to start the local variables
         self.stack_dir_start = stack_address  # Address to start the stack
         self.stack_dir = stack_address  # Next free address to start continue stack
-        self.context = ["main", [], []]  # Current context
+        self.context = ["main", [], []]  # [function name, [stack begin, stack end], [{temporals list}]]
         self.obj = self.load_obj(filename)
         self.quads = self.obj["quads"]
         self.functions = self.obj["functions"]
@@ -67,6 +67,12 @@ class VirtualMachine:
             elif(op == "/"):
                 self.mem[res] = self.mem[op1] / self.mem[op2]
             elif(op == "="):
+                # Check if result is a pointer
+                if(self.mem.get(res) != None and isinstance(self.mem[res], str) and self.mem[res][0] == "*"):
+                    res = int(self.mem[res][1:])
+                # Check if operand is a pointer
+                if(isinstance(self.mem[op1], str) and self.mem[op1][0] == "*"):
+                    op1 = int(self.mem[op1][1:])
                 self.mem[res] = self.mem[op1]
             elif(op == ">"):
                 if(self.mem[op1] > self.mem[op2]):
@@ -96,9 +102,17 @@ class VirtualMachine:
             elif(op == "return"):
                 self.return_value_stack.append(self.mem[op1])
 
+            # Array operations
+            if(op == "ver"):
+                if(self.mem[op1] > res or self.mem[op1] < 0):
+                    raise NameError("Array limits out of bounds")
+            elif(op == "add"):
+                self.mem[res] = "*" + str(self.mem[op1] + op2)
+            elif(op == "mul"):
+                self.mem[res] = self.mem[op1] * op2
+
             # Function operations
             if(op == "era"):
-                # [function name, [stack begin, stack end], [temporals]]
                 self.context[0] = op1
                 # Checks if function returns a value
                 # if it returns assigns a memory address
@@ -132,9 +146,6 @@ class VirtualMachine:
                 else:
                     self.instr_ptr += 1
             elif(op == "gosub"):
-                # Map function's memory address to VM
-                #for var in self.functions[op1][4]:
-                #    self.mem[var[0]] = var[1]
                 self.context = [op1, [], []]
                 self.instr_ptr_stack.append(self.instr_ptr + 1)
                 self.instr_ptr = res

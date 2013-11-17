@@ -148,8 +148,11 @@ def p_assign(p):
 
 def p_assign_1(p):
     '''Assign1 : SuperExpr
-               | Call
                | STRING'''
+
+def p_array_2(p):
+    '''Array2 : LBRACKET SuperExpr RBRACKET Array2
+              | empty'''
 
 def p_call(p):
     '''Call : ID LPAREN Params RPAREN'''
@@ -256,7 +259,7 @@ def p_rtype(p):
              | empty'''
 
 def p_constant(p):
-    '''Constant : ID
+    '''Constant : ID Array2
                 | FCONST
                 | ICONST
                 | CCONST
