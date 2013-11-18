@@ -211,7 +211,11 @@ def p_go_back_to_validate(p):
 
 
 def p_assign(p):
-    '''Assign : ID Array2 Seen_Operand1 EQUAL Seen_Operator Assign1'''
+    '''Assign : ID Array2 Seen_Operand1 EQUAL Seen_Operator Assign1 Clear_Dimensions'''
+
+def p_assign_1(p):
+    '''Assign1 : SuperExpr Gen_Quad5
+               | STRING Check_Char Seen_Char_Operand Gen_Quad5'''
 
 def p_array_2(p):
     '''Array2 : Array3 Update_Offset Generate_Dir
@@ -223,6 +227,11 @@ def p_array_3(p):
 def p_array_4(p):
     '''Array4 : LBRACKET SuperExpr RBRACKET Verify_Limit Array4
               | empty'''
+
+def p_clear_dimensions(p):
+    '''Clear_Dimensions : '''
+    state.arr_current_dim = 0
+    state.arr_dim_stack = []
 
 def p_update_offset(p):
     '''Update_Offset : '''
@@ -241,8 +250,6 @@ def p_update_offset(p):
 
 def p_generate_dir(p):
     '''Generate_Dir : '''
-    state.arr_dim_stack.append(state.arr_current_dim)
-    state.arr_current_dim = 0  # Resets the current dimension for the next array
     var = sem.get_variable(p[-3])
     arr.generate_dir(var[1][1])  # Starting address
 
@@ -254,10 +261,6 @@ def p_verify_limit(p):
     arr.generate_verify(index, var[1][2][state.arr_current_dim] - 1)  # Gets dimension limits
     arr.generate_multiply_m(index, var[1][4][state.arr_current_dim - 1])  # Gets mn
     p[0] = p[-4]
-
-def p_assign_1(p):
-    '''Assign1 : SuperExpr Gen_Quad5
-               | STRING Check_Char Seen_Char_Operand Gen_Quad5'''
 
 def p_check_char(p):
     '''Check_Char : '''
@@ -468,14 +471,9 @@ def p_seen_return_function(p):
 def p_seen_return_function_end(p):
     '''Seen_Return_Function_End : '''
     func_name = p[-7]
-    #return_var = state.operand_stack.pop()
-    #func.generate_return(func_name, return_var)
     func.generate_end(func_name)
     # Appends the function size
     sem.func_table[func_name].append(state.f_size)
-    #sem.func_table[func_name][0] = return_var[1]
-    #state.return_dir_stack.pop()
-    #state.return_var_stack.pop()
     state.f_size = 0
 
 def p_seen_program(p):
@@ -504,16 +502,24 @@ def p_check_signature(p):
 def p_seen_operand(p):
     '''Seen_Operand : '''
     if(sem.is_declared(p[-1])):
-        var = sem.get_variable(p[-1])
-        if("[]" not in var[1][0]):  # Variable is not an array
+        if(state.arr_current_dim == 0):
             expr.add_operand(sem.get_variable(p[-1]))
+    state.arr_dim_stack.append(state.arr_current_dim)  # Saves first parameter's dimensions
+    state.arr_current_dim = 0  # Resets the counter for the next parameter
 
 def p_seen_operand_1(p):
     '''Seen_Operand1 : '''
     if(sem.is_declared(p[-2])):
-        var = sem.get_variable(p[-2])
-        if("[]" not in var[1][0]):  # Variable is not an array
+        if(state.arr_current_dim == 0):
             expr.add_operand(sem.get_variable(p[-2]))
+    state.arr_dim_stack.append(state.arr_current_dim)  # Saves first parameter's dimensions
+    state.arr_current_dim = 0  # Resets the counter for the next parameter
+        #var = sem.get_variable(p[-2])
+        #if("[]" not in var[1][0]):  # Variable is not an array
+        #    expr.add_operand(sem.get_variable(p[-2]))
+        #    # revisar este pedo
+        #elif(state.arr_current_dim == 0):
+        #    expr.add_operand(sem.get_variable(p[-2]))
 
 def p_seen_unary_operator(p):
     '''Seen_Unary_Operator : '''
@@ -617,10 +623,14 @@ def p_seen_local_variable_1(p):
         size = 1
     # Check if variable has dimensions
     if(len(state.arr_dim) > 0):
-        # Multiplies all the items in the dimensions list
+        dims = [0]  # List to hold temporal values of dimensions
+        m_list = []  # List to hold temporal values of m
+        # Appends brackets to type for each dimension
         for dim in state.arr_dim:
             type += "[]"
-        sem.fill_local_variables_table(p[-2], type, [0, 0], [])  # Temporal values
+            dims.append(0)
+            m_list.append(0)
+        sem.fill_local_variables_table(p[-2], type, dims, m_list)  # Temporal values
         state.arr_dim = []
     else:
         sem.fill_local_variables_table(p[-2], type, [size, 1], None)

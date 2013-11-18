@@ -433,10 +433,13 @@ def is_declared(var):
         raise NameError("Undeclared variable '{0}'".format(var))
 
 def get_variable(var):
+    # First looks in scope
     if(var_table.get(scope) != None and var_table[scope].get(var) != None):
         return [var, var_table[scope].get(var)]
+    # Then looks in constants
     elif(var_table[constant_str].get(var) != None):
         return [var, var_table[constant_str].get(var)]
+    # Then looks in functions
     elif(func_table.get(var) != None):
         type = func_table[var][0][0]  # Function return value information
         if(type[0] == "i" or type[0] == "f"):
@@ -444,6 +447,7 @@ def get_variable(var):
         else:
             size = 1
         return [var, [type, state.return_dir_stack[-1], [size, 1], 't']]
+    # At last looks in globals
     else:
         return [var, var_table[global_str].get(var)]
 
