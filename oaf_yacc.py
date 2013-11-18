@@ -183,10 +183,10 @@ def p_params_1(p):
 def p_params_2(p):
     '''Params2 : COMMA Params1
                | empty'''
-
+# revisar este pedo
 def p_params_3(p):
-    '''Params3 : SuperExpr Seen_Param_Print Params4
-               | STRING Seen_Param_Print Params4'''
+    '''Params3 : SuperExpr Seen_Param_Print Clear_Dimensions Params4
+               | STRING Seen_Param_Print Clear_Dimensions Params4'''
     p[0] = p[1]
 
 def p_params_4(p):
@@ -502,15 +502,17 @@ def p_check_signature(p):
 def p_seen_operand(p):
     '''Seen_Operand : '''
     if(sem.is_declared(p[-1])):
-        if(state.arr_current_dim == 0):
+        var = sem.get_variable(p[-1])
+        if(state.arr_current_dim == 0 or "[]" not in var[1][0]):
             expr.add_operand(sem.get_variable(p[-1]))
-    state.arr_dim_stack.append(state.arr_current_dim)  # Saves first parameter's dimensions
-    state.arr_current_dim = 0  # Resets the counter for the next parameter
+    #state.arr_dim_stack.append(state.arr_current_dim)  # Saves first parameter's dimensions
+    #state.arr_current_dim = 0  # Resets the counter for the next parameter
 
 def p_seen_operand_1(p):
     '''Seen_Operand1 : '''
     if(sem.is_declared(p[-2])):
-        if(state.arr_current_dim == 0):
+        var = sem.get_variable(p[-2])
+        if(state.arr_current_dim == 0 or "[]" not in var[1][0]):
             expr.add_operand(sem.get_variable(p[-2]))
     state.arr_dim_stack.append(state.arr_current_dim)  # Saves first parameter's dimensions
     state.arr_current_dim = 0  # Resets the counter for the next parameter
