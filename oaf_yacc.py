@@ -9,7 +9,11 @@ import oaf_yacc_func as func_parser
 
 import oaf_state as state
 
-import oaf_main as main
+import oaf_main as main      
+
+
+#all the grafic quads
+import oaf_grafic_quads as gq
 
 # Expressions module
 import oaf_expr as expr
@@ -51,7 +55,7 @@ def p_local_declaration(p):
                          | empty'''
 
 def p_array(p):
-    '''Array : LBRACKET ICONST RBRACKET Seen_Dimension Array
+    '''Array : LBRACKET ICONST Seen_Int RBRACKET Seen_Dimension Array
              | empty'''
 
 def p_seen_array(p):
@@ -63,8 +67,8 @@ def p_seen_array(p):
 
 def p_seen_dimension(p):
     '''Seen_Dimension : '''
-    state.arr_dim.append(p[-2])
-    state.arr_r *= p[-2]
+    state.arr_dim.append(p[-3])
+    state.arr_r *= p[-3]
 
 def p_seen_dimension_1(p):
     '''Seen_Dimension1 : '''
@@ -169,10 +173,6 @@ def p_factor_3(p):
     '''Factor3 : Constant
                | Call'''
     p[0] = p[1]
-    if(p[0] == "uno"):
-        pass
-    if(p[0] == 7):
-        pass
 
 # revisar este pedo
 # Agregar tipo STRING para variables y funciones
@@ -187,10 +187,10 @@ def p_params_1(p):
 def p_params_2(p):
     '''Params2 : COMMA Params1
                | empty'''
-
+# revisar este pedo
 def p_params_3(p):
-    '''Params3 : SuperExpr Seen_Param_Print Params4
-               | STRING Seen_Param_Print Params4'''
+    '''Params3 : SuperExpr Seen_Param_Print Clear_Dimensions Params4
+               | STRING Seen_Param_Print Clear_Dimensions Params4'''
     p[0] = p[1]
 
 def p_params_4(p):
@@ -215,21 +215,56 @@ def p_go_back_to_validate(p):
 
 
 def p_assign(p):
-    '''Assign : ID Array2 Seen_Operand1 EQUAL Seen_Operator Assign1'''
-
-def p_array_2(p):
-    '''Array2 : LBRACKET SuperExpr RBRACKET Verify_Limit Array
-              | empty'''
-
-def p_verify_limit(p):
-    '''Verify_Limit : '''
-    state.arr_current_dim += 1
-    var = sem.get_variable(p[-4])
-    arr.generate_verify(state.operand_stack[-1], var[1][2][state.arr_current_dim])
+    '''Assign : ID Array2 Seen_Operand1 EQUAL Seen_Operator Assign1 Clear_Dimensions'''
 
 def p_assign_1(p):
     '''Assign1 : SuperExpr Gen_Quad5
                | STRING Check_Char Seen_Char_Operand Gen_Quad5'''
+
+def p_array_2(p):
+    '''Array2 : Array3 Update_Offset Generate_Dir
+              | empty'''
+
+def p_array_3(p):
+    '''Array3 : LBRACKET SuperExpr RBRACKET Verify_Limit Array4'''
+
+def p_array_4(p):
+    '''Array4 : LBRACKET SuperExpr RBRACKET Verify_Limit Array4
+              | empty'''
+
+def p_clear_dimensions(p):
+    '''Clear_Dimensions : '''
+    state.arr_current_dim = 0
+    state.arr_dim_stack = []
+
+def p_update_offset(p):
+    '''Update_Offset : '''
+    var = sem.get_variable(p[-2])
+    type = var[1][0]
+    expr.add_operator("#")
+    for x in range(state.arr_current_dim - 1):
+        expr.add_operator("+")
+        expr.generate_quad(2)  # Generates quads to sum all the indices
+    if(type[0] == "i" or type[0] == "f"):
+        sem.fill_symbol_table_constant(4, "int", 4)
+        expr.add_operand(sem.get_variable(4))
+        expr.add_operator("*")
+        expr.generate_quad(1)
+    expr.pop_operator()
+
+def p_generate_dir(p):
+    '''Generate_Dir : '''
+    var = sem.get_variable(p[-3])
+    arr.generate_dir(var[1][1])  # Starting address
+
+def p_verify_limit(p):
+    '''Verify_Limit : '''
+    state.arr_current_dim += 1  # First position holds the array size in bytes
+    index = state.operand_stack.pop()
+    var = sem.get_variable(p[-4])
+    arr.generate_verify(index, var[1][2][state.arr_current_dim] - 1)  # Gets dimension limits
+    arr.generate_multiply_m(index, var[1][4][state.arr_current_dim - 1])  # Gets mn
+    p[0] = p[-4]
 
 def p_check_char(p):
     '''Check_Char : '''
@@ -256,34 +291,61 @@ def p_print(p):
     '''Print : PRINT LPAREN Params3 RPAREN'''
 
 def p_brush(p):
-    '''Brush : BRUSH LPAREN Color COMMA SuperExpr RPAREN'''
+    '''Brush : BRUSH LPAREN SuperExpr RPAREN Seen_grafic_operation_requieres_name_expr'''
+
 
 def p_color(p):
-    '''Color : COLOR LPAREN SuperExpr COMMA SuperExpr COMMA SuperExpr RPAREN'''
+    '''Color : COLOR LPAREN SuperExpr COMMA SuperExpr COMMA SuperExpr RPAREN Seen_Color'''
+
+def p_seen_color(p):
+	'''Seen_Color : '''   
+	blue = state.operand_stack.pop() 
+	green = state.operand_stack.pop()   
+	red = state.operand_stack.pop()      
+	gq.generate_color_quad(red,green,blue)
 
 def p_pendown(p):
-    '''PenDown : PD LPAREN RPAREN'''
+    '''PenDown : PD LPAREN RPAREN Pen_Home'''
 
 def p_penup(p):
-    '''PenUp : PU LPAREN RPAREN'''
+    '''PenUp : PU LPAREN RPAREN Pen_Home'''  
+
+def p_pen_home(p):
+	'''Pen_Home : '''        
+	gq.generate_pen_home_quad(p[-3])
 
 def p_home(p):
-    '''Home : HOME LPAREN RPAREN'''
+    '''Home : HOME LPAREN RPAREN Pen_Home'''
 
 def p_forward(p):
-    '''Forward : FD LPAREN SuperExpr RPAREN'''
+    '''Forward : FD LPAREN SuperExpr RPAREN Seen_grafic_operation_requieres_name_expr'''
+
+def p_seen_grafic_operation_requieres_name_expr(p):
+	'''Seen_grafic_operation_requieres_name_expr :''' 
+	gq.generate_draw_quad(p[-4],state.operand_stack.pop())
+    
+
 
 def p_rotate(p):
-    '''Rotate : RT LPAREN SuperExpr RPAREN'''
+    '''Rotate : RT LPAREN SuperExpr RPAREN Seen_grafic_operation_requieres_name_expr'''
+
 
 def p_circle(p):
-    '''Circle : CIRCLE LPAREN SuperExpr RPAREN'''
+    '''Circle : CIRCLE LPAREN SuperExpr RPAREN Seen_grafic_operation_requieres_name_expr'''
+
 
 def p_arc(p):
-    '''Arc : ARC LPAREN SuperExpr COMMA SuperExpr RPAREN'''
+    '''Arc : ARC LPAREN SuperExpr COMMA SuperExpr RPAREN Seen_Arc'''
+
+def p_seen_arc(p):
+	'''Seen_Arc : '''    
+	p2 = state.operand_stack.pop()
+	p1 = state.operand_stack.pop()
+	gq.generate_arc_quad(p1,p2)
+
 
 def p_square(p):
-    '''Square : SQUARE LPAREN SuperExpr RPAREN'''
+    '''Square : SQUARE LPAREN SuperExpr RPAREN Seen_grafic_operation_requieres_name_expr'''
 
 def p_param(p):
     '''Param : Primitive ID Array1 Seen_Local_Variable1'''
@@ -352,7 +414,7 @@ def p_rtype(p):
 
 
 def p_constant(p):
-    '''Constant : ID
+    '''Constant : ID Array2
                 | FCONST Seen_Float
                 | ICONST Seen_Int
                 | CCONST Seen_Char
@@ -367,7 +429,6 @@ def p_constant_1(p):
 def p_seen_char_operand(p):
     '''Seen_Char_Operand :'''
     expr.add_operand(p[-2])
-
 
 def p_seen_call(p):
     '''Seen_Call : '''
@@ -398,7 +459,7 @@ def p_seen_param_call(p):
     '''Seen_Param_Call : '''
     param = state.operand_stack.pop()
     # Check if it's a dimentional parameter
-    if(param[1][2][0] > 4 or ((param[1][0][0] == "b" or param[1][0][0] == "c") and param[1][2][0] > 1)):
+    if("[]" in param[1][0]):  # Checks if the parameter is an array
         var = sem.func_table[state.current_call][2][state.param_counter]  # Gets variable to replace
         dir = max(map(lambda x: x[1][1] + x[1][2][0], sem.var_table[state.current_call].items()))  # Gets the last available address
         sem.var_table[state.current_call][var][2] = param[1][2]  # Replace the size and dimensions of the variable with the passed parameter
@@ -440,14 +501,9 @@ def p_seen_return_function(p):
 def p_seen_return_function_end(p):
     '''Seen_Return_Function_End : '''
     func_name = p[-7]
-    #return_var = state.operand_stack.pop()
-    #func.generate_return(func_name, return_var)
     func.generate_end(func_name)
     # Appends the function size
     sem.func_table[func_name].append(state.f_size)
-    #sem.func_table[func_name][0] = return_var[1]
-    #state.return_dir_stack.pop()
-    #state.return_var_stack.pop()
     state.f_size = 0
 
 def p_seen_program(p):
@@ -476,13 +532,26 @@ def p_check_signature(p):
 def p_seen_operand(p):
     '''Seen_Operand : '''
     if(sem.is_declared(p[-1])):
-        expr.add_operand(sem.get_variable(p[-1]))
+        var = sem.get_variable(p[-1])
+        if(state.arr_current_dim == 0 or "[]" not in var[1][0]):
+            expr.add_operand(sem.get_variable(p[-1]))
+    #state.arr_dim_stack.append(state.arr_current_dim)  # Saves first parameter's dimensions
+    #state.arr_current_dim = 0  # Resets the counter for the next parameter
 
 def p_seen_operand_1(p):
     '''Seen_Operand1 : '''
-    print state.arr_dim
     if(sem.is_declared(p[-2])):
-        expr.add_operand(sem.get_variable(p[-2]))
+        var = sem.get_variable(p[-2])
+        if(state.arr_current_dim == 0 or "[]" not in var[1][0]):
+            expr.add_operand(sem.get_variable(p[-2]))
+    state.arr_dim_stack.append(state.arr_current_dim)  # Saves first parameter's dimensions
+    state.arr_current_dim = 0  # Resets the counter for the next parameter
+        #var = sem.get_variable(p[-2])
+        #if("[]" not in var[1][0]):  # Variable is not an array
+        #    expr.add_operand(sem.get_variable(p[-2]))
+        #    # revisar este pedo
+        #elif(state.arr_current_dim == 0):
+        #    expr.add_operand(sem.get_variable(p[-2]))
 
 def p_seen_unary_operator(p):
     '''Seen_Unary_Operator : '''
@@ -586,10 +655,14 @@ def p_seen_local_variable_1(p):
         size = 1
     # Check if variable has dimensions
     if(len(state.arr_dim) > 0):
-        # Multiplies all the items in the dimensions list
+        dims = [0]  # List to hold temporal values of dimensions
+        m_list = []  # List to hold temporal values of m
+        # Appends brackets to type for each dimension
         for dim in state.arr_dim:
             type += "[]"
-        sem.fill_local_variables_table(p[-2], type, [0, 0], [])  # Temporal values
+            dims.append(0)
+            m_list.append(0)
+        sem.fill_local_variables_table(p[-2], type, dims, m_list)  # Temporal values
         state.arr_dim = []
     else:
         sem.fill_local_variables_table(p[-2], type, [size, 1], None)
@@ -724,11 +797,28 @@ for idx, quad in enumerate(state.quads):
 def swap(element):
     return element[1][1], element[0]
 
+# Initializes arrays with None (null)
+init_dict = {}  # Dictionary that holds arrays initializations [dir, value]
+for scope in sem.var_table:
+    for var in sem.var_table[scope].items():
+        if("[]" in var[1][0]):
+            start = var[1][1]
+            end = start + var[1][2][0]
+            if(var[1][0][0] == "i" or var[1][0][0] == "f"):
+                step = 4
+            else:
+                step = 1
+            for dir in range(start, end, step):
+                init_dict[dir] = None
+# Appends other variables to the same dictionary
+mem_dict = dict(map(swap, sem.var_table[sem.global_str].items()) + map(swap, sem.var_table[sem.constant_str].items()))
+mem_dict.update(init_dict)
+
 with open("o.af", "wb") as out:
     obj = {
         "quads": state.quads,
         "functions": sem.func_table,
-        "mem": dict(map(swap, sem.var_table[sem.constant_str].items()) + map(swap, sem.var_table[sem.global_str].items()))
+        "mem": mem_dict
     }
     pickle.dump(obj, out, -1)
 

@@ -433,10 +433,13 @@ def is_declared(var):
         raise NameError("Undeclared variable '{0}'".format(var))
 
 def get_variable(var):
+    # First looks in scope
     if(var_table.get(scope) != None and var_table[scope].get(var) != None):
         return [var, var_table[scope].get(var)]
+    # Then looks in constants
     elif(var_table[constant_str].get(var) != None):
         return [var, var_table[constant_str].get(var)]
+    # Then looks in functions
     elif(func_table.get(var) != None):
         type = func_table[var][0][0]  # Function return value information
         if(type[0] == "i" or type[0] == "f"):
@@ -444,27 +447,40 @@ def get_variable(var):
         else:
             size = 1
         return [var, [type, state.return_dir_stack[-1], [size, 1], 't']]
+    # At last looks in globals
     else:
         return [var, var_table[global_str].get(var)]
 
 def get_type(op, op1, op2): 
-    #print op, op1, op2 
+    type = None
     if(isinstance(op1, str)):
         type = semantic_cube[op]["char"][op2[1][0]]
     else:
         if(op1[1] == None):
             type1 = func_table[op1[0]][0]
         else:
-            type1 = op1[1][0]
+            type1 = op1[1][0][:]
+            if("[]" in type1):  # Checks if operand is an array
+                state.arr_current_dim = state.arr_dim_stack.pop()
+                for x in range(state.arr_current_dim):
+                    type1 = type1[:-2]  # Removes pair of brackets
         if(op2[1] == None):
             type2 = func_table[op2[0]][0]
         else:
-            type2 = op2[1][0]
-        type = semantic_cube[op][type1][type2]
-    if(type != None): 
+            type2 = op2[1][0][:]
+            if("[]" in type2):  # Checks if operand is an array
+                state.arr_current_dim = state.arr_dim_stack.pop()
+                for x in range(state.arr_current_dim):
+                    type2 = type2[:-2]  # Removes pair of brackets
+        try:
+            type = semantic_cube[op][type1][type2]
+        except(KeyError):  # Types weren't found in dictionary
+            if(cmp(type1, type2) == 0):  # Both variables have the same type and dimensions
+                type = type1
+    if(type != None):
         return type
-    else: 
-        raise NameError("Incompatible types '{0}' and '{1}'".format(op1[1][0], op2[1][0]))
+    else:
+        raise NameError("Incompatible types '{0}' and '{1}'".format(type1, type2))
 
 
 def is_char(char): 
@@ -480,9 +496,9 @@ def is_signature_valid(func_name, signature):
 
 #validate if the return function returns a value if its not void  and if the type of return is equal to the var it returns
 def validate_return_funtion(var):
-	if(func_table[scope][0][0] != var):
-		raise NameError(" wrong return type in function '{0}'".format(scope))
-		
+    if(func_table[scope][0][0] != var):
+        raise NameError(" wrong return type in function '{0}'".format(scope))
+
 #	if(isinstance(var,int)):
 #		var_exist = True
 #	elif(var_table.get(scope) == None):

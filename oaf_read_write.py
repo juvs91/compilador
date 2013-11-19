@@ -6,7 +6,6 @@ import oaf_sem as sem
 def print_quad(printable):
     q = quad.Quad()
     q.set_quad("print", None, printable, None)
-    #state.operand_stack.append(q.result)
     state.quads.append(q)
 
 def read_quad(type, var, scope):

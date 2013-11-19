@@ -10,13 +10,11 @@ class VirtualMachine:
         self.local_dir_start = local_address  # Address to start the local variables
         self.stack_dir_start = stack_address  # Address to start the stack
         self.stack_dir = stack_address  # Next free address to start continue stack
-        self.context = ["main", [], []]  # Current context
+        self.context = ["main", [], []]  # [function name, [stack begin, stack end], [{temporals list}]]
         self.obj = self.load_obj(filename)
         self.quads = self.obj["quads"]
         self.functions = self.obj["functions"]
         self.mem = self.obj["mem"]
-
-        self.max_mem = []
 
     def load_obj(self, filename):
         f = open(filename, "rb")
@@ -38,7 +36,6 @@ class VirtualMachine:
                 self.mem[copy_dir] = item  # Copies the memory address
                 self.mem[copy_dir + 4] = self.mem[item]  # Copies the value stored in that address
                 copy_dir += 8
-        self.max_mem.append(len(self.mem))
         return copy_dir
 
     def restore_state(self):
@@ -48,8 +45,9 @@ class VirtualMachine:
             for i in range(dirs[0], dirs[1], 8):
                 self.mem[self.mem[i]] = self.mem[i + 4]
                 del(self.mem[i], self.mem[i + 4])
-            # Restore the temporal variables
-        return dirs[0]
+            return dirs[0]  # Something was restored
+        else:
+            return self.stack_dir  # Nothing was restored
 
     def run(self):
         quad = self.quads[self.instr_ptr]
@@ -67,6 +65,12 @@ class VirtualMachine:
             elif(op == "/"):
                 self.mem[res] = self.mem[op1] / self.mem[op2]
             elif(op == "="):
+                # Check if result is a pointer
+                if(self.mem.get(res) != None and isinstance(self.mem[res], str) and self.mem[res][0] == "*"):
+                    res = int(self.mem[res][1:])
+                # Check if operand is a pointer
+                if(isinstance(self.mem[op1], str) and self.mem[op1][0] == "*"):
+                    op1 = int(self.mem[op1][1:])
                 self.mem[res] = self.mem[op1]
             elif(op == ">"):
                 if(self.mem[op1] > self.mem[op2]):
@@ -96,9 +100,17 @@ class VirtualMachine:
             elif(op == "return"):
                 self.return_value_stack.append(self.mem[op1])
 
+            # Array operations
+            if(op == "ver"):
+                if(self.mem[op1] > res or self.mem[op1] < 0):
+                    raise NameError("Array limits out of bounds")
+            elif(op == "add"):
+                self.mem[res] = "*" + str(self.mem[op1] + op2)
+            elif(op == "mul"):
+                self.mem[res] = self.mem[op1] * op2
+
             # Function operations
             if(op == "era"):
-                # [function name, [stack begin, stack end], [temporals]]
                 self.context[0] = op1
                 # Checks if function returns a value
                 # if it returns assigns a memory address
@@ -117,10 +129,16 @@ class VirtualMachine:
                 func_name = self.function_call_stack[-1][0]
                 # revisar este pedo
                 dir = self.functions[func_name][5][res][0]
+                # Check if operand is a pointer
+                if(isinstance(self.mem[op1], str) and self.mem[op1][0] == "*"):
+                    op1 = int(self.mem[op1][1:])
                 self.mem[dir] = self.mem[op1]
 
             # Printing functions
             if(op == "print"):
+                # Check if operand is a pointer
+                if(isinstance(self.mem[op1], str) and self.mem[op1][0] == "*"):
+                    op1 = int(self.mem[op1][1:])
                 print self.mem[op1]
 
             # Operators that change the instruction pointer
@@ -132,15 +150,13 @@ class VirtualMachine:
                 else:
                     self.instr_ptr += 1
             elif(op == "gosub"):
-                # Map function's memory address to VM
-                #for var in self.functions[op1][4]:
-                #    self.mem[var[0]] = var[1]
                 self.context = [op1, [], []]
                 self.instr_ptr_stack.append(self.instr_ptr + 1)
                 self.instr_ptr = res
             elif(op == "end"):
                 self.stack_dir = self.restore_state()  # Reloads previous values and returns next free address
-                self.mem[self.return_dir_stack.pop()] = self.return_value_stack.pop()  # Saves value returned by function
+                if(self.functions[op1][0][0] != "void"):  # Function returns a value
+                    self.mem[self.return_dir_stack.pop()] = self.return_value_stack.pop()  # Saves value returned by function
                 self.instr_ptr = self.instr_ptr_stack.pop()
             else:
                 self.instr_ptr += 1
@@ -149,4 +165,4 @@ class VirtualMachine:
             op1 = quad.operand1
             op2 = quad.operand2
             res = quad.result
-        #print "Program finished", len(self.max_mem), max(self.max_mem)
+        print "Program finished"

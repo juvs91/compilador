@@ -1,5 +1,0 @@
-vm = {
-    "quads": {},
-    "functions": {},
-    "constants": {}
-}
