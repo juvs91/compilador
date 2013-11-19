@@ -10,6 +10,6 @@ main() {
     int a;
     a = fact(12);  
 	rt(30+5);
-	fw(a);
+	fd(3);
     print(a);
 }

@@ -1,6 +1,5 @@
 import oaf_state as state 
 import oaf_quad as quad
-import oaf_sem as sem
 
 # Functions quads module   
 def generate_era(func_name, res):
@@ -14,10 +13,9 @@ def generate_param(op1):
     state.quads.append(q)
     state.param_counter += 1
     
-def generate_gosub(func_name):
+def generate_gosub(func_name, index):
     q = quad.Quad()
-    # revisar este pedo quitar sem de esta clase
-    q.set_quad("gosub", None, func_name, sem.get_function(func_name)[2])
+    q.set_quad("gosub", None, func_name, index)
     state.quads.append(q)
 
 def generate_return(op1):

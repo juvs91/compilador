@@ -8,7 +8,7 @@ scope = global_str
 var_table = {scope: {}, constant_str: {}}
 
 # Stores the functions information
-# [[return type], [signature], starting quad, function size, [memory map (optional)]]
+# [[return type], [signature], [param list], starting quad, function size, [memory map (optional)]]
 func_table = {}
 
 operation = None
@@ -361,31 +361,39 @@ def fill_symbol_table_function(symbol, attributes):
     else: 
         raise NameError("Function redeclaration, '{0}' already exists".format(symbol))
 
-def fill_local_variables_table(var, type, size):
+def fill_local_variables_table(var, type, attrs, m_list):
     #verifica si existe el scope dado
     if(var_table.get(scope) == None):
         var_table[scope] = {}
     if(var == scope or var_table[scope].get(var) != None):
         raise NameError("Variable redeclaration, '{0}' already exists".format(var))
     else:
-        var_table[scope][var] = [type, state.local_dir, size, 'l']
-        state.local_dir += size
+        if(m_list):
+            var_table[scope][var] = [type, state.local_dir, attrs, 'l', m_list]
+        else:
+            var_table[scope][var] = [type, state.local_dir, attrs, 'l']
+        state.local_dir += attrs[0]
 
-def fill_global_variables_table(var, type, size):
-    #verifica si existe el scope dado
+# revisar este pedo
+def fill_global_variables_table(var, type, attrs, m_list):
+    # attrs = [size of variable,{each dimension size}]
+    # verifica si existe el scope dado
     if(var_table.get(scope) == None):
         var_table[scope] = {}
     if(var == scope or var_table[scope].get(var) != None):
         raise NameError("Variable redeclaration, '{0}' already exists".format(var))
     else:
-        var_table[scope][var] = [type, state.global_dir, size, 'g']
-        state.global_dir += size
+        if(m_list):
+            var_table[scope][var] = [type, state.global_dir, attrs, 'g', m_list]
+        else:
+            var_table[scope][var] = [type, state.global_dir, attrs, 'g']
+        state.global_dir += attrs[0]
 
 def fill_symbol_table_constant(symbol, type, size):
     if(var_table[constant_str].get(symbol) != None):
         pass
     else:
-        var_table[constant_str][symbol] = [type, state.constant_dir, size, 'c']
+        var_table[constant_str][symbol] = [type, state.constant_dir, [size, 1], 'c']
         if(type[0] == "i" or type[0] == "f"):
             state.constant_dir += 4
         else:
@@ -435,7 +443,7 @@ def get_variable(var):
             size = 4
         else:
             size = 1
-        return [var, [type, state.return_dir_stack[-1], size, 't']]
+        return [var, [type, state.return_dir_stack[-1], [size, 1], 't']]
     else:
         return [var, var_table[global_str].get(var)]
 

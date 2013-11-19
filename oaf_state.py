@@ -1,17 +1,21 @@
 # Module that keeps the state of the parser
 
-#list of al the params
-params_list = []
+# Current calling function
+current_call = ""
 
 #label stack 
 label_stack = []
 
-# Maintains the addresses references when changing scopes
-#address_stack = []  # [global, constant, local, temp]
-
 # Return values of functions
 return_dir_stack = []
 return_var_stack = []
+
+# Array information, used when parsing arrays
+arr_dim = []  # Used to get dimension size
+arr_dim_str = ""  # Used to update function signature in preparser
+arr_current_dim = 0  # Used to access array and verify limits
+arr_m_list = []  # M values for each dimension
+arr_r = 1  # R value
 
 # Operands stack
 operand_stack = []
@@ -31,6 +35,8 @@ stack_dir = 0
 
 # Function signature
 signature = []
+# List of al the parameters
+f_param_list = []
 # Function size(bytes)
 f_size = 0
 

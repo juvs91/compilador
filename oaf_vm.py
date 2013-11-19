@@ -10,6 +10,7 @@ class VirtualMachine:
         self.local_dir_start = local_address  # Address to start the local variables
         self.stack_dir_start = stack_address  # Address to start the stack
         self.stack_dir = stack_address  # Next free address to start continue stack
+        self.context = ["main", [], []]  # Current context
         self.obj = self.load_obj(filename)
         self.quads = self.obj["quads"]
         self.functions = self.obj["functions"]
@@ -24,25 +25,31 @@ class VirtualMachine:
     # Adds current function variables to stack before calling another one
     # and saves the local variables to the stack
     # If the functions returns a value that value is also stored in the stack
-    def save_state(self, *ret_dir):
+    def save_state(self, temporals):
         copy_dir = self.stack_dir
         for item in self.mem.items()[:]:
             # revisar este pedo
-            if(self.local_dir_start <= item[0] < self.stack_dir_start or item[1] != None):
+            if(self.local_dir_start <= item[0] < self.stack_dir_start):
                 self.mem[copy_dir] = item[0]  # Copies the memory address
                 self.mem[copy_dir + 4] = item[1]  # Copies the value stored in that address
+                copy_dir += 8
+        for item in temporals:
+            if(self.mem[item] != None):
+                self.mem[copy_dir] = item  # Copies the memory address
+                self.mem[copy_dir + 4] = self.mem[item]  # Copies the value stored in that address
                 copy_dir += 8
         self.max_mem.append(len(self.mem))
         return copy_dir
 
     def restore_state(self):
-        dirs = self.function_call_stack.pop()
-        if(dirs[1][0] >= 0):  # Restore the local variables
-            for i in range(dirs[1][0], dirs[1][1], 8):
+        self.context = self.function_call_stack.pop()
+        dirs = self.context[1]
+        if(dirs[0] >= 0):  # There's something to restore
+            for i in range(dirs[0], dirs[1], 8):
                 self.mem[self.mem[i]] = self.mem[i + 4]
                 del(self.mem[i], self.mem[i + 4])
             # Restore the temporal variables
-        return dirs[1][0]
+        return dirs[0]
 
     def run(self):
         quad = self.quads[self.instr_ptr]
@@ -91,24 +98,25 @@ class VirtualMachine:
 
             # Function operations
             if(op == "era"):
+                # [function name, [stack begin, stack end], [temporals]]
+                self.context[0] = op1
                 # Checks if function returns a value
                 # if it returns assigns a memory address
                 if(res):
                     self.mem[res] = None
                     self.return_dir_stack.append(res)
-                copy_dir = self.save_state(res)  # Saves memory state and returns next free address
-                prev_state = [op1, [], []]       # Previous state [function name, [stack begin, stack end], [temporals addresses]]
+                    self.context[2].append(res)
+                copy_dir = self.save_state(self.context[2])  # Saves memory state and returns next free address
                 if(copy_dir == self.stack_dir):  # Function didn't save any variables
-                    prev_state[1] = [-1, -1]     # [stack begin, stack end]
+                    self.context[1] = [-1, -1]
                 else:  # Function saved variables in the stack
-                    prev_state[1] = [self.stack_dir, copy_dir - 4]
-                if(self.mem[res] != None):  # There's a temporal with a result
-                    prev_state[2].append(res)
-                self.function_call_stack.append(prev_state)
+                    self.context[1] = [self.stack_dir, copy_dir - 4]
+                self.function_call_stack.append(self.context)
                 self.stack_dir = copy_dir
             if(op == "param"):
                 func_name = self.function_call_stack[-1][0]
-                dir = self.functions[func_name][4][res][0]
+                # revisar este pedo
+                dir = self.functions[func_name][5][res][0]
                 self.mem[dir] = self.mem[op1]
 
             # Printing functions
@@ -127,6 +135,7 @@ class VirtualMachine:
                 # Map function's memory address to VM
                 #for var in self.functions[op1][4]:
                 #    self.mem[var[0]] = var[1]
+                self.context = [op1, [], []]
                 self.instr_ptr_stack.append(self.instr_ptr + 1)
                 self.instr_ptr = res
             elif(op == "end"):
@@ -140,4 +149,4 @@ class VirtualMachine:
             op1 = quad.operand1
             op2 = quad.operand2
             res = quad.result
-        print "Program finished", len(self.max_mem), max(self.max_mem)
+        #print "Program finished", len(self.max_mem), max(self.max_mem)
