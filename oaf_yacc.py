@@ -9,7 +9,11 @@ import oaf_yacc_func as func_parser
 
 import oaf_state as state
 
-import oaf_main as main
+import oaf_main as main      
+
+
+#all the grafic quads
+import oaf_grafic_quads as gq
 
 # Expressions module
 import oaf_expr as expr
@@ -300,34 +304,61 @@ def p_print(p):
     '''Print : PRINT LPAREN Params3 RPAREN'''
 
 def p_brush(p):
-    '''Brush : BRUSH LPAREN Color COMMA SuperExpr RPAREN'''
+    '''Brush : BRUSH LPAREN SuperExpr RPAREN Seen_grafic_operation_requieres_name_expr'''
+
 
 def p_color(p):
-    '''Color : COLOR LPAREN SuperExpr COMMA SuperExpr COMMA SuperExpr RPAREN'''
+    '''Color : COLOR LPAREN SuperExpr COMMA SuperExpr COMMA SuperExpr RPAREN Seen_Color'''
+
+def p_seen_color(p):
+	'''Seen_Color : '''   
+	blue = state.operand_stack.pop() 
+	green = state.operand_stack.pop()   
+	red = state.operand_stack.pop()      
+	gq.generate_color_quad(red,green,blue)
 
 def p_pendown(p):
-    '''PenDown : PD LPAREN RPAREN'''
+    '''PenDown : PD LPAREN RPAREN Pen_Home'''
 
 def p_penup(p):
-    '''PenUp : PU LPAREN RPAREN'''
+    '''PenUp : PU LPAREN RPAREN Pen_Home'''  
+
+def p_pen_home(p):
+	'''Pen_Home : '''        
+	gq.generate_pen_home_quad(p[-3])
 
 def p_home(p):
-    '''Home : HOME LPAREN RPAREN'''
+    '''Home : HOME LPAREN RPAREN Pen_Home'''
 
 def p_forward(p):
-    '''Forward : FD LPAREN SuperExpr RPAREN'''
+    '''Forward : FD LPAREN SuperExpr RPAREN Seen_grafic_operation_requieres_name_expr'''
+
+def p_seen_grafic_operation_requieres_name_expr(p):
+	'''Seen_grafic_operation_requieres_name_expr :''' 
+	gq.generate_draw_quad(p[-4],state.operand_stack.pop())
+    
+
 
 def p_rotate(p):
-    '''Rotate : RT LPAREN SuperExpr RPAREN'''
+    '''Rotate : RT LPAREN SuperExpr RPAREN Seen_grafic_operation_requieres_name_expr'''
+
 
 def p_circle(p):
-    '''Circle : CIRCLE LPAREN SuperExpr RPAREN'''
+    '''Circle : CIRCLE LPAREN SuperExpr RPAREN Seen_grafic_operation_requieres_name_expr'''
+
 
 def p_arc(p):
-    '''Arc : ARC LPAREN SuperExpr COMMA SuperExpr RPAREN'''
+    '''Arc : ARC LPAREN SuperExpr COMMA SuperExpr RPAREN Seen_Arc'''
+
+def p_seen_arc(p):
+	'''Seen_Arc : '''    
+	p2 = state.operand_stack.pop()
+	p1 = state.operand_stack.pop()
+	gq.generate_arc_quad(p1,p2)
+
 
 def p_square(p):
-    '''Square : SQUARE LPAREN SuperExpr RPAREN'''
+    '''Square : SQUARE LPAREN SuperExpr RPAREN Seen_grafic_operation_requieres_name_expr'''
 
 def p_param(p):
     '''Param : Primitive ID Array1 Seen_Local_Variable1'''
@@ -389,7 +420,6 @@ def p_return(p):
         sem.validate_return_funtion(return_var[1][0])
     else:
         sem.validate_return_funtion("void")
-
 def p_rtype(p):
     '''RType : SuperExpr
              | empty'''

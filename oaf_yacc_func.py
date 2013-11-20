@@ -170,7 +170,7 @@ def p_print(p):
     '''Print : PRINT LPAREN Params3 RPAREN'''
 
 def p_brush(p):
-    '''Brush : BRUSH LPAREN Color COMMA SuperExpr RPAREN'''
+    '''Brush : BRUSH LPAREN SuperExpr RPAREN'''
 
 def p_color(p):
     '''Color : COLOR LPAREN SuperExpr COMMA SuperExpr COMMA SuperExpr RPAREN'''
