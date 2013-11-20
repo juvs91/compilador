@@ -23,11 +23,14 @@ class Quad:
             else:
                 size = 1
             # Check if result is of pointer type
-            if(res[0] == "p"):
-                self.result = [res, [type, state.temp_dir, [size, 1], 's']]
+            if(res != None):
+               if(res[0] == "p"):
+                  self.result = [res, [type, state.temp_dir, [size, 1], 's']]
+               else:
+                  self.result = [res, [type, state.temp_dir, [size, 1], 't']]
+               state.temp_dir -= size
             else:
-                self.result = [res, [type, state.temp_dir, [size, 1], 't']]
-            state.temp_dir -= size
+                self.result = res
 
     #def add_offset(self, g_offset, c_offset, l_offset, t_offset):
     #    if(isinstance(self.operand1, list)):
