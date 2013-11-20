@@ -11,9 +11,11 @@ class VirtualMachine:
         self.stack_dir_start = stack_address  # Address to start the stack
         self.stack_dir = stack_address  # Next free address to start continue stack
         self.context = ["main", [], []]  # [function name, [stack begin, stack end], [{temporals list}]]
+        # Loads the object code and initializes the virtual machine
         self.obj = self.load_obj(filename)
         self.quads = self.obj["quads"]
         self.functions = self.obj["functions"]
+        self.vars = self.obj["vars"]
         self.mem = self.obj["mem"]
 
     def load_obj(self, filename):
@@ -128,11 +130,19 @@ class VirtualMachine:
             if(op == "param"):
                 func_name = self.function_call_stack[-1][0]
                 # revisar este pedo
-                dir = self.functions[func_name][5][res][0]
+                type = self.functions[func_name][5][res][1]
+                dir = self.functions[func_name][5][res][2]
+                size = self.functions[func_name][5][res][3]
+                if(type[0] == "i" or type[0] == "f"):
+                    bytes = 4
+                else:
+                    bytes = 1
                 # Check if operand is a pointer
                 if(isinstance(self.mem[op1], str) and self.mem[op1][0] == "*"):
                     op1 = int(self.mem[op1][1:])
-                self.mem[dir] = self.mem[op1]
+                # Copies the whole array to local memory
+                for x in range(0, size, bytes):
+                    self.mem[dir + x] = self.mem[op1 + x]
 
             # Printing functions
             if(op == "print"):
