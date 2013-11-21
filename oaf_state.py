@@ -17,7 +17,10 @@ arr_current_dim = 0  # Used to access array and verify limits
 arr_dim_stack = []  # Used for nested arrays
 arr_m_list = []  # M values for each dimension
 arr_r = 1  # R value
-arr_indices = []  # List that holds the calculates indices
+arr_indices = []  # List that holds the calculated indices
+
+# Unresolved variables
+unresolved_vars = {}
 
 # Operands stack
 operand_stack = []

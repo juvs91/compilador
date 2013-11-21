@@ -116,16 +116,18 @@ def init():
 
 
 def draw():      
+	glClearColor(1,1,1,1)#DEFINE EL COLOR DEL FONDO DE TU PANTALLA 
+	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 	
-	glClearColor(1,1,1,1)#DEFINE EL COLOR DEL FONDO DE TU PANTALLA 
 	fd(30)
 	rt(90)  
 	fd(30)
-	#circle(100)
-	glutSwapBuffers()  
-
+	circle(100)
 	
+	glutSwapBuffers()
+def main_loop():
+	glutMainLoop()
 	
 def main():
 	
@@ -137,10 +139,15 @@ def main():
 	
 	init()                    
 	
-	glutDisplayFunc(draw)
 	
-	glutMainLoop()
+	glutDisplayFunc(draw) 
+	circle(100)
 	
+	
+	
+	
+	
+	main_loop()
 
 
 if __name__ == '__main__':

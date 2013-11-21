@@ -181,7 +181,7 @@ def p_params(p):
               | empty'''
 
 def p_params_1(p):
-    '''Params1 : SuperExpr Seen_Param_Call Params2'''
+    '''Params1 : SuperExpr Seen_Param_Call Clear_Dimensions Params2'''
     p[0] = p[1]
 
 def p_params_2(p):
@@ -255,6 +255,10 @@ def p_update_offset(p):
 def p_generate_dir(p):
     '''Generate_Dir : '''
     var = sem.get_variable(p[-3])
+
+    if(var[1][2][0] <= 0):
+        state.unresolved_vars[sem.scope][var[0]].append(len(state.quads))
+
     arr.generate_dir(var[1][1])  # Starting address
 
 def p_verify_limit(p):
@@ -262,8 +266,17 @@ def p_verify_limit(p):
     state.arr_current_dim += 1  # First position holds the array size in bytes
     index = state.operand_stack.pop()
     var = sem.get_variable(p[-4])
+
+    if(var[1][2][0] <= 0):
+        if(state.unresolved_vars.get(sem.scope) == None):
+            state.unresolved_vars[sem.scope] = {}
+        if(state.unresolved_vars[sem.scope].get(var[0]) == None):
+            state.unresolved_vars[sem.scope][var[0]] = []
+        state.unresolved_vars[sem.scope][var[0]].append(len(state.quads))
+
     arr.generate_verify(index, var[1][2][state.arr_current_dim] - 1)  # Gets dimension limits
     arr.generate_multiply_m(index, var[1][4][state.arr_current_dim - 1])  # Gets mn
+
     p[0] = p[-4]
 
 def p_check_char(p):
@@ -458,14 +471,25 @@ def p_seen_call_end(p):
 def p_seen_param_call(p):
     '''Seen_Param_Call : '''
     param = state.operand_stack.pop()
+    var = sem.get_variable(p[-1])
+    type = var[1][0]
     # Check if it's a dimentional parameter
-    if("[]" in param[1][0]):  # Checks if the parameter is an array
-        var = sem.func_table[state.current_call][2][state.param_counter]  # Gets variable to replace
+    if("[]" in type and "[]" in sem.func_table[state.current_call][1][state.param_counter]):  # Checks if the parameter is an array
+        arg = sem.func_table[state.current_call][2][state.param_counter]  # Gets variable to replace
         dir = max(map(lambda x: x[1][1] + x[1][2][0], sem.var_table[state.current_call].items()))  # Gets the last available address
-        sem.var_table[state.current_call][var][2] = param[1][2]  # Replace the size and dimensions of the variable with the passed parameter
-        sem.var_table[state.current_call][var][1] = dir  # Updates the starting address
+        sem.var_table[state.current_call][arg][1] = dir  # Updates the starting address
+        sem.var_table[state.current_call][arg][2] = [var[1][2][0] / max(sum(var[1][2][1:state.arr_current_dim + 1]), 1)] + var[1][2][state.arr_current_dim + 1:]  # Updates the size and dimensions of the variable with the passed parameter
+        sem.var_table[state.current_call][arg][4] = var[1][4][state.arr_current_dim:]  # Updates the m of each dimension
+    #if("[]" in param[1][0]):  # Checks if the parameter is an array
+    #    var = sem.func_table[state.current_call][2][state.param_counter]  # Gets variable to replace
+    #    dir = max(map(lambda x: x[1][1] + x[1][2][0], sem.var_table[state.current_call].items()))  # Gets the last available address
+    #    sem.var_table[state.current_call][var][1] = dir  # Updates the starting address
+    #    sem.var_table[state.current_call][var][2] = param[1][2]  # Updates the size and dimensions of the variable with the passed parameter
+    #    sem.var_table[state.current_call][var][4] = param[1][4]  # Updates the m of each dimension
     func.generate_param(param)
-    state.signature.append(param[1][0])
+    for x in range(0, state.arr_current_dim):
+        type = type[:-2]
+    state.signature.append(type)
 
 def p_seen_param_print(p):
     '''Seen_Param_Print : '''
@@ -660,8 +684,8 @@ def p_seen_local_variable_1(p):
         # Appends brackets to type for each dimension
         for dim in state.arr_dim:
             type += "[]"
-            dims.append(0)
-            m_list.append(0)
+            dims.append(-1)
+            m_list.append(-1)
         sem.fill_local_variables_table(p[-2], type, dims, m_list)  # Temporal values
         state.arr_dim = []
     else:
@@ -773,25 +797,37 @@ for okey in sem.var_table:
     for ikey in sem.var_table[okey].items():
         add_offset(ikey[1], state.g_offset, state.c_offset, state.l_offset)
 
-# Pass the starting stack address to the VM as the biggest function size plus the global and constant variables
-# Concatenates a list with 0 in it in case there's no functions
-func_max_size = max(map(lambda x: x[1][3], sem.func_table.items()) + [0])
-if(sem.var_table.get("main") != None):  # Main method has local variables declared
-    main_size = sum(map(lambda x: x[1][2][0], sem.var_table["main"].items()))  # [id, [type, address, [size, {dimensions}], scope]]
-else:  # Main has no local variables
-    main_size = 0
-state.stack_dir += state.global_dir + state.constant_dir + max(func_max_size, main_size)
-
 # Appends memory map to functions
 for func_name in sem.func_table:
     if(sem.var_table.get(func_name) != None and sem.var_table[func_name] != None):
-        sem.func_table[func_name].append(sorted(map(lambda x: [x[1][1], x[0]], sem.var_table[func_name].items())))
+        var_map = []
+        for id in sem.func_table[func_name][2]:
+            var = sem.var_table[func_name][id]
+            var_map.append([id, var[0], var[1], var[2][0]])  # [id, type, address, size (bytes)]
+            #var_map.append([sem.var_table[func_name][id][1], id, sem.var_table[func_name][id][2][0]])
+        sem.func_table[func_name].append(var_map)
+        #sem.func_table[func_name].append(map(lambda x: [x[1][1], x[0]], sem.var_table[func_name].items()))
 
 # Changes variables to memory addresses and adds temporal address offset
 for idx, quad in enumerate(state.quads):
     quad.transform(state.t_offset)
     #quad.add_offset(0, state.global_dir, 9000, 43000)
-    print idx, (quad.operator, quad.operand1, quad.operand2, quad.result)
+    #print idx, (quad.operator, quad.operand1, quad.operand2, quad.result)
+
+# Updates unresolved variables
+for func_name in state.unresolved_vars:
+    for var in state.unresolved_vars[func_name].items():
+        arr.update_quads(var[1][0], var[1][-1], sem.var_table[func_name][var[0]])
+    sem.func_table[func_name][4] = sum(map(lambda x: x[1][2][0], sem.var_table[func_name].items()))
+
+# Pass the starting stack address to the VM as the biggest function size plus the global and constant variables
+# Concatenates a list with 0 in it in case there's no functions
+func_max_size = max(map(lambda x: x[1][4], sem.func_table.items()) + [0])
+if(sem.var_table.get("main") != None):  # Main method has local variables declared
+    main_size = sum(map(lambda x: x[1][2][0], sem.var_table["main"].items()))  # [id, [type, address, [size, {dimensions}], scope]]
+else:  # Main has no local variables
+    main_size = 0
+state.stack_dir += state.global_dir + state.constant_dir + max(func_max_size, main_size)
 
 # Sorting function
 def swap(element):
@@ -818,9 +854,13 @@ with open("o.af", "wb") as out:
     obj = {
         "quads": state.quads,
         "functions": sem.func_table,
+        "vars": sem.var_table,
         "mem": mem_dict
     }
     pickle.dump(obj, out, -1)
+
+for idx, quad in enumerate(state.quads):
+    print idx, (quad.operator, quad.operand1, quad.operand2, quad.result)
 
 machine = vm.VirtualMachine("o.af", state.l_offset, state.stack_dir)
 machine.run()

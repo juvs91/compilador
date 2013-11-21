@@ -23,3 +23,17 @@ def generate_dir(d):
     state.temp_counter += 1
     state.quads.append(q)
     state.operand_stack.append(q.result)
+
+def update_quads(start, end, var):
+    v_dim = 1
+    m_dim = 0
+    for index in range(start, end + 1):
+        q = state.quads[index]
+        if(q.operator == "ver"):
+            q.result = var[2][v_dim] - 1
+            v_dim += 1
+        elif(q.operator == "mul"):
+            q.operand2 = var[4][m_dim]
+            m_dim += 1
+        elif(q.operator == "add"):
+            q.operand2 = var[1]
