@@ -1,7 +1,7 @@
 import cPickle as pickle
 
 class VirtualMachine:
-    def __init__(self, filename, local_address, stack_address):
+    def __init__(self, filename, local_address, stack_address, heap_address):
         self.instr_ptr = 0  # Current quad
         self.instr_ptr_stack = []  # Stack used when returning to previous instruction
         self.function_call_stack = []  # Stack of function calls
@@ -10,6 +10,7 @@ class VirtualMachine:
         self.local_dir_start = local_address  # Address to start the local variables
         self.stack_dir_start = stack_address  # Address to start the stack
         self.stack_dir = stack_address  # Next free address to start continue stack
+        self.heap_dir = heap_address  # Last used temporal address
         self.context = ["main", [], []]  # [function name, [stack begin, stack end], [{temporals list}]]
         # Loads the object code and initializes the virtual machine
         self.obj = self.load_obj(filename)
@@ -38,6 +39,8 @@ class VirtualMachine:
                 self.mem[copy_dir] = item  # Copies the memory address
                 self.mem[copy_dir + 4] = self.mem[item]  # Copies the value stored in that address
                 copy_dir += 8
+        if(copy_dir > self.heap_dir):
+            raise NameError("Stack buffer overflow")
         return copy_dir
 
     def restore_state(self):
@@ -170,6 +173,16 @@ class VirtualMachine:
                 self.instr_ptr = self.instr_ptr_stack.pop()
             else:
                 self.instr_ptr += 1
+
+            # Updates last temporal variable
+            self.heap_dir = min(filter(lambda x: x > self.stack_dir, self.mem.keys()) + [self.heap_dir])
+            # Check if heap and stack buffers collided
+            if(self.heap_dir < self.stack_dir):
+                raise NameError("Heap buffer overflow")
+            # Check if memory is full
+            if(min(self.mem.keys()) < 0 or self.heap_dir < self.stack_dir):
+                raise NameError("Not enough memory")
+
             quad = self.quads[self.instr_ptr]
             op = quad.operator
             op1 = quad.operand1
