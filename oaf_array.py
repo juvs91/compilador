@@ -37,3 +37,5 @@ def update_quads(start, end, var):
             m_dim += 1
         elif(q.operator == "add"):
             q.operand2 = var[1]
+            v_dim = 1
+            m_dim = 0

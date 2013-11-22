@@ -68,17 +68,17 @@ class VirtualMachine:
         # Initializes local variables
         self.mem_map = {}
         # Adds all the used addresses to the dictionary
-        for var in self.functions[func_name][5]:
+        for var in self.functions[func_name][5].items():
             # Check if variable is an array
-            if ("[]" in var[1]):
-                if (var[1][0] == "i" or var[1][0] == "f"):
+            if ("[]" in var[1][0]):
+                if (var[1][0][0] == "i" or var[1][0][0] == "f"):
                     step = 4
                 else:
                     step = 1
-                for x in range(0, var[3], step):
-                    self.mem_map[var[2] + x] = None
+                for x in range(0, var[1][2], step):
+                    self.mem_map[var[1][1] + x] = None
             else:
-                self.mem_map[var[2]] = None
+                self.mem_map[var[1][1]] = None
 
     def copy_mem(self):
         # Clears the local memory
@@ -100,6 +100,10 @@ class VirtualMachine:
             elif (op == "-"):
                 self.mem[res] = self.mem[op1] - self.mem[op2]
             elif (op == "*"):
+                if (isinstance(self.mem[op1], str) and self.mem[op1][0] == "*"):
+                    op1 = int(self.mem[op1][1:])
+                if (isinstance(self.mem[op2], str) and self.mem[op2][0] == "*"):
+                    op2 = int(self.mem[op2][1:])
                 self.mem[res] = self.mem[op1] * self.mem[op2]
             elif (op == "/"):
                 self.mem[res] = self.mem[op1] / self.mem[op2]
@@ -167,10 +171,10 @@ class VirtualMachine:
                 self.stack_dir = copy_dir
             if (op == "param"):
                 func_name = self.function_call_stack[-1][0]
-                # revisar este pedo
-                type = self.functions[func_name][5][res][1]
-                dir = self.functions[func_name][5][res][2]
-                size = self.functions[func_name][5][res][3]
+                var = self.functions[func_name][2][res]
+                type = self.functions[func_name][5][var][0]
+                dir = self.functions[func_name][5][var][1]
+                size = self.functions[func_name][5][var][2]
                 if (type[0] == "i" or type[0] == "f"):
                     bytes = 4
                 else:
@@ -180,7 +184,7 @@ class VirtualMachine:
                     op1 = int(self.mem[op1][1:])
                     # Copies the variables to local memory
                 for x in range(0, size, bytes):
-                    self.mem[dir + x] = self.mem[op1 + x]
+                    #self.mem[dir + x] = self.mem[op1 + x]
                     self.mem_map[dir + x] = self.mem[op1 + x]
                     # Removes already initialized variables
                     #self.mem_map.remove(dir + x)

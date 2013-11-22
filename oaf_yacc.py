@@ -793,11 +793,11 @@ for okey in sem.var_table:
 # Appends memory map to functions
 for func_name in sem.func_table:
     if(sem.var_table.get(func_name) != None and sem.var_table[func_name] != None):
-        var_map = []
+        var_map = {}
         # revisar este pedo
         for var in sem.var_table[func_name].items():
             #var = sem.var_table[func_name][id]
-            var_map.append([var[0], var[1][0], var[1][1], var[1][2][0]])  # [id, type, address, size (bytes)]
+            var_map[var[0]] = [var[1][0], var[1][1], var[1][2][0]]  # {id: [type, address, size (bytes)]}
             #sem.func_table[func_name][4] += var[2][0]
             #var_map.append([sem.var_table[func_name][id][1], id, sem.var_table[func_name][id][2][0]])
         sem.func_table[func_name].append(var_map)
@@ -830,10 +830,10 @@ def swap(element):
 
 # Initializes main method variables
 init_dict = {}
-for var in sem.func_table["main"][5]:
-    start = var[2]
-    end = start + var[3]
-    if(var[1][0] == "i" or var[1][0] == "f"):
+for var in sem.func_table["main"][5].items():
+    start = var[1][1]
+    end = start + var[1][2]
+    if(var[1][0][0] == "i" or var[1][0][0] == "f"):
         step = 4
     else:
         step = 1
