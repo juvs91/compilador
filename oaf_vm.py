@@ -1,7 +1,9 @@
 import cPickle as pickle
+import turtle
 
 class VirtualMachine:
     def __init__(self, filename, local_address, stack_address, heap_address):
+        self.color_list = []#the list of colors
         self.instr_ptr = 0  # Current quad
         self.instr_ptr_stack = []  # Stack used when returning to previous instruction
         self.function_call_stack = []  # Stack of function calls
@@ -16,10 +18,16 @@ class VirtualMachine:
         self.obj = self.load_obj(filename)
         self.quads = self.obj["quads"]
         self.functions = self.obj["functions"]
-        self.vars = self.obj["vars"]
         self.mem = self.obj["mem"]
+
         # List of memory addresses
-        self.mem_map = []
+        self.mem_map = {}
+        self.grafic_used = False  # variable to seet main loop if any grafic comands are used
+
+    def square(self, size):
+        for i in range(4):
+            turtle.fd(size)
+            turtle.rt(90)
 
     def load_obj(self, filename):
         f = open(filename, "rb")
@@ -32,50 +40,53 @@ class VirtualMachine:
         copy_dir = self.stack_dir
         for item in self.mem.items()[:]:
             # revisar este pedo
-            if(self.local_dir_start <= item[0] < self.stack_dir_start):
+            if (self.local_dir_start <= item[0] < self.stack_dir_start):
                 self.mem[copy_dir] = item[0]  # Copies the memory address
                 self.mem[copy_dir + 4] = item[1]  # Copies the value stored in that address
                 copy_dir += 8
         for item in temporals:
-            if(self.mem[item] != None):
+            if (self.mem[item] != None):
                 self.mem[copy_dir] = item  # Copies the memory address
                 self.mem[copy_dir + 4] = self.mem[item]  # Copies the value stored in that address
                 copy_dir += 8
-        if(copy_dir > self.heap_dir):
+        if (copy_dir > self.heap_dir):  # If addresses collide
             raise NameError("Stack buffer overflow")
         return copy_dir
 
     def restore_state(self):
         self.context = self.function_call_stack.pop()
         dirs = self.context[1]
-        if(dirs[0] >= 0):  # There's something to restore
+        if (dirs[0] >= 0):  # There's something to restore
             for i in range(dirs[0], dirs[1], 8):
                 self.mem[self.mem[i]] = self.mem[i + 4]
-                del(self.mem[i], self.mem[i + 4])
+                del (self.mem[i], self.mem[i + 4])
             return dirs[0]  # Something was restored
         else:
             return self.stack_dir  # Nothing was restored
 
     def init_func(self, func_name):
         # Initializes local variables
-        self.mem_map = []
+        self.mem_map = {}
+        # Adds all the used addresses to the dictionary
         for var in self.functions[func_name][5]:
             # Check if variable is an array
-            if("[]" in var[1]):
-                if(var[1][0] == "i" or var[1][0] == "f"):
+            if ("[]" in var[1]):
+                if (var[1][0] == "i" or var[1][0] == "f"):
                     step = 4
                 else:
                     step = 1
                 for x in range(0, var[3], step):
-                    self.mem_map.append(var[2] + x)
+                    self.mem_map[var[2] + x] = None
             else:
-                self.mem_map.append(var[2])
+                self.mem_map[var[2]] = None
 
     def copy_mem(self):
         # Clears the local memory
-        for dir in self.mem_map:
-            if(dir in self.mem):
-                del(self.mem[dir])
+        for dir in range(self.local_dir_start, self.stack_dir_start):
+            if (dir in self.mem):
+                del (self.mem[dir])
+        # Adds the variables to memory
+        self.mem.update(self.mem_map)
 
     def run(self):
         quad = self.quads[self.instr_ptr]
@@ -83,119 +94,175 @@ class VirtualMachine:
         op1 = quad.operand1
         op2 = quad.operand2
         res = quad.result
-        while(op != "end" or op1 != "main"):
-            if(op == "+"):
+        while (op != "end" or op1 != "main"):
+            if (op == "+"):
                 self.mem[res] = self.mem[op1] + self.mem[op2]
-            elif(op == "-"):
+            elif (op == "-"):
                 self.mem[res] = self.mem[op1] - self.mem[op2]
-            elif(op == "*"):
+            elif (op == "*"):
                 self.mem[res] = self.mem[op1] * self.mem[op2]
-            elif(op == "/"):
+            elif (op == "/"):
                 self.mem[res] = self.mem[op1] / self.mem[op2]
-            elif(op == "="):
+            elif (op == "="):
                 # Check if result is a pointer
-                if(self.mem.get(res) != None and isinstance(self.mem[res], str) and self.mem[res][0] == "*"):
+                if (self.mem.get(res) != None and isinstance(self.mem[res], str) and self.mem[res][0] == "*"):
                     res = int(self.mem[res][1:])
-                # Check if operand is a pointer
-                if(isinstance(self.mem[op1], str) and self.mem[op1][0] == "*"):
+                    # Check if operand is a pointer
+                if (isinstance(self.mem[op1], str) and self.mem[op1][0] == "*"):
                     op1 = int(self.mem[op1][1:])
                 self.mem[res] = self.mem[op1]
-            elif(op == ">"):
-                if(self.mem[op1] > self.mem[op2]):
+            elif (op == ">"):
+                if (self.mem[op1] > self.mem[op2]):
                     self.mem[res] = 1
                 else:
                     self.mem[res] = 0
-            elif(op == "<"):
-                if(self.mem[op1] < self.mem[op2]):
+            elif (op == "<"):
+                if (self.mem[op1] < self.mem[op2]):
                     self.mem[res] = 1
                 else:
                     self.mem[res] = 0
-            elif(op == "=="):
-                if(self.mem[op1] == self.mem[op2]):
+            elif (op == "=="):
+                if (self.mem[op1] == self.mem[op2]):
                     self.mem[res] = 1
                 else:
                     self.mem[res] = 0
-            elif(op == ">="):
-                if(self.mem[op1] >= self.mem[op2]):
+            elif (op == ">="):
+                if (self.mem[op1] >= self.mem[op2]):
                     self.mem[res] = 1
                 else:
                     self.mem[res] = 0
-            elif(op == "<="):
-                if(self.mem[op1] <= self.mem[op2]):
+            elif (op == "<="):
+                if (self.mem[op1] <= self.mem[op2]):
                     self.mem[res] = 1
                 else:
                     self.mem[res] = 0
-            elif(op == "return"):
+            elif (op == "return"):
                 self.return_value_stack.append(self.mem[op1])
 
             # Array operations
-            if(op == "ver"):
-                if(self.mem[op1] > res or self.mem[op1] < 0):
+            if (op == "ver"):
+                if (self.mem[op1] > res or self.mem[op1] < 0):
                     raise NameError("Array limits out of bounds")
-            elif(op == "add"):
+            elif (op == "add"):
                 self.mem[res] = "*" + str(self.mem[op1] + op2)
-            elif(op == "mul"):
+            elif (op == "mul"):
                 self.mem[res] = self.mem[op1] * op2
 
             # Function operations
-            if(op == "era"):
+            if (op == "era"):
                 self.context[0] = op1
                 self.init_func(op1)
                 # Checks if function returns a value
                 # if it returns assigns a memory address
-                if(res):
+                if (res):
                     self.mem[res] = None
                     self.return_dir_stack.append(res)
                     self.context[2].append(res)
                 copy_dir = self.save_state(self.context[2])  # Saves memory state and returns next free address
-                if(copy_dir == self.stack_dir):  # Function didn't save any variables
+                if (copy_dir == self.stack_dir):  # Function didn't save any variables
                     self.context[1] = [-1, -1]
                 else:  # Function saved variables in the stack
                     self.context[1] = [self.stack_dir, copy_dir - 4]
                 self.function_call_stack.append(self.context)
                 self.stack_dir = copy_dir
-            if(op == "param"):
+            if (op == "param"):
                 func_name = self.function_call_stack[-1][0]
                 # revisar este pedo
                 type = self.functions[func_name][5][res][1]
                 dir = self.functions[func_name][5][res][2]
                 size = self.functions[func_name][5][res][3]
-                if(type[0] == "i" or type[0] == "f"):
+                if (type[0] == "i" or type[0] == "f"):
                     bytes = 4
                 else:
                     bytes = 1
-                # Check if operand is a pointer
-                if(isinstance(self.mem[op1], str) and self.mem[op1][0] == "*"):
+                    # Check if operand is a pointer
+                if (isinstance(self.mem[op1], str) and self.mem[op1][0] == "*"):
                     op1 = int(self.mem[op1][1:])
-                # Copies the whole array to local memory
+                    # Copies the variables to local memory
                 for x in range(0, size, bytes):
                     self.mem[dir + x] = self.mem[op1 + x]
-                    self.mem_map.remove(dir + x)
+                    self.mem_map[dir + x] = self.mem[op1 + x]
+                    # Removes already initialized variables
+                    #self.mem_map.remove(dir + x)
 
             # Printing functions
-            if(op == "print"):
+            if (op == "print"):
                 # Check if operand is a pointer
-                if(isinstance(self.mem[op1], str) and self.mem[op1][0] == "*"):
+                if (isinstance(self.mem[op1], str) and self.mem[op1][0] == "*"):
                     op1 = int(self.mem[op1][1:])
                 print self.mem[op1]
+                #read a variable in a memory addres
+            if (op == "read"):
+            #if(op1 == "int"):
+                response = input("data:")
+                if (isinstance(response, int) and op1 != "int" ):
+                    raise NameError("Incompatible types '{0}' and '{1}'".format("int", op1))
+                if (isinstance(response, float) and op1 != "float"):
+                    raise NameError("Incompatible types '{0}' and '{1}'".format("float", op1))
+                if (isinstance(response, bool) and op1 != "bool"):
+                    raise NameError("Incompatible types '{0}' and '{1}'".format("bool", op1))
+                if (isinstance(response, str) and op1 != "char"):
+                    raise NameError("Incompatible types '{0}' and '{1}'".format("char", op1))
+                self.mem[res] = response
+
+                #all the grafic quads traductions
+            if (op == "circle"):
+                turtle.circle(self.mem[op1])
+                self.grafic_used = True
+            if (op == "fd"):
+                turtle.forward(self.mem[op1])
+                self.grafic_used = True
+            if (op == "rt"):
+                print "rt"
+                turtle.rt(self.mem[op1])
+                self.grafic_used = True
+            if (op == "square"):
+                print "square"
+                self.square(self.mem[op1])
+
+                self.grafic_used = True
+            if (op == "brush"):
+                print "brush"
+                turtle.pensize(self.mem[op1])
+                self.grafic_used = True
+            if (op == "arc"):
+                print "arc"
+
+                self.grafic_used = True
+            if (op == "pd"):
+                print "pd"
+                turtle.pd()
+                self.grafic_used = True
+            if (op == "pu"):
+                print "pu"
+                turtle.pu()
+                self.grafic_used = True
+            if (op == "color"):
+                self.color_list.append(self.mem[op2])
+                if (len(self.color_list) == 3):
+                    turtle.pencolor(self.color_list[0], self.color_list[1], self.color_list[2])
+                    self.grafic_used = True
+            if (op == "home"):
+                turtle.home()
 
             # Operators that change the instruction pointer
-            if(op == "goto"):
+            if (op == "goto"):
                 self.instr_ptr = res
-            elif(op == "gotoFalse"):
-                if(self.mem[op1] == 0):
+            elif (op == "gotoFalse"):
+                if (self.mem[op1] == 0):
                     self.instr_ptr = res
                 else:
                     self.instr_ptr += 1
-            elif(op == "gosub"):
+            elif (op == "gosub"):
                 self.context = [op1, [], []]
                 self.instr_ptr_stack.append(self.instr_ptr + 1)
                 self.instr_ptr = res
                 self.copy_mem()
-            elif(op == "end"):
+            elif (op == "end"):
                 self.stack_dir = self.restore_state()  # Reloads previous values and returns next free address
-                if(self.functions[op1][0][0] != "void"):  # Function returns a value
-                    self.mem[self.return_dir_stack.pop()] = self.return_value_stack.pop()  # Saves value returned by function
+                if (self.functions[op1][0][0] != "void"):  # Function returns a value
+                    self.mem[
+                        self.return_dir_stack.pop()] = self.return_value_stack.pop()  # Saves value returned by function
                 self.instr_ptr = self.instr_ptr_stack.pop()
             else:
                 self.instr_ptr += 1
@@ -203,10 +270,10 @@ class VirtualMachine:
             # Updates last temporal variable
             self.heap_dir = min(filter(lambda x: x > self.stack_dir, self.mem.keys()) + [self.heap_dir])
             # Check if heap and stack buffers collided
-            if(self.heap_dir < self.stack_dir):
+            if (self.heap_dir < self.stack_dir):
                 raise NameError("Heap buffer overflow")
-            # Check if memory is full
-            if(min(self.mem.keys()) < 0 or self.heap_dir < self.stack_dir):
+                # Check if memory is full
+            if (min(self.mem.keys()) < 0 or self.heap_dir < self.stack_dir):
                 raise NameError("Not enough memory")
 
             quad = self.quads[self.instr_ptr]
@@ -214,4 +281,6 @@ class VirtualMachine:
             op1 = quad.operand1
             op2 = quad.operand2
             res = quad.result
+        if (self.grafic_used):
+            turtle.mainloop()
         print "Program finished"

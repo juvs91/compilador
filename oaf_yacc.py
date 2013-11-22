@@ -294,7 +294,7 @@ def p_read(p):
 
 def p_generate_read(p):
     '''Generate_Read : '''
-    rw.read_quad(p[-3], p[-1], sem.scope)
+    rw.read_quad(p[-3], sem.get_variable(p[-1]))
 
 def p_type(p):
     '''Type : Primitive
@@ -312,11 +312,11 @@ def p_color(p):
     '''Color : COLOR LPAREN SuperExpr COMMA SuperExpr COMMA SuperExpr RPAREN Seen_Color'''
 
 def p_seen_color(p):
-	'''Seen_Color : '''   
-	blue = state.operand_stack.pop() 
-	green = state.operand_stack.pop()   
-	red = state.operand_stack.pop()      
-	gq.generate_color_quad(red,green,blue)
+    '''Seen_Color : '''
+    blue = state.operand_stack.pop()
+    green = state.operand_stack.pop()
+    red = state.operand_stack.pop()
+    gq.generate_color_quad(red,green,blue)
 
 def p_pendown(p):
     '''PenDown : PD LPAREN RPAREN Pen_Home'''
@@ -325,8 +325,8 @@ def p_penup(p):
     '''PenUp : PU LPAREN RPAREN Pen_Home'''  
 
 def p_pen_home(p):
-	'''Pen_Home : '''        
-	gq.generate_pen_home_quad(p[-3])
+    '''Pen_Home : '''
+    gq.generate_pen_home_quad(p[-3])
 
 def p_home(p):
     '''Home : HOME LPAREN RPAREN Pen_Home'''
@@ -335,9 +335,10 @@ def p_forward(p):
     '''Forward : FD LPAREN SuperExpr RPAREN Seen_grafic_operation_requieres_name_expr'''
 
 def p_seen_grafic_operation_requieres_name_expr(p):
-	'''Seen_grafic_operation_requieres_name_expr :''' 
-	gq.generate_draw_quad(p[-4],state.operand_stack.pop())
-    
+    '''Seen_grafic_operation_requieres_name_expr :'''
+    print p[-4]
+    gq.generate_draw_quad(p[-4],state.operand_stack.pop())
+
 
 
 def p_rotate(p):
@@ -352,10 +353,10 @@ def p_arc(p):
     '''Arc : ARC LPAREN SuperExpr COMMA SuperExpr RPAREN Seen_Arc'''
 
 def p_seen_arc(p):
-	'''Seen_Arc : '''    
-	p2 = state.operand_stack.pop()
-	p1 = state.operand_stack.pop()
-	gq.generate_arc_quad(p1,p2)
+    '''Seen_Arc : '''
+    p2 = state.operand_stack.pop()
+    p1 = state.operand_stack.pop()
+    gq.generate_arc_quad(p1,p2)
 
 
 def p_square(p):
@@ -862,7 +863,6 @@ with open("o.af", "wb") as out:
     obj = {
         "quads": state.quads,
         "functions": sem.func_table,
-        "vars": sem.var_table,
         "mem": mem_dict
     }
     pickle.dump(obj, out, -1)
