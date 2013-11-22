@@ -40,6 +40,7 @@ constant_dir = 0
 local_dir = 0
 temp_dir = 0
 stack_dir = 0
+special_dir = 0
 
 # Function signature
 signature = []
@@ -60,7 +61,7 @@ quads = []
 g_offset = 0      # Global
 c_offset = 0      # Constant
 l_offset = 0      # Local
-t_offset = 56000  # Temporal
+t_offset = 56000  # Temporal  
 
 def clear_stacks():
     global operator_stack, operand_stack, last_operator

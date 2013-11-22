@@ -27,8 +27,12 @@ class Quad:
             #    self.result = [res, [type, state.temp_dir, [size, 1], 's']]
             #else:
             #    self.result = [res, [type, state.temp_dir, [size, 1], 't']]
-            self.result = [res, [type, state.temp_dir, [size, 1], 't']]
-            state.temp_dir -= size
+            if(type == "color"):         
+               self.result = [res, [type, state.constant_dir, [size, 1], 't']]
+               state.constant_dir+= size
+            else:
+               self.result = [res, [type, state.temp_dir, [size, 1], 't']]
+               state.temp_dir -= size
 
     #def add_offset(self, g_offset, c_offset, l_offset, t_offset):
     #    if(isinstance(self.operand1, list)):

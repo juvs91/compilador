@@ -197,7 +197,7 @@ def p_arc(p):
     '''Arc : ARC LPAREN SuperExpr COMMA SuperExpr RPAREN'''
 
 def p_square(p):
-    '''Square : SQUARE LPAREN SuperExpr RPAREN'''
+	'''Square : SQUARE LPAREN SuperExpr RPAREN '''
 
 def p_param(p):
     '''Param : Primitive ID Array1 Update_Signature'''

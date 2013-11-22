@@ -9,12 +9,10 @@ def print_quad(printable):
     state.quads.append(q)
 
 def read_quad(type, var, scope):
-    print type, var, scope
-    if(type == sem.var_table[scope][var][0]):
-        q = quad.Quad()
-        q.set_quad("read", None, "t" + str(state.temp_counter), var)
+    if(type == var[1][0]):
+        q = quad.Quad()                    
+        q.set_quad("read",None,type, var)
         #state.operand_stack.append(q.result)
         state.quads.append(q)
-        state.temp_counter += 1
     else:
         print "error tipos incompatiblee"
