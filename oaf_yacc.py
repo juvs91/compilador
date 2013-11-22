@@ -89,7 +89,7 @@ def p_block(p):
     '''Block : LBRACE Instruction RBRACE'''
 
 def p_fblock(p):
-    '''FBlock : LBRACE Local_Declaration Update_Function_Size Instruction RBRACE'''
+    '''FBlock : LBRACE Local_Declaration Instruction RBRACE'''
 
 def p_conditional(p):
     '''Conditional : IF LPAREN SuperExpr RPAREN Push_Label_Stack Block Else'''
@@ -256,6 +256,7 @@ def p_generate_dir(p):
     '''Generate_Dir : '''
     var = sem.get_variable(p[-3])
 
+    # If size is zero variable is unresolved
     if(var[1][2][0] <= 0):
         state.unresolved_vars[sem.scope][var[0]].append(len(state.quads))
 
@@ -511,9 +512,8 @@ def p_seen_function_end(p):
     '''Seen_Function_End : '''
     func_name = p[-7]
     func.generate_end(func_name)
-    # Appends the function size
-    sem.func_table[func_name].append(state.f_size)
-    state.f_size = 0
+    # Appends the function size (temporal value)
+    sem.func_table[func_name].append(-1)
 
 def p_seen_return_function(p):
     '''Seen_Return_Function : '''
@@ -526,9 +526,8 @@ def p_seen_return_function_end(p):
     '''Seen_Return_Function_End : '''
     func_name = p[-7]
     func.generate_end(func_name)
-    # Appends the function size
-    sem.func_table[func_name].append(state.f_size)
-    state.f_size = 0
+    # Appends the function size (temporal value)
+    sem.func_table[func_name].append(-1)
 
 def p_seen_program(p):
     '''Seen_Program : '''
@@ -541,12 +540,8 @@ def p_seen_program_end(p):
 def p_seen_main(p):
     '''Seen_Main : '''
     state.local_dir = 0
+    sem.func_table["main"][3] = len(state.quads)
     main.update_goto(len(state.quads))
-
-def p_update_function_size(p):
-    '''Update_Function_Size : '''
-    if(sem.var_table.get(p[-7]) != None):
-        state.f_size = sum(map(lambda x: x[1][2][0], sem.var_table[p[-7]].items()))
 
 def p_check_signature(p):
     '''Check_Signature : '''
@@ -779,8 +774,8 @@ with open(raw_input('filename > '), 'r') as f:
     input = f.read()
     preparsing = f_parser.parse(input, 0, 0)
     result = parser.parse(input, 0, 0)
-    for idx, quad in enumerate(state.quads):
-        print idx, (quad.operator, quad.operand1, quad.operand2, quad.result)
+    #for idx, quad in enumerate(state.quads):
+    #    print idx, (quad.operator, quad.operand1, quad.operand2, quad.result)
 
 def add_offset(lst, g_offset, c_offset, l_offset):
     if(lst[3] == 'g'):
@@ -801,51 +796,64 @@ for okey in sem.var_table:
 for func_name in sem.func_table:
     if(sem.var_table.get(func_name) != None and sem.var_table[func_name] != None):
         var_map = []
-        for id in sem.func_table[func_name][2]:
-            var = sem.var_table[func_name][id]
-            var_map.append([id, var[0], var[1], var[2][0]])  # [id, type, address, size (bytes)]
+        # revisar este pedo
+        for var in sem.var_table[func_name].items():
+            #var = sem.var_table[func_name][id]
+            var_map.append([var[0], var[1][0], var[1][1], var[1][2][0]])  # [id, type, address, size (bytes)]
+            #sem.func_table[func_name][4] += var[2][0]
             #var_map.append([sem.var_table[func_name][id][1], id, sem.var_table[func_name][id][2][0]])
         sem.func_table[func_name].append(var_map)
+        sem.func_table[func_name][4] = sum(map(lambda x: x[1][2][0], sem.var_table[func_name].items()))
         #sem.func_table[func_name].append(map(lambda x: [x[1][1], x[0]], sem.var_table[func_name].items()))
 
 # Changes variables to memory addresses and adds temporal address offset
 for idx, quad in enumerate(state.quads):
-    quad.transform(state.t_offset)
+    quad.transform(state.t_offset, state.l_offset)
     #quad.add_offset(0, state.global_dir, 9000, 43000)
     #print idx, (quad.operator, quad.operand1, quad.operand2, quad.result)
 
+# revisar este pedo
 # Updates unresolved variables
 for func_name in state.unresolved_vars:
     for var in state.unresolved_vars[func_name].items():
         arr.update_quads(var[1][0], var[1][-1], sem.var_table[func_name][var[0]])
-    sem.func_table[func_name][4] = sum(map(lambda x: x[1][2][0], sem.var_table[func_name].items()))
 
 # Pass the starting stack address to the VM as the biggest function size plus the global and constant variables
-# Concatenates a list with 0 in it in case there's no functions
-func_max_size = max(map(lambda x: x[1][4], sem.func_table.items()) + [0])
-if(sem.var_table.get("main") != None):  # Main method has local variables declared
-    main_size = sum(map(lambda x: x[1][2][0], sem.var_table["main"].items()))  # [id, [type, address, [size, {dimensions}], scope]]
-else:  # Main has no local variables
-    main_size = 0
-state.stack_dir += state.global_dir + state.constant_dir + max(func_max_size, main_size)
+func_max_size = max(map(lambda x: x[1][4], sem.func_table.items()))
+#if(sem.var_table.get("main") != None):  # Main method has local variables declared
+#    main_size = sum(map(lambda x: x[1][2][0], sem.var_table["main"].items()))  # [id, [type, address, [size, {dimensions}], scope]]
+#else:  # Main has no local variables
+#    main_size = 0
+state.stack_dir += state.global_dir + state.constant_dir + func_max_size
 
 # Sorting function
 def swap(element):
     return element[1][1], element[0]
 
-# Initializes arrays with None (null)
-init_dict = {}  # Dictionary that holds arrays initializations [dir, value]
-for scope in sem.var_table:
-    for var in sem.var_table[scope].items():
-        if("[]" in var[1][0]):
-            start = var[1][1]
-            end = start + var[1][2][0]
-            if(var[1][0][0] == "i" or var[1][0][0] == "f"):
-                step = 4
-            else:
-                step = 1
-            for dir in range(start, end, step):
-                init_dict[dir] = None
+# Initializes main method variables
+init_dict = {}
+for var in sem.func_table["main"][5]:
+    start = var[2]
+    end = start + var[3]
+    if(var[1][0] == "i" or var[1][0] == "f"):
+        step = 4
+    else:
+        step = 1
+    for dir in range(start, end, step):
+        init_dict[dir] = None
+
+#init_dict = {}  # Dictionary that holds arrays initializations [dir, value]
+#for scope in sem.var_table:
+#    for var in sem.var_table[scope].items():
+#        if("[]" in var[1][0]):
+#            start = var[1][1]
+#            end = start + var[1][2][0]
+#            if(var[1][0][0] == "i" or var[1][0][0] == "f"):
+#                step = 4
+#            else:
+#                step = 1
+#            for dir in range(start, end, step):
+#                init_dict[dir] = None
 # Appends other variables to the same dictionary
 mem_dict = dict(map(swap, sem.var_table[sem.global_str].items()) + map(swap, sem.var_table[sem.constant_str].items()))
 mem_dict.update(init_dict)
@@ -858,9 +866,6 @@ with open("o.af", "wb") as out:
         "mem": mem_dict
     }
     pickle.dump(obj, out, -1)
-
-for idx, quad in enumerate(state.quads):
-    print idx, (quad.operator, quad.operand1, quad.operand2, quad.result)
 
 machine = vm.VirtualMachine("o.af", state.l_offset, state.stack_dir, state.t_offset)
 machine.run()

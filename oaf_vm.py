@@ -18,6 +18,8 @@ class VirtualMachine:
         self.functions = self.obj["functions"]
         self.vars = self.obj["vars"]
         self.mem = self.obj["mem"]
+        # List of memory addresses
+        self.mem_map = []
 
     def load_obj(self, filename):
         f = open(filename, "rb")
@@ -53,6 +55,27 @@ class VirtualMachine:
             return dirs[0]  # Something was restored
         else:
             return self.stack_dir  # Nothing was restored
+
+    def init_func(self, func_name):
+        # Initializes local variables
+        self.mem_map = []
+        for var in self.functions[func_name][5]:
+            # Check if variable is an array
+            if("[]" in var[1]):
+                if(var[1][0] == "i" or var[1][0] == "f"):
+                    step = 4
+                else:
+                    step = 1
+                for x in range(0, var[3], step):
+                    self.mem_map.append(var[2] + x)
+            else:
+                self.mem_map.append(var[2])
+
+    def copy_mem(self):
+        # Clears the local memory
+        for dir in self.mem_map:
+            if(dir in self.mem):
+                del(self.mem[dir])
 
     def run(self):
         quad = self.quads[self.instr_ptr]
@@ -117,6 +140,7 @@ class VirtualMachine:
             # Function operations
             if(op == "era"):
                 self.context[0] = op1
+                self.init_func(op1)
                 # Checks if function returns a value
                 # if it returns assigns a memory address
                 if(res):
@@ -146,6 +170,7 @@ class VirtualMachine:
                 # Copies the whole array to local memory
                 for x in range(0, size, bytes):
                     self.mem[dir + x] = self.mem[op1 + x]
+                    self.mem_map.remove(dir + x)
 
             # Printing functions
             if(op == "print"):
@@ -166,6 +191,7 @@ class VirtualMachine:
                 self.context = [op1, [], []]
                 self.instr_ptr_stack.append(self.instr_ptr + 1)
                 self.instr_ptr = res
+                self.copy_mem()
             elif(op == "end"):
                 self.stack_dir = self.restore_state()  # Reloads previous values and returns next free address
                 if(self.functions[op1][0][0] != "void"):  # Function returns a value
