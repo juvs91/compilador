@@ -293,7 +293,7 @@ def p_read(p):
 
 def p_generate_read(p):
     '''Generate_Read : '''
-    rw.read_quad(p[-3], p[-1], sem.scope)
+    rw.read_quad(p[-3], sem.get_variable(p[-1]), sem.scope)
 
 def p_type(p):
     '''Type : Primitive
@@ -334,7 +334,8 @@ def p_forward(p):
     '''Forward : FD LPAREN SuperExpr RPAREN Seen_grafic_operation_requieres_name_expr'''
 
 def p_seen_grafic_operation_requieres_name_expr(p):
-	'''Seen_grafic_operation_requieres_name_expr :''' 
+	'''Seen_grafic_operation_requieres_name_expr :'''
+	print p[-4] 
 	gq.generate_draw_quad(p[-4],state.operand_stack.pop())
     
 
@@ -358,8 +359,8 @@ def p_seen_arc(p):
 
 
 def p_square(p):
-    '''Square : SQUARE LPAREN SuperExpr RPAREN Seen_grafic_operation_requieres_name_expr'''
-
+	'''Square : SQUARE LPAREN SuperExpr RPAREN Seen_grafic_operation_requieres_name_expr'''
+	
 def p_param(p):
     '''Param : Primitive ID Array1 Seen_Local_Variable1'''
 
@@ -779,8 +780,8 @@ with open(raw_input('filename > '), 'r') as f:
     input = f.read()
     preparsing = f_parser.parse(input, 0, 0)
     result = parser.parse(input, 0, 0)
-    for idx, quad in enumerate(state.quads):
-        print idx, (quad.operator, quad.operand1, quad.operand2, quad.result)
+    #for idx, quad in enumerate(state.quads):
+    #    print idx, (quad.operator, quad.operand1, quad.operand2, quad.result)
 
 def add_offset(lst, g_offset, c_offset, l_offset):
     if(lst[3] == 'g'):

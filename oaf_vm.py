@@ -1,7 +1,9 @@
-import cPickle as pickle
+import cPickle as pickle 
+import turtle
 
 class VirtualMachine:
-    def __init__(self, filename, local_address, stack_address):
+    def __init__(self, filename, local_address, stack_address):  
+        self.color_list=[]#the list of colors
         self.instr_ptr = 0  # Current quad
         self.instr_ptr_stack = []  # Stack used when returning to previous instruction
         self.function_call_stack = []  # Stack of function calls
@@ -17,6 +19,12 @@ class VirtualMachine:
         self.functions = self.obj["functions"]
         self.vars = self.obj["vars"]
         self.mem = self.obj["mem"]
+        self.grafic_used = False # variable to seet main loop if any grafic comands are used 
+    
+    def square(self,size):
+        for i in range(4):
+           turtle.fd(size)
+           turtle.rt(90)
 
     def load_obj(self, filename):
         f = open(filename, "rb")
@@ -149,8 +157,61 @@ class VirtualMachine:
                 # Check if operand is a pointer
                 if(isinstance(self.mem[op1], str) and self.mem[op1][0] == "*"):
                     op1 = int(self.mem[op1][1:])
-                print self.mem[op1]
+                print self.mem[op1]  
+            #read a variable in a memory addres
+            if(op == "read"):
+                #if(op1 == "int"):
+               response = input("data:")
+               if(isinstance(response,int) and op1 != "int" ):
+                  raise NameError("Incompatible types '{0}' and '{1}'".format("int", op1))
+               if(isinstance(response,float) and op1 != "float"):
+                  raise NameError("Incompatible types '{0}' and '{1}'".format("float", op1))
+               if(isinstance(response,bool) and op1 != "bool"):
+                  raise NameError("Incompatible types '{0}' and '{1}'".format("bool", op1))
+               if(isinstance(response,str) and op1 != "char"):
+                  raise NameError("Incompatible types '{0}' and '{1}'".format("char", op1))
+               self.mem[res] = response
+                
+             #all the grafic quads traductions
+            if(op == "circle"):
+                turtle.circle(self.mem[op1])  
+                self.grafic_used = True
+            if(op == "fd"):               
+                turtle.forward(self.mem[op1])
+                self.grafic_used = True   
+            if(op == "rt"):
+                print "rt"
+                turtle.rt(self.mem[op1])
+                self.grafic_used = True
+            if(op == "square"):
+                print "square"
+                self.square(self.mem[op1])
 
+                self.grafic_used = True 
+            if(op == "brush"):
+                print "brush"
+                turtle.pensize(self.mem[op1])
+                self.grafic_used = True 
+            if(op == "arc"):
+                print "arc"
+
+                self.grafic_used = True
+            if(op == "pd"):
+                print "pd"  
+                turtle.pd()
+                self.grafic_used = True
+            if(op == "pu"):
+                print "pu"
+                turtle.pu()
+                self.grafic_used = True
+            if(op == "color"):
+                self.color_list.append(self.mem[op2])
+                if(len(self.color_list) == 3):
+                   turtle.pencolor(self.color_list[0],self.color_list[1],self.color_list[2])
+                   self.grafic_used = True
+            if(op == "home"):
+                turtle.home()
+    
             # Operators that change the instruction pointer
             if(op == "goto"):
                 self.instr_ptr = res
@@ -174,5 +235,7 @@ class VirtualMachine:
             op = quad.operator
             op1 = quad.operand1
             op2 = quad.operand2
-            res = quad.result
+            res = quad.result   
+        if(self.grafic_used):
+            turtle.mainloop()
         print "Program finished"
