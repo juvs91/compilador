@@ -863,7 +863,7 @@ with open("o.af", "wb") as out:
 for idx, quad in enumerate(state.quads):
     print idx, (quad.operator, quad.operand1, quad.operand2, quad.result)
 
-machine = vm.VirtualMachine("o.af", state.l_offset, state.stack_dir)
+machine = vm.VirtualMachine("o.af", state.l_offset, state.stack_dir, state.t_offset)
 machine.run()
 
 #target.write(str(vm.vm))
