@@ -316,16 +316,13 @@ def p_term_error(p):
 # Error rule for syntax errors
 def p_error(p):
     try:
-        print("Syntax error at line {0} col {1}, unexpected '{2}'".format(p.lineno, find_column(input, p), p.value))
+        raise NameError("Syntax error at line {0} col {1}, unexpected '{2}'".format(p.lineno, find_column(input, p), p.value))
     except:
-        print("Preparser syntax error")
+        raise NameError("Preparser syntax error")
     lexer.push_state("err")
-    #print(tok, p.type)
-    #print(p)
     if(p):
         lexer.pop_state()
         if(p.type == 'SEMI'):
-            print("in$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
             while(True):
                 tok = lexer.token()
                 if(tok.type != 'ASCII'):
@@ -334,7 +331,7 @@ def p_error(p):
                 else:
                     break
     else:
-        print("Abrupt file termination")
+        raise NameError("Abrupt file termination")
 
 # Build the parser
 parser = yacc.yacc(tabmodule="preparser")
