@@ -46,8 +46,6 @@ special_dir = 0
 signature = []
 # List of al the parameters
 f_param_list = []
-# Function size(bytes)
-f_size = 0
 
 # Param counter
 param_counter = 0

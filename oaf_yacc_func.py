@@ -16,7 +16,7 @@ def p_program(p):
     '''Program : Declaration Function Main'''
 
 def p_main(p):
-    '''Main : MAIN LPAREN RPAREN FBlock'''
+    '''Main : MAIN LPAREN RPAREN Seen_Main FBlock'''
 
 def p_declaration(p):
     '''Declaration : Primitive ID Declaration1
@@ -144,7 +144,7 @@ def p_loop(p):
     '''Loop : LOOP LPAREN SuperExpr RPAREN Block'''
 
 def p_assign(p):
-    '''Assign : ID Array EQUAL Assign1'''
+    '''Assign : ID Array2 EQUAL Assign1'''
 
 def p_assign_1(p):
     '''Assign1 : SuperExpr
@@ -273,6 +273,11 @@ def p_seen_function(p):
     sem.fill_symbol_table_function(p[-4], [[p[-5]], state.signature, state.f_param_list])
     state.f_param_list = []
     state.signature = []
+
+def p_seen_main(p):
+    '''Seen_Main : '''
+    # Main has no signature, parameters, or return type
+    sem.fill_symbol_table_function(p[-3], [[], [], [], 0, 0])
 
 def p_update_signature_size(p):
     '''Update_Signature : '''

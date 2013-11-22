@@ -17,6 +17,7 @@ class Quad:
                 res[1][0] = sem.get_type(op, op1, res)
             self.result = res
         else:
+
             type = sem.get_type(op, op1, op2)
             if(type[0] == "i" or type[0] == "f"):
                 size = 4
@@ -66,7 +67,7 @@ class Quad:
     #            self.result[1][1] += t_offset
 
     # Transforms variables to memory addresses
-    def transform(self, t_offset):
+    def transform(self, t_offset, l_offset):
         if(isinstance(self.operand1, list)):
             if(self.operand1[1][3] == 'g'):
                 self.operand1 = self.operand1[1][1]
@@ -102,3 +103,6 @@ class Quad:
                 self.result = self.result[1][1] + t_offset
             elif(self.result[1][3] == 's'):
                 self.result = self.result[0]
+
+        if(self.operator == "add"):
+            self.operand2 += l_offset
