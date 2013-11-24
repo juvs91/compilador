@@ -96,6 +96,10 @@ class VirtualMachine:
         res = quad.result
         while (op != "end" or op1 != "main"):
             if (op == "+"):
+                if (isinstance(self.mem[op1], str) and self.mem[op1][0] == "*"):
+                    op1 = int(self.mem[op1][1:])
+                if (isinstance(self.mem[op2], str) and self.mem[op2][0] == "*"):
+                    op2 = int(self.mem[op2][1:])
                 self.mem[res] = self.mem[op1] + self.mem[op2]
             elif (op == "-"):
                 self.mem[res] = self.mem[op1] - self.mem[op2]

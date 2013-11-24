@@ -161,17 +161,35 @@ def p_factor(p):
 
 def p_factor_1(p):
     '''Factor1 : Factor2
-               | Factor3'''
+               | Constant'''
     p[0] = p[1]
 
 def p_factor_2(p):
-    '''Factor2 : MINUS Seen_Unary_Operator Factor3 Gen_Quad0
-               | PLUS Seen_Unary_Operator Factor3 Gen_Quad0'''
+    '''Factor2 : MINUS Seen_Unary_Operator Constant Gen_Quad0
+               | PLUS Seen_Unary_Operator Constant Gen_Quad0'''
     p[0] = p[3]
 
-def p_factor_3(p):
-    '''Factor3 : Constant
-               | Call'''
+#def p_factor_3(p):
+#    '''Factor3 : Constant
+#               | Call'''
+#    p[0] = p[1]
+
+def p_constant(p):
+    '''Constant : ID Constant1
+                | FCONST Seen_Float
+                | ICONST Seen_Int
+                | CCONST Seen_Char
+                | Constant2 Seen_Bool'''
+    p[0] = p[1]
+
+def p_constant_1(p):
+    '''Constant1 : Array2
+                 | Call'''
+    p[0] = p[1]
+
+def p_constant_2(p):
+    '''Constant2 : TRUE
+                 | FALSE'''
     p[0] = p[1]
 
 # revisar este pedo
@@ -213,20 +231,33 @@ def p_go_back_to_validate(p):
     il.generate_loop_goto(state.label_stack.pop())
     state.label_stack.append(temp)
 
+def p_call_assign(p):
+    '''Call_Assign : ID Call_Assign1'''
+    p[0] = p[1]
+
+def p_call_assign_1(p):
+    '''Call_Assign1 : Assign
+                    | Call'''
+    p[0] = p[-1]
 
 def p_assign(p):
-    '''Assign : ID Array2 Seen_Operand1 EQUAL Seen_Operator Assign1 Clear_Dimensions'''
+    '''Assign : Clear_Assign Assign1 Check_Assign'''
+    p[0] = p[-1]
 
 def p_assign_1(p):
-    '''Assign1 : SuperExpr Gen_Quad5
+    '''Assign1 : Array2 Seen_Operand1 EQUAL Seen_Operator Assign2 Clear_Dimensions'''
+
+def p_assign_2(p):
+    '''Assign2 : SuperExpr Gen_Quad5
                | STRING Check_Char Seen_Char_Operand Gen_Quad5'''
 
 def p_array_2(p):
-    '''Array2 : Array3 Update_Offset Generate_Dir
+    '''Array2 : Clear_Current_Dimension Array3 Update_Offset Generate_Dir
               | empty'''
 
 def p_array_3(p):
     '''Array3 : LBRACKET SuperExpr RBRACKET Verify_Limit Array4'''
+    p[0] = p[-1]
 
 def p_array_4(p):
     '''Array4 : LBRACKET SuperExpr RBRACKET Verify_Limit Array4
@@ -236,6 +267,25 @@ def p_clear_dimensions(p):
     '''Clear_Dimensions : '''
     state.arr_current_dim = 0
     state.arr_dim_stack = []
+
+def p_clear_current_dimension(p):
+    '''Clear_Current_Dimension : '''
+    expr.add_operator("#")
+    state.arr_current_dim = 0
+    p[0] = p[-1]
+
+def p_clear_assign(p):
+    '''Clear_Assign : '''
+    state.assign_list = []
+    state.arr_current_dim = 0
+    state.arr_dim_stack = []
+    p[0] = p[-1]
+
+def p_check_assign(p):
+    '''Check_Assign : '''
+    if(not all(e == state.assign_list[0] for e in state.assign_list)):
+        raise NameError("Incompatible assignment type.")
+    state.assign_list = []
 
 def p_update_offset(p):
     '''Update_Offset : '''
@@ -255,12 +305,13 @@ def p_update_offset(p):
 def p_generate_dir(p):
     '''Generate_Dir : '''
     var = sem.get_variable(p[-3])
-
     # If size is zero variable is unresolved
     if(var[1][2][0] <= 0):
         state.unresolved_vars[sem.scope][var[0]].append(len(state.quads))
-
     arr.generate_dir(var[1][1])  # Starting address
+    state.assign_list.append(var[1][0][:-2 * state.arr_current_dim])
+    state.arr_dim_stack.append(state.arr_current_dim)
+    expr.pop_operator()
 
 def p_verify_limit(p):
     '''Verify_Limit : '''
@@ -286,7 +337,7 @@ def p_check_char(p):
 
 
 def p_call(p):
-    '''Call : ID LPAREN Seen_Call Params RPAREN Check_Signature Seen_Call_End'''
+    '''Call : LPAREN Seen_Call Params RPAREN Check_Signature Seen_Call_End'''
     p[0] = p[1]
 
 def p_read(p):
@@ -396,8 +447,7 @@ def p_instruction(p):
 def p_instruction_1(p):
     '''Instruction1 : Loop
                     | Conditional
-                    | Assign
-                    | Call
+                    | Call_Assign
                     | Brush
                     | Read
                     | Print
@@ -425,20 +475,6 @@ def p_return(p):
 def p_rtype(p):
     '''RType : SuperExpr
              | empty'''
-    p[0] = p[1]
-
-
-def p_constant(p):
-    '''Constant : ID Array2
-                | FCONST Seen_Float
-                | ICONST Seen_Int
-                | CCONST Seen_Char
-                | Constant1 Seen_Bool'''
-    p[0] = p[1]
-
-def p_constant_1(p):
-    '''Constant1 : TRUE
-                 | FALSE'''
     p[0] = p[1]
 
 def p_seen_char_operand(p):
@@ -482,12 +518,6 @@ def p_seen_param_call(p):
         sem.var_table[state.current_call][arg][1] = dir  # Updates the starting address
         sem.var_table[state.current_call][arg][2] = [var[1][2][0] / max(sum(var[1][2][1:state.arr_current_dim + 1]), 1)] + var[1][2][state.arr_current_dim + 1:]  # Updates the size and dimensions of the variable with the passed parameter
         sem.var_table[state.current_call][arg][4] = var[1][4][state.arr_current_dim:]  # Updates the m of each dimension
-    #if("[]" in param[1][0]):  # Checks if the parameter is an array
-    #    var = sem.func_table[state.current_call][2][state.param_counter]  # Gets variable to replace
-    #    dir = max(map(lambda x: x[1][1] + x[1][2][0], sem.var_table[state.current_call].items()))  # Gets the last available address
-    #    sem.var_table[state.current_call][var][1] = dir  # Updates the starting address
-    #    sem.var_table[state.current_call][var][2] = param[1][2]  # Updates the size and dimensions of the variable with the passed parameter
-    #    sem.var_table[state.current_call][var][4] = param[1][4]  # Updates the m of each dimension
     func.generate_param(param)
     for x in range(0, state.arr_current_dim):
         type = type[:-2]
@@ -554,9 +584,9 @@ def p_seen_operand(p):
     if(sem.is_declared(p[-1])):
         var = sem.get_variable(p[-1])
         if(state.arr_current_dim == 0 or "[]" not in var[1][0]):
-            expr.add_operand(sem.get_variable(p[-1]))
-    #state.arr_dim_stack.append(state.arr_current_dim)  # Saves first parameter's dimensions
-    #state.arr_current_dim = 0  # Resets the counter for the next parameter
+            expr.add_operand(var)
+            if(len(state.operator_stack) > 0 and state.operator_stack[-1] != "#"):
+                state.assign_list.append(var[1][0])
 
 def p_seen_operand_1(p):
     '''Seen_Operand1 : '''
@@ -564,14 +594,7 @@ def p_seen_operand_1(p):
         var = sem.get_variable(p[-2])
         if(state.arr_current_dim == 0 or "[]" not in var[1][0]):
             expr.add_operand(sem.get_variable(p[-2]))
-    state.arr_dim_stack.append(state.arr_current_dim)  # Saves first parameter's dimensions
-    state.arr_current_dim = 0  # Resets the counter for the next parameter
-        #var = sem.get_variable(p[-2])
-        #if("[]" not in var[1][0]):  # Variable is not an array
-        #    expr.add_operand(sem.get_variable(p[-2]))
-        #    # revisar este pedo
-        #elif(state.arr_current_dim == 0):
-        #    expr.add_operand(sem.get_variable(p[-2]))
+            state.assign_list.append(var[1][0])
 
 def p_seen_unary_operator(p):
     '''Seen_Unary_Operator : '''
@@ -722,34 +745,35 @@ def p_empty(p):
     pass
 
 # Error rules for productions
-def p_program_error(p):
-    '''Program : ASCII Program'''
-
-def p_block_error(p):
-    '''Block : LBRACE error RBRACE'''
-
-def p_fblock_error(p):
-    '''FBlock : LBRACE Local_Declaration error RBRACE'''
-
-def p_circle_error(p):
-    '''Circle : CIRCLE LPAREN error RPAREN'''
-    print("Missing parameter(s)")
-
-def p_superexpr_error(p):
-    '''SuperExpr : Expression error SuperExpr1'''
-    print("Malformed expression")
-
-def p_term_error(p):
-    '''Term1 : DIVIDE error Term
-             | TIMES error Term'''
-    print("Malformed expression")
+#def p_program_error(p):
+#    '''Program : ASCII Program'''
+#
+#def p_block_error(p):
+#    '''Block : LBRACE error RBRACE'''
+#
+#def p_fblock_error(p):
+#    '''FBlock : LBRACE Local_Declaration error RBRACE'''
+#
+#def p_circle_error(p):
+#    '''Circle : CIRCLE LPAREN error RPAREN'''
+#    print("Missing parameter(s)")
+#
+#def p_superexpr_error(p):
+#    '''SuperExpr : Expression error SuperExpr1'''
+#    print("Malformed expression")
+#
+#def p_term_error(p):
+#    '''Term1 : DIVIDE error Term
+#             | TIMES error Term'''
+#    print("Malformed expression")
 
 # Error rule for syntax errors
 def p_error(p):
-    try:
-        raise NameError("Syntax error at line {0} col {1}, unexpected '{2}'".format(p.lineno, find_column(input, p), p.value))
-    except:
-        raise NameError("Syntax error")
+    raise NameError("Syntax error at line {0} col {1}, unexpected '{2}'".format(p.lineno, find_column(input, p), p.value))
+    #try:
+    #    raise NameError("Syntax error at line {0} col {1}, unexpected '{2}'".format(p.lineno, find_column(input, p), p.value))
+    #except:
+    #    raise NameError("Syntax error")
     lexer.push_state("err")
     if(p):
         lexer.pop_state()

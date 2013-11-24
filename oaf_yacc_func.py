@@ -315,21 +315,8 @@ def p_term_error(p):
 
 # Error rule for syntax errors
 def p_error(p):
-    try:
-        raise NameError("Syntax error at line {0} col {1}, unexpected '{2}'".format(p.lineno, find_column(input, p), p.value))
-    except:
-        raise NameError("Preparser syntax error")
-    lexer.push_state("err")
     if(p):
-        lexer.pop_state()
-        if(p.type == 'SEMI'):
-            while(True):
-                tok = lexer.token()
-                if(tok.type != 'ASCII'):
-                    yacc.errok()
-                    return(tok)
-                else:
-                    break
+        raise NameError("Syntax error at line {0} col {1}, unexpected '{2}'".format(p.lineno, find_column(lexer.lexdata, p), p.value))
     else:
         raise NameError("Abrupt file termination")
 
