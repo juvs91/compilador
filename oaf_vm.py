@@ -207,7 +207,11 @@ class VirtualMachine:
 
             # Printing functions
             if (op == "print"):
-                print self.mem[op1]
+                # Parameter is a string
+                if(isinstance(op1, str) and op1[0] == '"'):
+                    print op1[1:-1]
+                else:
+                    print self.mem[op1]
                 #read a variable in a memory addres
             if (op == "read"):
             #if(op1 == "int"):
@@ -290,7 +294,7 @@ class VirtualMachine:
             if (self.heap_dir < self.stack_dir):
                 raise NameError("Heap buffer overflow")
                 # Check if memory is full
-            if (min(self.mem.keys()) < 0 or self.heap_dir < self.stack_dir):
+            if (min(self.mem.keys() + [0]) < 0 or self.heap_dir < self.stack_dir):
                 raise NameError("Not enough memory")
 
             quad = self.quads[self.instr_ptr]

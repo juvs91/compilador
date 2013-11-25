@@ -850,7 +850,10 @@ def swap(element):
 
 # Initializes main method variables and global variables
 init_dict = {}
-for var in (sem.var_table["main"].items() + sem.var_table["global"].items()):
+var_list = sem.var_table["global"].items()
+if(sem.var_table.get("main") != None):
+    var_list += sem.var_table["main"].items()
+for var in var_list:
     start = var[1][1]
     end = start + var[1][2][0]
     if(var[1][0][0] == "i" or var[1][0][0] == "f"):

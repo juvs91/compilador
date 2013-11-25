@@ -412,10 +412,8 @@ def get_scope():
 
 
 def validate_redeclaration_function(validate_scope): 
-    if(var_table.get(validate_scope) != None):  raise NameError('se declaro varias veces una misma funcion')
-
-def validate_variable_is_declared(var): 
-    if(var_table[scope][var] == None):  raise NameError('la variable {0} no se ha declarado'.var)
+    if(var_table.get(validate_scope) != None):
+        raise NameError("Function redeclaration '{0}'".format(validate_scope))
 
 # revisar este pedo
 def is_declared(var):
