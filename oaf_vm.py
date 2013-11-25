@@ -278,7 +278,8 @@ class VirtualMachine:
                 self.instr_ptr = res
                 self.copy_mem()
             elif (op == "return"):
-                self.return_value_stack.append(self.mem[op1])
+                if(op1):
+                    self.return_value_stack.append(self.mem[op1])
                 self.instr_ptr = self.functions[self.context[0]][3][1]
             elif (op == "end"):
                 self.stack_dir = self.restore_state()  # Reloads previous values and returns next free address

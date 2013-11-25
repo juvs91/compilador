@@ -462,12 +462,17 @@ def p_instruction_1(p):
 def p_return(p):
     '''Return : RETURN RType '''
     #print state.operand_stack[-1][1][0]
-    return_var = state.operand_stack.pop()
-    func.generate_return(return_var)
-    if(p[2] != None):
+    if(p[2]):
+        return_var = state.operand_stack.pop()
+        func.generate_return(return_var)
         sem.validate_return_funtion(return_var[1][0])
     else:
+        func.generate_return(None)
         sem.validate_return_funtion("void")
+    #if(p[2] != None):
+    #    sem.validate_return_funtion(return_var[1][0])
+    #else:
+    #    sem.validate_return_funtion("void")
 def p_rtype(p):
     '''RType : SuperExpr
              | empty'''
@@ -566,12 +571,14 @@ def p_seen_program(p):
 
 def p_seen_program_end(p):
     '''Seen_Program_End : '''
+    # Set main ending quad
+    sem.func_table["main"][3].append(len(state.quads))
     func.generate_end("main")
 
 def p_seen_main(p):
     '''Seen_Main : '''
     state.local_dir = 0
-    sem.func_table["main"][3] = len(state.quads)
+    sem.func_table["main"][3].append(len(state.quads))
     main.update_goto(len(state.quads))
 
 def p_check_signature(p):

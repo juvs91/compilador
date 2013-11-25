@@ -486,5 +486,5 @@ def is_signature_valid(func_name, signature):
 
 #validate if the return function returns a value if its not void  and if the type of return is equal to the var it returns
 def validate_return_funtion(var):
-    if(func_table[scope][0][0] != var):
-        raise NameError(" wrong return type in function '{0}'".format(scope))
+    if(scope != "main" and func_table[scope][0][0] != var):
+        raise NameError("Wrong return type in function '{0}'".format(scope))

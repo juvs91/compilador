@@ -277,7 +277,7 @@ def p_seen_function(p):
 def p_seen_main(p):
     '''Seen_Main : '''
     # Main has no signature, parameters, or return type
-    sem.fill_symbol_table_function(p[-3], [[], [], [], 0, 0])
+    sem.fill_symbol_table_function(p[-3], [[], [], [], [], 0])
 
 def p_update_signature_size(p):
     '''Update_Signature : '''
