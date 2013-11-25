@@ -532,12 +532,14 @@ def p_seen_function(p):
     '''Seen_Function : '''
     state.local_dir = 0
     # Appends the starting quad of the function
-    sem.func_table[p[-1]].append(len(state.quads))
+    sem.func_table[p[-1]].append([len(state.quads)])
     p[0] = p[-1]
 
 def p_seen_function_end(p):
     '''Seen_Function_End : '''
     func_name = p[-7]
+    # Appends the ending quad of the function
+    sem.func_table[func_name][3].append(len(state.quads))
     func.generate_end(func_name)
     # Appends the function size (temporal value)
     sem.func_table[func_name].append(-1)
@@ -546,12 +548,14 @@ def p_seen_return_function(p):
     '''Seen_Return_Function : '''
     state.local_dir = 0
     # Appends the starting quad of the function
-    sem.func_table[p[-1]].append(len(state.quads))
+    sem.func_table[p[-1]].append([len(state.quads)])
     p[0] = p[-1]
 
 def p_seen_return_function_end(p):
     '''Seen_Return_Function_End : '''
     func_name = p[-7]
+    # Appends the ending quad of the function
+    sem.func_table[func_name][3].append(len(state.quads))
     func.generate_end(func_name)
     # Appends the function size (temporal value)
     sem.func_table[func_name].append(-1)
@@ -838,10 +842,6 @@ for func_name in state.unresolved_vars:
 
 # Pass the starting stack address to the VM as the biggest function size plus the global and constant variables
 func_max_size = max(map(lambda x: x[1][4], sem.func_table.items()))
-#if(sem.var_table.get("main") != None):  # Main method has local variables declared
-#    main_size = sum(map(lambda x: x[1][2][0], sem.var_table["main"].items()))  # [id, [type, address, [size, {dimensions}], scope]]
-#else:  # Main has no local variables
-#    main_size = 0
 state.stack_dir += state.global_dir + state.constant_dir + func_max_size
 
 # Sorting function

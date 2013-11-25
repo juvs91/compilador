@@ -71,6 +71,8 @@ class Quad:
     def transform(self, t_offset, l_offset):
         if(self.operator == "add" and self.operand2[1][3][1] == "l"):
             self.operand2[0] += l_offset
+        if(self.operator == "gosub"):  # Sets the starting quad
+            self.result = self.result[0]
 
         if(isinstance(self.operand1, list)):
             if(self.operand1[1][3][0] == 'g'):

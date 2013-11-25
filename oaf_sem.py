@@ -8,7 +8,7 @@ scope = global_str
 var_table = {scope: {}, constant_str: {}}
 
 # Stores the functions information
-# [[return type], [signature], [param list], starting quad, function size, [memory map (optional)]]
+# [[return type], [signature], [param list], [starting quad,  ending quad], function size, [memory map (optional)]]
 func_table = {}
 
 operation = None
@@ -458,18 +458,10 @@ def get_type(op, op1, op2):
             type1 = func_table[op1[0]][0]
         else:
             type1 = op1[1][0][:]
-            #if("[]" in type1):  # Checks if operand is an array
-            #    state.arr_current_dim = state.arr_dim_stack.pop()
-            #    for x in range(state.arr_current_dim):
-            #        type1 = type1[:-2]  # Removes pair of brackets
         if(op2[1] == None):
             type2 = func_table[op2[0]][0]
         else:
             type2 = op2[1][0][:]
-            #if("[]" in type2):  # Checks if operand is an array
-            #    state.arr_current_dim = state.arr_dim_stack.pop()
-            #    for x in range(state.arr_current_dim):
-            #        type2 = type2[:-2]  # Removes pair of brackets
         try:
             type = semantic_cube[op][type1][type2]
         except(KeyError):  # Types weren't found in dictionary
@@ -496,60 +488,3 @@ def is_signature_valid(func_name, signature):
 def validate_return_funtion(var):
     if(func_table[scope][0][0] != var):
         raise NameError(" wrong return type in function '{0}'".format(scope))
-
-#	if(isinstance(var,int)):
-#		var_exist = True
-#	elif(var_table.get(scope) == None):
-#		var_exist = False
-#	elif(var_table.get(scope).get(var) == None):
-#		var_exist = False
-#	else:
-#		var_exist = True
-#	if((func_table[scope][0][0] != "void" and var == None) or (func_table[scope][0][0] == "void" and var_exist)):
-#		raise NameError(" wrong return type in function '{0}'".format(scope))
-	#check if the return returns the type of the scope
-#	if(func_table[scope][0][0] != "void"):
-#		if(func_table[scope][0][0] == "int"):
-#			if(not isinstance(var,str)):
-#				if(not isinstance(var,int)):
-#					raise NameError(" wrong return type in function '{0}'".format(scope)) 
-#			else:
-#				if(var_table.get("global").get(var) != None):
-#					if(var_table.get("global").get(var)[0] != "int"):
-#						raise NameError(" wrong return type in function '{0}'".format(scope))
-#				else:
-#					if(var_table.get(scope).get(var)[0] != "int"):
-#						raise NameError(" wrong return type in function '{0}'".format(scope))
-#		elif(func_table[scope][0][0] == "float"):
-#			if(not isinstance(var,str)):
-#				if(not isinstance(var,float)):
-#					raise NameError(" wrong return type in function '{0}'".format(scope))
-#			else:
-#				if(var_table.get("global").get(var) != None):
-#					if(var_table.get("global").get(var)[0] != "float"):
-#						raise NameError(" wrong return type in function '{0}'".format(scope))
-#				else:
-#					if(var_table.get(scope).get(var)[0] != "float"):
-#						raise NameError(" wrong return type in function '{0}'".format(scope))
-#		elif(func_table[scope][0][0] == "char"):
-#			if(is_var_char(var)):
-#				if(isinstance(var,int) or isinstance(var,float)):#check if the var is not a number
-#					raise NameError(" wrong return type in function '{0}'".format(scope))
-#				else:
-#					if(var_table.get("global").get(var) != None):
-#						if(var_table.get("global").get(var)[0] != "char"):
-#							raise NameError(" wrong return type in function '{0}'".format(scope))
-#					else:
-#						if(var_table.get(scope).get(var)[0] != "char"):
-#							raise NameError(" wrong return type in function '{0}'".format(scope))
-				
-				
-#def is_var_char(char):#no es la mejor forma de codear pero YOLO jala 
-#	if(isinstance(char,int) or isinstance(char,float)):
-#		return True
-#	is_variable=re.findall(r"\'(.+?)\'",char)
-#	if(is_variable):
-#		return False
-#	else:
-#		return True
-	
