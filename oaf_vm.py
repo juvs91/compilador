@@ -24,6 +24,9 @@ class VirtualMachine:
         self.mem_map = {}
         self.grafic_used = False  # variable to seet main loop if any grafic comands are used
 
+        # Operators list
+        self.op_list = ["u+", "u-", "=", "+", "-", "*", "/", "<", ">", "<=", ">=", "<>", "==", "||", "&&", "print", "param", "return"]
+
     def square(self, size):
         for i in range(4):
             turtle.fd(size)
@@ -95,55 +98,67 @@ class VirtualMachine:
         op2 = quad.operand2
         res = quad.result
         while (op != "end" or op1 != "main"):
-            if (op == "+"):
-                if (isinstance(self.mem[op1], str) and self.mem[op1][0] == "*"):
+            if(op in self.op_list):
+                if (self.mem.get(op1) != None and isinstance(self.mem[op1], str) and self.mem[op1][0] == "*"):
                     op1 = int(self.mem[op1][1:])
-                if (isinstance(self.mem[op2], str) and self.mem[op2][0] == "*"):
+                if (self.mem.get(op2) != None and isinstance(self.mem[op2], str) and self.mem[op2][0] == "*"):
                     op2 = int(self.mem[op2][1:])
+                if (self.mem.get(res) != None and isinstance(self.mem[res], str) and self.mem[res][0] == "*"):
+                    res = int(self.mem[res][1:])
+            if(op == "u+"):
+                self.mem[res] = self.mem[op1]
+            elif(op == "u-"):
+                self.mem[res] = -self.mem[op1]
+            elif (op == "+"):
                 self.mem[res] = self.mem[op1] + self.mem[op2]
             elif (op == "-"):
                 self.mem[res] = self.mem[op1] - self.mem[op2]
             elif (op == "*"):
-                if (isinstance(self.mem[op1], str) and self.mem[op1][0] == "*"):
-                    op1 = int(self.mem[op1][1:])
-                if (isinstance(self.mem[op2], str) and self.mem[op2][0] == "*"):
-                    op2 = int(self.mem[op2][1:])
                 self.mem[res] = self.mem[op1] * self.mem[op2]
             elif (op == "/"):
                 self.mem[res] = self.mem[op1] / self.mem[op2]
             elif (op == "="):
-                # Check if result is a pointer
-                if (self.mem.get(res) != None and isinstance(self.mem[res], str) and self.mem[res][0] == "*"):
-                    res = int(self.mem[res][1:])
-                    # Check if operand is a pointer
-                if (isinstance(self.mem[op1], str) and self.mem[op1][0] == "*"):
-                    op1 = int(self.mem[op1][1:])
                 self.mem[res] = self.mem[op1]
             elif (op == ">"):
                 if (self.mem[op1] > self.mem[op2]):
-                    self.mem[res] = 1
+                    self.mem[res] = "true"
                 else:
-                    self.mem[res] = 0
+                    self.mem[res] = "false"
             elif (op == "<"):
                 if (self.mem[op1] < self.mem[op2]):
-                    self.mem[res] = 1
+                    self.mem[res] = "true"
                 else:
-                    self.mem[res] = 0
+                    self.mem[res] = "false"
             elif (op == "=="):
                 if (self.mem[op1] == self.mem[op2]):
-                    self.mem[res] = 1
+                    self.mem[res] = "true"
                 else:
-                    self.mem[res] = 0
+                    self.mem[res] = "false"
+            elif (op == "<>"):
+                if (self.mem[op1] != self.mem[op2]):
+                    self.mem[res] = "true"
+                else:
+                    self.mem[res] = "false"
             elif (op == ">="):
                 if (self.mem[op1] >= self.mem[op2]):
-                    self.mem[res] = 1
+                    self.mem[res] = "true"
                 else:
-                    self.mem[res] = 0
+                    self.mem[res] = "false"
             elif (op == "<="):
                 if (self.mem[op1] <= self.mem[op2]):
-                    self.mem[res] = 1
+                    self.mem[res] = "true"
                 else:
-                    self.mem[res] = 0
+                    self.mem[res] = "false"
+            elif (op == "&&"):
+                if (self.mem[op1] and self.mem[op2]):
+                    self.mem[res] = "true"
+                else:
+                    self.mem[res] = "false"
+            elif (op == "||"):
+                if (self.mem[op1] or self.mem[op2]):
+                    self.mem[res] = "true"
+                else:
+                    self.mem[res] = "false"
             elif (op == "return"):
                 self.return_value_stack.append(self.mem[op1])
 
@@ -183,9 +198,6 @@ class VirtualMachine:
                     bytes = 4
                 else:
                     bytes = 1
-                    # Check if operand is a pointer
-                if (isinstance(self.mem[op1], str) and self.mem[op1][0] == "*"):
-                    op1 = int(self.mem[op1][1:])
                     # Copies the variables to local memory
                 for x in range(0, size, bytes):
                     #self.mem[dir + x] = self.mem[op1 + x]
@@ -195,9 +207,6 @@ class VirtualMachine:
 
             # Printing functions
             if (op == "print"):
-                # Check if operand is a pointer
-                if (isinstance(self.mem[op1], str) and self.mem[op1][0] == "*"):
-                    op1 = int(self.mem[op1][1:])
                 print self.mem[op1]
                 #read a variable in a memory addres
             if (op == "read"):
@@ -257,7 +266,7 @@ class VirtualMachine:
             if (op == "goto"):
                 self.instr_ptr = res
             elif (op == "gotoFalse"):
-                if (self.mem[op1] == 0):
+                if (self.mem[op1] == "false"):
                     self.instr_ptr = res
                 else:
                     self.instr_ptr += 1

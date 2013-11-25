@@ -156,23 +156,19 @@ def p_term_1(p):
 
 def p_factor(p):
     '''Factor : LPAREN Push_Expr SuperExpr RPAREN Pop_Expr
-              | Factor1 Seen_Operand'''
+              | Constant Seen_Operand
+              | Factor1'''
     p[0] = p[1]
+
+#def p_factor_1(p):
+#    '''Factor1 : Factor2
+#               | Constant'''
+#    p[0] = p[1]
 
 def p_factor_1(p):
-    '''Factor1 : Factor2
-               | Constant'''
-    p[0] = p[1]
-
-def p_factor_2(p):
-    '''Factor2 : MINUS Seen_Unary_Operator Constant Gen_Quad0
-               | PLUS Seen_Unary_Operator Constant Gen_Quad0'''
+    '''Factor1 : MINUS Seen_Unary_Operator Constant Seen_Operand Gen_Quad0
+               | PLUS Seen_Unary_Operator Constant Seen_Operand Gen_Quad0'''
     p[0] = p[3]
-
-#def p_factor_3(p):
-#    '''Factor3 : Constant
-#               | Call'''
-#    p[0] = p[1]
 
 def p_constant(p):
     '''Constant : ID Constant1
@@ -308,7 +304,7 @@ def p_generate_dir(p):
     # If size is zero variable is unresolved
     if(var[1][2][0] <= 0):
         state.unresolved_vars[sem.scope][var[0]].append(len(state.quads))
-    arr.generate_dir(var[1][1])  # Starting address
+    arr.generate_dir(var[1][1], var[1][3])  # Starting address, scope
     state.assign_list.append(var[1][0][:-2 * state.arr_current_dim])
     state.arr_dim_stack.append(state.arr_current_dim)
     expr.pop_operator()
@@ -525,7 +521,7 @@ def p_seen_param_call(p):
 
 def p_seen_param_print(p):
     '''Seen_Param_Print : '''
-    if(p[-1][0] == '"'):
+    if(isinstance(p[-1], str) and p[-1][0] == '"'):
         param = p[-1]
     else:
         param = state.operand_stack.pop()
@@ -852,11 +848,11 @@ state.stack_dir += state.global_dir + state.constant_dir + func_max_size
 def swap(element):
     return element[1][1], element[0]
 
-# Initializes main method variables
+# Initializes main method variables and global variables
 init_dict = {}
-for var in sem.func_table["main"][5].items():
+for var in (sem.var_table["main"].items() + sem.var_table["global"].items()):
     start = var[1][1]
-    end = start + var[1][2]
+    end = start + var[1][2][0]
     if(var[1][0][0] == "i" or var[1][0][0] == "f"):
         step = 4
     else:
@@ -864,19 +860,6 @@ for var in sem.func_table["main"][5].items():
     for dir in range(start, end, step):
         init_dict[dir] = None
 
-#init_dict = {}  # Dictionary that holds arrays initializations [dir, value]
-#for scope in sem.var_table:
-#    for var in sem.var_table[scope].items():
-#        if("[]" in var[1][0]):
-#            start = var[1][1]
-#            end = start + var[1][2][0]
-#            if(var[1][0][0] == "i" or var[1][0][0] == "f"):
-#                step = 4
-#            else:
-#                step = 1
-#            for dir in range(start, end, step):
-#                init_dict[dir] = None
-# Appends other variables to the same dictionary
 mem_dict = dict(map(swap, sem.var_table[sem.global_str].items()) + map(swap, sem.var_table[sem.constant_str].items()))
 mem_dict.update(init_dict)
 
@@ -890,5 +873,3 @@ with open("o.af", "wb") as out:
 
 machine = vm.VirtualMachine("o.af", state.l_offset, state.stack_dir, state.t_offset)
 machine.run()
-
-#target.write(str(vm.vm))
