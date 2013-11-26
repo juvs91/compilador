@@ -277,7 +277,7 @@ def p_seen_function(p):
 def p_seen_main(p):
     '''Seen_Main : '''
     # Main has no signature, parameters, or return type
-    sem.fill_symbol_table_function(p[-3], [[], [], [], 0, 0])
+    sem.fill_symbol_table_function(p[-3], [[], [], [], [], 0])
 
 def p_update_signature_size(p):
     '''Update_Signature : '''
@@ -315,26 +315,10 @@ def p_term_error(p):
 
 # Error rule for syntax errors
 def p_error(p):
-    try:
-        print("Syntax error at line {0} col {1}, unexpected '{2}'".format(p.lineno, find_column(input, p), p.value))
-    except:
-        print("Preparser syntax error")
-    lexer.push_state("err")
-    #print(tok, p.type)
-    #print(p)
     if(p):
-        lexer.pop_state()
-        if(p.type == 'SEMI'):
-            print("in$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-            while(True):
-                tok = lexer.token()
-                if(tok.type != 'ASCII'):
-                    yacc.errok()
-                    return(tok)
-                else:
-                    break
+        raise NameError("Syntax error at line {0} col {1}, unexpected '{2}'".format(p.lineno, find_column(lexer.lexdata, p), p.value))
     else:
-        print("Abrupt file termination")
+        raise NameError("Abrupt file termination")
 
 # Build the parser
 parser = yacc.yacc(tabmodule="preparser")

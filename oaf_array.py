@@ -16,9 +16,9 @@ def generate_multiply_m(index, m):
     state.quads.append(q)
     state.operand_stack.append(q.result)
 
-def generate_dir(d):
+def generate_dir(d, s):
     q = quad.Quad()
-    dir = [d, ["int", 0, [4, 1], "s"]]
+    dir = [d, ["int", 0, [4, 1], "s" + s]]
     q.set_quad("add", dir, state.operand_stack.pop(), "t" + str(state.temp_counter))
     state.temp_counter += 1
     state.quads.append(q)
@@ -37,3 +37,5 @@ def update_quads(start, end, var):
             m_dim += 1
         elif(q.operator == "add"):
             q.operand2 = var[1]
+            v_dim = 1
+            m_dim = 0

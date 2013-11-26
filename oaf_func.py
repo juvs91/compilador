@@ -20,15 +20,6 @@ def generate_gosub(func_name, index):
 
 def generate_return(op1):
     q = quad.Quad()
-    #type = op1[1][0]
-    #if(type[0] == "i" or type[0] == "f"):
-    #    size = 4
-    #else:
-    #    size = 1
-    #var = [func_name, [type, 0, size, 't']]
-    # Revisar este pedo
-    #state.return_var_stack.append(var)
-    #q.set_quad("return", None, op1, var)
     q.set_quad("return", None, op1, None)
     state.quads.append(q)
 

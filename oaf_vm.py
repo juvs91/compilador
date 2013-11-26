@@ -25,6 +25,9 @@ class VirtualMachine:
         self.mem_map = {}
         self.grafic_used = False  # variable to seet main loop if any grafic comands are used
 
+        # Operators list
+        self.op_list = ["u+", "u-", "=", "+", "-", "*", "/", "<", ">", "<=", ">=", "<>", "==", "||", "&&", "print", "param", "return"]
+
     def square(self, size):
         for i in range(4):
             turtle.fd(size)
@@ -69,17 +72,17 @@ class VirtualMachine:
         # Initializes local variables
         self.mem_map = {}
         # Adds all the used addresses to the dictionary
-        for var in self.functions[func_name][5]:
+        for var in self.functions[func_name][5].items():
             # Check if variable is an array
-            if ("[]" in var[1]):
-                if (var[1][0] == "i" or var[1][0] == "f"):
+            if ("[]" in var[1][0]):
+                if (var[1][0][0] == "i" or var[1][0][0] == "f"):
                     step = 4
                 else:
                     step = 1
-                for x in range(0, var[3], step):
-                    self.mem_map[var[2] + x] = None
+                for x in range(0, var[1][2], step):
+                    self.mem_map[var[1][1] + x] = None
             else:
-                self.mem_map[var[2]] = None
+                self.mem_map[var[1][1]] = None
 
     def copy_mem(self):
         # Clears the local memory
@@ -96,7 +99,18 @@ class VirtualMachine:
         op2 = quad.operand2
         res = quad.result
         while (op != "end" or op1 != "main"):
-            if (op == "+"):
+            if(op in self.op_list):
+                if (self.mem.get(op1) != None and isinstance(self.mem[op1], str) and self.mem[op1][0] == "*"):
+                    op1 = int(self.mem[op1][1:])
+                if (self.mem.get(op2) != None and isinstance(self.mem[op2], str) and self.mem[op2][0] == "*"):
+                    op2 = int(self.mem[op2][1:])
+                if (self.mem.get(res) != None and isinstance(self.mem[res], str) and self.mem[res][0] == "*"):
+                    res = int(self.mem[res][1:])
+            if(op == "u+"):
+                self.mem[res] = self.mem[op1]
+            elif(op == "u-"):
+                self.mem[res] = -self.mem[op1]
+            elif (op == "+"):
                 self.mem[res] = self.mem[op1] + self.mem[op2]
             elif (op == "-"):
                 self.mem[res] = self.mem[op1] - self.mem[op2]
@@ -105,40 +119,47 @@ class VirtualMachine:
             elif (op == "/"):
                 self.mem[res] = self.mem[op1] / self.mem[op2]
             elif (op == "="):
-                # Check if result is a pointer
-                if (self.mem.get(res) != None and isinstance(self.mem[res], str) and self.mem[res][0] == "*"):
-                    res = int(self.mem[res][1:])
-                    # Check if operand is a pointer
-                if (isinstance(self.mem[op1], str) and self.mem[op1][0] == "*"):
-                    op1 = int(self.mem[op1][1:])
                 self.mem[res] = self.mem[op1]
             elif (op == ">"):
                 if (self.mem[op1] > self.mem[op2]):
-                    self.mem[res] = 1
+                    self.mem[res] = "true"
                 else:
-                    self.mem[res] = 0
+                    self.mem[res] = "false"
             elif (op == "<"):
                 if (self.mem[op1] < self.mem[op2]):
-                    self.mem[res] = 1
+                    self.mem[res] = "true"
                 else:
-                    self.mem[res] = 0
+                    self.mem[res] = "false"
             elif (op == "=="):
                 if (self.mem[op1] == self.mem[op2]):
-                    self.mem[res] = 1
+                    self.mem[res] = "true"
                 else:
-                    self.mem[res] = 0
+                    self.mem[res] = "false"
+            elif (op == "<>"):
+                if (self.mem[op1] != self.mem[op2]):
+                    self.mem[res] = "true"
+                else:
+                    self.mem[res] = "false"
             elif (op == ">="):
                 if (self.mem[op1] >= self.mem[op2]):
-                    self.mem[res] = 1
+                    self.mem[res] = "true"
                 else:
-                    self.mem[res] = 0
+                    self.mem[res] = "false"
             elif (op == "<="):
                 if (self.mem[op1] <= self.mem[op2]):
-                    self.mem[res] = 1
+                    self.mem[res] = "true"
                 else:
-                    self.mem[res] = 0
-            elif (op == "return"):
-                self.return_value_stack.append(self.mem[op1])
+                    self.mem[res] = "false"
+            elif (op == "&&"):
+                if (self.mem[op1] and self.mem[op2]):
+                    self.mem[res] = "true"
+                else:
+                    self.mem[res] = "false"
+            elif (op == "||"):
+                if (self.mem[op1] or self.mem[op2]):
+                    self.mem[res] = "true"
+                else:
+                    self.mem[res] = "false"
 
             # Array operations
             if (op == "ver"):
@@ -168,30 +189,28 @@ class VirtualMachine:
                 self.stack_dir = copy_dir
             if (op == "param"):
                 func_name = self.function_call_stack[-1][0]
-                # revisar este pedo
-                type = self.functions[func_name][5][res][1]
-                dir = self.functions[func_name][5][res][2]
-                size = self.functions[func_name][5][res][3]
+                var = self.functions[func_name][2][res]
+                type = self.functions[func_name][5][var][0]
+                dir = self.functions[func_name][5][var][1]
+                size = self.functions[func_name][5][var][2]
                 if (type[0] == "i" or type[0] == "f"):
                     bytes = 4
                 else:
                     bytes = 1
-                    # Check if operand is a pointer
-                if (isinstance(self.mem[op1], str) and self.mem[op1][0] == "*"):
-                    op1 = int(self.mem[op1][1:])
                     # Copies the variables to local memory
                 for x in range(0, size, bytes):
-                    self.mem[dir + x] = self.mem[op1 + x]
+                    #self.mem[dir + x] = self.mem[op1 + x]
                     self.mem_map[dir + x] = self.mem[op1 + x]
                     # Removes already initialized variables
                     #self.mem_map.remove(dir + x)
 
             # Printing functions
             if (op == "print"):
-                # Check if operand is a pointer
-                if (isinstance(self.mem[op1], str) and self.mem[op1][0] == "*"):
-                    op1 = int(self.mem[op1][1:])
-                print self.mem[op1]
+                # Parameter is a string
+                if(isinstance(op1, str) and op1[0] == '"'):
+                    print op1[1:-1]
+                else:
+                    print self.mem[op1]
                 #read a variable in a memory addres
             if (op == "read"):
             #if(op1 == "int"):
@@ -260,6 +279,10 @@ class VirtualMachine:
                 self.instr_ptr_stack.append(self.instr_ptr + 1)
                 self.instr_ptr = res
                 self.copy_mem()
+            elif (op == "return"):
+                if(op1):
+                    self.return_value_stack.append(self.mem[op1])
+                self.instr_ptr = self.functions[self.context[0]][3][1]
             elif (op == "end"):
                 self.stack_dir = self.restore_state()  # Reloads previous values and returns next free address
                 if (self.functions[op1][0][0] != "void"):  # Function returns a value
@@ -275,7 +298,7 @@ class VirtualMachine:
             if (self.heap_dir < self.stack_dir):
                 raise NameError("Heap buffer overflow")
                 # Check if memory is full
-            if (min(self.mem.keys()) < 0 or self.heap_dir < self.stack_dir):
+            if (min(self.mem.keys() + [0]) < 0 or self.heap_dir < self.stack_dir):
                 raise NameError("Not enough memory")
 
             quad = self.quads[self.instr_ptr]

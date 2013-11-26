@@ -6,6 +6,9 @@ current_call = ""
 #label stack 
 label_stack = []
 
+# Assign list used for dimentional operations
+assign_list = []
+
 # Return values of functions
 return_dir_stack = []
 return_var_stack = []
