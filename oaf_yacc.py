@@ -4,6 +4,8 @@ import oaf_vm as vm
 # Module to serialize objects
 import cPickle as pickle
 
+import re
+
 # Functions preparser
 import oaf_yacc_func as func_parser
 
@@ -849,10 +851,12 @@ state.stack_dir += state.global_dir + state.constant_dir + func_max_size
 def swap(element):
     return element[1][1], element[0]
 def swap_str(element):
-    if("." in element[0]):
+    if(re.match(r'\d+\.\d+', element[0])):
         return element[1][1], float(element[0])
-    else:
+    elif(re.match(r'\d+', element[0])):
         return element[1][1], int(element[0])
+    else:
+        return element[1][1], element[0]
 
 # Initializes main method variables and global variables
 init_dict = {}
