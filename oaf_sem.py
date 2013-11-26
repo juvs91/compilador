@@ -374,7 +374,6 @@ def fill_local_variables_table(var, type, attrs, m_list):
             var_table[scope][var] = [type, state.local_dir, attrs, 'l']
         state.local_dir += attrs[0]
 
-# revisar este pedo
 def fill_global_variables_table(var, type, attrs, m_list):
     # attrs = [size of variable,{each dimension size}]
     # verifica si existe el scope dado
@@ -415,7 +414,6 @@ def validate_redeclaration_function(validate_scope):
     if(var_table.get(validate_scope) != None):
         raise NameError("Function redeclaration '{0}'".format(validate_scope))
 
-# revisar este pedo
 def is_declared(var):
     if(var_table[constant_str].get(var) != None):
         return True

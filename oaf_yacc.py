@@ -188,8 +188,6 @@ def p_constant_2(p):
                  | FALSE'''
     p[0] = p[1]
 
-# revisar este pedo
-# Agregar tipo STRING para variables y funciones
 def p_params(p):
     '''Params : Params1
               | empty'''
@@ -201,7 +199,7 @@ def p_params_1(p):
 def p_params_2(p):
     '''Params2 : COMMA Params1
                | empty'''
-# revisar este pedo
+
 def p_params_3(p):
     '''Params3 : SuperExpr Seen_Param_Print Clear_Dimensions Params4
                | STRING Seen_Param_Print Clear_Dimensions Params4'''
@@ -210,9 +208,6 @@ def p_params_3(p):
 def p_params_4(p):
     '''Params4 : COMMA Params3
                | empty'''
-#
-# revisar este pedo
-
 
 def p_loop(p):
     '''Loop : LOOP LPAREN Save_Label SuperExpr RPAREN Push_Label_Stack Block Go_Back_To_Validate Pop_Label_Stack'''
@@ -462,7 +457,7 @@ def p_instruction_1(p):
 def p_return(p):
     '''Return : RETURN RType '''
     #print state.operand_stack[-1][1][0]
-    if(p[2]):
+    if(p[2] != None):
         return_var = state.operand_stack.pop()
         func.generate_return(return_var)
         sem.validate_return_funtion(return_var[1][0])
@@ -473,6 +468,7 @@ def p_return(p):
     #    sem.validate_return_funtion(return_var[1][0])
     #else:
     #    sem.validate_return_funtion("void")
+
 def p_rtype(p):
     '''RType : SuperExpr
              | empty'''
@@ -825,15 +821,10 @@ for okey in sem.var_table:
 for func_name in sem.func_table:
     if(sem.var_table.get(func_name) != None and sem.var_table[func_name] != None):
         var_map = {}
-        # revisar este pedo
         for var in sem.var_table[func_name].items():
-            #var = sem.var_table[func_name][id]
             var_map[var[0]] = [var[1][0], var[1][1], var[1][2][0]]  # {id: [type, address, size (bytes)]}
-            #sem.func_table[func_name][4] += var[2][0]
-            #var_map.append([sem.var_table[func_name][id][1], id, sem.var_table[func_name][id][2][0]])
         sem.func_table[func_name].append(var_map)
         sem.func_table[func_name][4] = sum(map(lambda x: x[1][2][0], sem.var_table[func_name].items()))
-        #sem.func_table[func_name].append(map(lambda x: [x[1][1], x[0]], sem.var_table[func_name].items()))
 
 # Changes variables to memory addresses and adds temporal address offset
 for idx, quad in enumerate(state.quads):
@@ -841,7 +832,6 @@ for idx, quad in enumerate(state.quads):
     #quad.add_offset(0, state.global_dir, 9000, 43000)
     #print idx, (quad.operator, quad.operand1, quad.operand2, quad.result)
 
-# revisar este pedo
 # Updates unresolved variables
 for func_name in state.unresolved_vars:
     for var in state.unresolved_vars[func_name].items():

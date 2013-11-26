@@ -20,6 +20,8 @@ class VirtualMachine:
         self.functions = self.obj["functions"]
         self.mem = self.obj["mem"]
 
+        turtle.speed(10)
+
         # List of memory addresses
         self.mem_map = {}
         self.grafic_used = False  # variable to seet main loop if any grafic comands are used
@@ -42,7 +44,6 @@ class VirtualMachine:
     def save_state(self, temporals):
         copy_dir = self.stack_dir
         for item in self.mem.items()[:]:
-            # revisar este pedo
             if (self.local_dir_start <= item[0] < self.stack_dir_start):
                 self.mem[copy_dir] = item[0]  # Copies the memory address
                 self.mem[copy_dir + 4] = item[1]  # Copies the value stored in that address
@@ -278,7 +279,7 @@ class VirtualMachine:
                 self.instr_ptr = res
                 self.copy_mem()
             elif (op == "return"):
-                if(op1):
+                if(op1 != None):
                     self.return_value_stack.append(self.mem[op1])
                 self.instr_ptr = self.functions[self.context[0]][3][1]
             elif (op == "end"):

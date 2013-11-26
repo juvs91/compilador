@@ -16,6 +16,5 @@ def generate_else_goto():
 
 def generate_loop_goto(label):
     q = quad.Quad()
-    # revisar este pedo
     q.set_quad("goto", None, None, label + 1)
     state.quads.append(q)
