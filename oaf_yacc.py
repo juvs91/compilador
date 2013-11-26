@@ -528,8 +528,8 @@ def p_seen_param_call(p):
     if("[]" in type and "[]" in sem.func_table[state.current_call][1][state.param_counter]):
         arg = sem.func_table[state.current_call][2][state.param_counter]  # Gets variable to replace
         if(sem.var_table[state.current_call][arg][1] < 0):  # If variable is not yet assigned
-            dir = max(map(lambda x: x[1][1] + x[1][2][0], sem.var_table[state.current_call].items()))  # Gets the last available address
-            sem.var_table[state.current_call][arg][1] = dir + 1  # Updates the starting address
+            dir = max(map(lambda x: x[1][1] + x[1][2][0], sem.var_table[state.current_call].items()) + [0])  # Gets the last available address
+            sem.var_table[state.current_call][arg][1] = dir  # Updates the starting address
             sem.var_table[state.current_call][arg][2] = [var[1][2][0] / max(sum(var[1][2][1:state.arr_current_dim + 1]), 1)] + var[1][2][state.arr_current_dim + 1:]  # Updates the size and dimensions of the variable with the passed parameter
             sem.var_table[state.current_call][arg][4] = var[1][4][state.arr_current_dim:]  # Updates the m of each dimension
     func.generate_param(param)
@@ -854,7 +854,7 @@ for func_name in sem.func_table:
 for idx, quad in enumerate(state.quads):
     quad.transform(state.t_offset, state.l_offset)
     #quad.add_offset(0, state.global_dir, 9000, 43000)
-    print idx, (quad.operator, quad.operand1, quad.operand2, quad.result)
+    #print idx, (quad.operator, quad.operand1, quad.operand2, quad.result)
 
 # Updates unresolved variables
 for func_name in state.unresolved_vars:
@@ -865,9 +865,14 @@ for func_name in state.unresolved_vars:
 func_max_size = max(map(lambda x: x[1][4], sem.func_table.items()))
 state.stack_dir += state.global_dir + state.constant_dir + func_max_size
 
-# Sorting function
+# Sorting functions
 def swap(element):
     return element[1][1], element[0]
+def swap_str(element):
+    if("." in element[0]):
+        return element[1][1], float(element[0])
+    else:
+        return element[1][1], int(element[0])
 
 # Initializes main method variables and global variables
 init_dict = {}
@@ -884,7 +889,7 @@ for var in var_list:
     for dir in range(start, end, step):
         init_dict[dir] = None
 
-mem_dict = dict(map(swap, sem.var_table[sem.global_str].items()) + map(swap, sem.var_table[sem.constant_str].items()))
+mem_dict = dict(map(swap, sem.var_table[sem.global_str].items()) + map(swap_str, sem.var_table[sem.constant_str].items()))
 mem_dict.update(init_dict)
 
 with open("o.af", "wb") as out:

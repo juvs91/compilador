@@ -63,6 +63,10 @@ def generate_quad(hierarchy):
         state.quads.append(q)
         if(q.operator != "="):
             state.operand_stack.append(q.result)
+            if(len(state.assign_list) > 1):
+                state.assign_list.pop()
+                state.assign_list.pop()
+                state.assign_list.append(q.result[1][0])
     else:
         del(q)
     if(len(state.operator_stack) > 0):

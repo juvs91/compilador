@@ -392,10 +392,10 @@ def fill_global_variables_table(var, type, attrs, m_list):
         state.global_dir += attrs[0]
 
 def fill_symbol_table_constant(symbol, type, size):
-    if(var_table[constant_str].get(symbol) != None):
+    if(var_table[constant_str].get(str(symbol)) != None):
         pass
     else:
-        var_table[constant_str][symbol] = [type, state.constant_dir, [size, 1], 'c']
+        var_table[constant_str][str(symbol)] = [type, state.constant_dir, [size, 1], 'c']
         if(type[0] == "i" or type[0] == "f"):
             state.constant_dir += 4
         else:
@@ -418,7 +418,7 @@ def validate_redeclaration_function(validate_scope):
         raise NameError("Function redeclaration '{0}'".format(validate_scope))
 
 def is_declared(var):
-    if(var_table[constant_str].get(var) != None):
+    if(var_table[constant_str].get(str(var)) != None):
         return True
     elif(var_table.get(scope) != None and var_table[scope].get(var) != None):
         return True
@@ -436,8 +436,8 @@ def get_variable(var):
     if(var_table.get(scope) != None and var_table[scope].get(var) != None):
         return [var, var_table[scope].get(var)]
     # Then looks in constants
-    elif(var_table[constant_str].get(var) != None):
-        return [var, var_table[constant_str].get(var)]
+    elif(var_table[constant_str].get(str(var)) != None):
+        return [var, var_table[constant_str].get(str(var))]
     # Then looks in functions
     elif(func_table.get(var) != None):
         type = func_table[var][0][0]  # Function return value information
@@ -453,7 +453,7 @@ def get_variable(var):
 def get_type(op, op1, op2): 
     type = None 
     if(op == "color"):
-       type = "color"
+        type = "color"
     elif(isinstance(op1, str)):
         type = semantic_cube[op]["char"][op2[1][0]]
     else:
