@@ -811,7 +811,7 @@ for func_name in sem.func_table:
 for idx, quad in enumerate(state.quads):
     quad.transform(state.t_offset, state.l_offset)
     #quad.add_offset(0, state.global_dir, 9000, 43000)
-    #print idx, (quad.operator, quad.operand1, quad.operand2, quad.result)
+    print idx, (quad.operator, quad.operand1, quad.operand2, quad.result)
 
 # revisar este pedo
 # Updates unresolved variables

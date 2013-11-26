@@ -452,8 +452,10 @@ def get_variable(var):
         return [var, var_table[global_str].get(var)]
 
 def get_type(op, op1, op2): 
-    type = None
-    if(isinstance(op1, str)):
+    type = None 
+    if(op == "color"):
+       type = "color"
+    elif(isinstance(op1, str)):
         type = semantic_cube[op]["char"][op2[1][0]]
     else:
         if(op1[1] == None):
@@ -485,7 +487,7 @@ def get_type(op, op1, op2):
 
 def is_char(char): 
     if(len(char) != 3): 
-        print len(char)
+        print (len(char))
         raise NameError("its not a char ")
 
 def is_signature_valid(func_name, signature):

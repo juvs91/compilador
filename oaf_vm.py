@@ -3,6 +3,7 @@ import turtle
 
 class VirtualMachine:
     def __init__(self, filename, local_address, stack_address, heap_address):
+        self.constant_loop = 0 # the control variable if the loop is located 
         self.color_list = []#the list of colors
         self.instr_ptr = 0  # Current quad
         self.instr_ptr_stack = []  # Stack used when returning to previous instruction
@@ -248,7 +249,8 @@ class VirtualMachine:
             # Operators that change the instruction pointer
             if (op == "goto"):
                 self.instr_ptr = res
-            elif (op == "gotoFalse"):
+            elif (op == "gotoFalse"): 
+                print self.mem[op1]
                 if (self.mem[op1] == 0):
                     self.instr_ptr = res
                 else:
