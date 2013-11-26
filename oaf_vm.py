@@ -31,7 +31,11 @@ class VirtualMachine:
     def square(self, size):
         for i in range(4):
             turtle.fd(size)
-            turtle.rt(90)
+            turtle.rt(90) 
+    def triangle(self,size):
+        for i in range(3):
+            turtle.fd(size)
+            turtle.rt(120)
 
     def load_obj(self, filename):
         f = open(filename, "rb")
@@ -43,7 +47,6 @@ class VirtualMachine:
     def save_state(self, temporals):
         copy_dir = self.stack_dir
         for item in self.mem.items()[:]:
-            # revisar este pedo
             if (self.local_dir_start <= item[0] < self.stack_dir_start):
                 self.mem[copy_dir] = item[0]  # Copies the memory address
                 self.mem[copy_dir + 4] = item[1]  # Copies the value stored in that address
@@ -117,6 +120,8 @@ class VirtualMachine:
             elif (op == "*"):
                 self.mem[res] = self.mem[op1] * self.mem[op2]
             elif (op == "/"):
+                if(self.mem[op2] == 0):
+                    raise NameError("Division by zero")
                 self.mem[res] = self.mem[op1] / self.mem[op2]
             elif (op == "="):
                 self.mem[res] = self.mem[op1]
@@ -238,11 +243,24 @@ class VirtualMachine:
             if (op == "square"):
                 self.square(self.mem[op1])
 
+            if (op =="triangle"):
+                self.triangle(self.mem[op1])
+
                 self.grafic_used = True
             if (op == "brush"):
                 turtle.pensize(self.mem[op1])
                 self.grafic_used = True
             if (op == "arc"):
+                a = self.mem[op1]
+                b = self.mem[op2]
+                c = a-b
+                if(c<0):
+                   c = c*-1
+                turtle.rt(270)
+                angle = 180/c 
+                for e in range(c*2):
+                    turtle.fd(1)
+                    turtle.rt(angle/2)
 
                 self.grafic_used = True
             if (op == "pd"):
@@ -258,6 +276,8 @@ class VirtualMachine:
                     self.grafic_used = True
             if (op == "home"):
                 turtle.home()
+            if (op == "speed"):
+                turtle.speed(self.mem[op1])
 
             # Operators that change the instruction pointer
             if (op == "goto"):
