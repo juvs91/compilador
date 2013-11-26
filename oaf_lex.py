@@ -74,34 +74,34 @@ def t_COMMENT(t):
     pass
 
 # Literals
-t_STRING    = r'".*"'
-t_CCONST    = r'\'[ -~]\''
+t_STRING     = r'".*"'
+t_CCONST     = r'\'[ -~]\''
 # Operators
-t_PLUS      = r'\+'
-t_MINUS     = r'-'
-t_TIMES     = r'\*'
-t_DIVIDE    = r'/'
+t_PLUS       = r'\+'
+t_MINUS      = r'-'
+t_TIMES      = r'\*'
+t_DIVIDE     = r'/'
 # Separators
-t_LPAREN    = r'\('
-t_RPAREN    = r'\)'
-t_LBRACE    = r'\{'
-t_RBRACE    = r'\}'
-t_LBRACKET  = r'\['
-t_RBRACKET  = r'\]'
-t_SEMI      = r';'
-t_COMMA     = r','
+t_LPAREN     = r'\('
+t_RPAREN     = r'\)'
+t_LBRACE     = r'\{'
+t_RBRACE     = r'\}'
+t_LBRACKET   = r'\['
+t_RBRACKET   = r'\]'
+t_SEMI       = r';'
+t_COMMA      = r','
 # Comparison
-t_LESSTHAN  = r'\<'
-t_GREATHAN  = r'\>'
-t_GREATEQUAL= r'\>='
-t_LESSEQUAL = r'\<='
-t_DIFFERENT = r'\<\>'
-t_TWOEQUAL  = r'=='
+t_LESSTHAN   = r'\<'
+t_GREATHAN   = r'\>'
+t_GREATEQUAL = r'\>='
+t_LESSEQUAL  = r'\<='
+t_DIFFERENT  = r'\<\>'
+t_TWOEQUAL   = r'=='
 # Logical
-t_AND       = r'&&'
-t_OR        = r'\|\|'
+t_AND        = r'&&'
+t_OR         = r'\|\|'
 # Assignment
-t_EQUAL     = r'='
+t_EQUAL      = r'='
 
 # Define a rule so we can track line numbers
 def t_newline(t):
@@ -117,7 +117,7 @@ t_ignore  = ' \t'
 def find_column(input, token):
     last_cr = input.rfind('\n', 0, token.lexpos)
     if last_cr < 0:
-       last_cr = 0
+        last_cr = 0
     column = (token.lexpos - last_cr) + 1
     return column
 

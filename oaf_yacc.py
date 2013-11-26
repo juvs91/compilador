@@ -768,29 +768,6 @@ def p_empty(p):
     '''empty : '''
     pass
 
-# Error rules for productions
-#def p_program_error(p):
-#    '''Program : ASCII Program'''
-#
-#def p_block_error(p):
-#    '''Block : LBRACE error RBRACE'''
-#
-#def p_fblock_error(p):
-#    '''FBlock : LBRACE Local_Declaration error RBRACE'''
-#
-#def p_circle_error(p):
-#    '''Circle : CIRCLE LPAREN error RPAREN'''
-#    print("Missing parameter(s)")
-#
-#def p_superexpr_error(p):
-#    '''SuperExpr : Expression error SuperExpr1'''
-#    print("Malformed expression")
-#
-#def p_term_error(p):
-#    '''Term1 : DIVIDE error Term
-#             | TIMES error Term'''
-#    print("Malformed expression")
-
 # Error rule for syntax errors
 def p_error(p):
     raise NameError("Syntax error at line {0} col {1}, unexpected '{2}'".format(p.lineno, find_column(input, p), p.value))
