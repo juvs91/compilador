@@ -161,6 +161,14 @@ class VirtualMachine:
                 else:
                     self.mem[res] = "false"
 
+            # Special functions
+            if(op == "len"):
+                if(op2 == 0):
+                    length = reduce(lambda x, y: x * y, self.functions[self.context[0]][5][op1][2][1:])
+                else:
+                    length = self.functions[self.context[0]][5][op1][2][op2]
+                self.mem[res] = length
+
             # Array operations
             if (op == "ver"):
                 if (self.mem[op1] > res or self.mem[op1] < 0):

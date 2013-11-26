@@ -369,7 +369,10 @@ def fill_local_variables_table(var, type, attrs, m_list):
         raise NameError("Variable redeclaration, '{0}' already exists".format(var))
     else:
         if(m_list):
-            var_table[scope][var] = [type, state.local_dir, attrs, 'l', m_list]
+            if(m_list[0] < 0):  # Variable has temporal values
+                var_table[scope][var] = [type, -1, attrs, 'l', m_list]
+            else:
+                var_table[scope][var] = [type, state.local_dir, attrs, 'l', m_list]
         else:
             var_table[scope][var] = [type, state.local_dir, attrs, 'l']
         state.local_dir += attrs[0]

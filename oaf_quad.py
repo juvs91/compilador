@@ -16,24 +16,22 @@ class Quad:
             if(op == "="):
                 res[1][0] = sem.get_type(op, op1, res)
             elif(op == "u+" or op == "u-"):
-                if(op1[1][0][0] == "i" or op1[1][0][0] == "f"):
+                size = 4
+                res = [res, [op1[1][0], state.temp_dir, [size, 1], 't']]
+                state.temp_dir -= size
+            self.result = res
+        else:
+            if(op == "len"):
+                size = 4
+                res = [res, ["int", state.temp_dir, [size, 1], 't']]
+            else:
+                type = sem.get_type(op, op1, op2)
+                if(type[0] == "i" or type[0] == "f"):
                     size = 4
                 else:
                     size = 1
-                res = [res, [op1[1][0], state.temp_dir, [size, 1], 't']]
+                res = [res, [type, state.temp_dir, [size, 1], 't']]
             self.result = res
-        else:
-            type = sem.get_type(op, op1, op2)
-            if(type[0] == "i" or type[0] == "f"):
-                size = 4
-            else:
-                size = 1
-            # Check if result is of pointer type
-            #if(res[0] == "p"):
-            #    self.result = [res, [type, state.temp_dir, [size, 1], 's']]
-            #else:
-            #    self.result = [res, [type, state.temp_dir, [size, 1], 't']]
-            self.result = [res, [type, state.temp_dir, [size, 1], 't']]
             state.temp_dir -= size
 
     #def add_offset(self, g_offset, c_offset, l_offset, t_offset):

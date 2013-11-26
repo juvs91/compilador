@@ -21,6 +21,8 @@ import oaf_expr as expr
 import oaf_func as func
 # Arrays module
 import oaf_array as arr
+# Special functions module
+import oaf_special as spec
 
 #read write module
 import oaf_read_write as rw
@@ -157,7 +159,8 @@ def p_term_1(p):
 def p_factor(p):
     '''Factor : LPAREN Push_Expr SuperExpr RPAREN Pop_Expr
               | Constant Seen_Operand
-              | Factor1'''
+              | Factor1
+              | Length'''
     p[0] = p[1]
 
 #def p_factor_1(p):
@@ -448,8 +451,17 @@ def p_instruction_1(p):
                     | Circle
                     | Arc
                     | Square
+                    | Length
                     | Return'''
     p[0] = p[1] 
+
+def p_length(p):
+    '''Length : LENGTH LPAREN ID Seen_Operand2 Array1 RPAREN Generate_Length'''
+
+def p_generate_length(p):
+    '''Generate_Length : '''
+    spec.generate_length(p[-4], len(state.arr_dim))
+    state.arr_dim = []  # Clears the array dimension list
 
 def p_return(p):
     '''Return : RETURN RType '''
@@ -506,12 +518,13 @@ def p_seen_param_call(p):
     var = sem.get_variable(p[-1])
     type = var[1][0]
     # Check if it's a dimentional parameter
-    if("[]" in type and "[]" in sem.func_table[state.current_call][1][state.param_counter]):  # Checks if the parameter is an array
+    if("[]" in type and "[]" in sem.func_table[state.current_call][1][state.param_counter]):
         arg = sem.func_table[state.current_call][2][state.param_counter]  # Gets variable to replace
-        dir = max(map(lambda x: x[1][1] + x[1][2][0], sem.var_table[state.current_call].items()))  # Gets the last available address
-        sem.var_table[state.current_call][arg][1] = dir  # Updates the starting address
-        sem.var_table[state.current_call][arg][2] = [var[1][2][0] / max(sum(var[1][2][1:state.arr_current_dim + 1]), 1)] + var[1][2][state.arr_current_dim + 1:]  # Updates the size and dimensions of the variable with the passed parameter
-        sem.var_table[state.current_call][arg][4] = var[1][4][state.arr_current_dim:]  # Updates the m of each dimension
+        if(sem.var_table[state.current_call][arg][1] < 0):  # If variable is not yet assigned
+            dir = max(map(lambda x: x[1][1] + x[1][2][0], sem.var_table[state.current_call].items()))  # Gets the last available address
+            sem.var_table[state.current_call][arg][1] = dir + 1  # Updates the starting address
+            sem.var_table[state.current_call][arg][2] = [var[1][2][0] / max(sum(var[1][2][1:state.arr_current_dim + 1]), 1)] + var[1][2][state.arr_current_dim + 1:]  # Updates the size and dimensions of the variable with the passed parameter
+            sem.var_table[state.current_call][arg][4] = var[1][4][state.arr_current_dim:]  # Updates the m of each dimension
     func.generate_param(param)
     for x in range(0, state.arr_current_dim):
         type = type[:-2]
@@ -595,6 +608,10 @@ def p_seen_operand_1(p):
         if(state.arr_current_dim == 0 or "[]" not in var[1][0]):
             expr.add_operand(sem.get_variable(p[-2]))
             state.assign_list.append(var[1][0])
+
+def p_seen_operand_2(p):
+    '''Seen_Operand2 : '''
+    sem.is_declared(p[-1])
 
 def p_seen_unary_operator(p):
     '''Seen_Unary_Operator : '''

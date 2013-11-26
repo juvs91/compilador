@@ -100,7 +100,8 @@ def p_term_1(p):
 
 def p_factor(p):
     '''Factor : LPAREN SuperExpr RPAREN
-              | Factor1'''
+              | Factor1
+              | Length'''
     p[0] = p[1]
 
 def p_factor_1(p):
@@ -249,7 +250,11 @@ def p_instruction_1(p):
                     | Circle
                     | Arc
                     | Square
+                    | Length
                     | Return'''
+
+def p_length(p):
+    '''Length : LENGTH LPAREN ID Array1 RPAREN'''
 
 def p_return(p):
     '''Return : RETURN RType'''
@@ -290,28 +295,28 @@ def p_empty(p):
     '''empty : '''
     pass
 
-# Error rules for productions
-def p_program_error(p):
-    '''Program : ASCII Program'''
-
-def p_block_error(p):
-    '''Block : LBRACE error RBRACE'''
-
-def p_fblock_error(p):
-    '''FBlock : LBRACE Local_Declaration error RBRACE'''
-
-def p_circle_error(p):
-    '''Circle : CIRCLE LPAREN error RPAREN'''
-    print("Missing parameter(s)")
-
-def p_superexpr_error(p):
-    '''SuperExpr : Expression error SuperExpr1'''
-    print("Malformed expression")
-
-def p_term_error(p):
-    '''Term1 : DIVIDE error Term 
-             | TIMES error Term'''
-    print("Malformed expression")
+## Error rules for productions
+#def p_program_error(p):
+#    '''Program : ASCII Program'''
+#
+#def p_block_error(p):
+#    '''Block : LBRACE error RBRACE'''
+#
+#def p_fblock_error(p):
+#    '''FBlock : LBRACE Local_Declaration error RBRACE'''
+#
+#def p_circle_error(p):
+#    '''Circle : CIRCLE LPAREN error RPAREN'''
+#    print("Missing parameter(s)")
+#
+#def p_superexpr_error(p):
+#    '''SuperExpr : Expression error SuperExpr1'''
+#    print("Malformed expression")
+#
+#def p_term_error(p):
+#    '''Term1 : DIVIDE error Term
+#             | TIMES error Term'''
+#    print("Malformed expression")
 
 # Error rule for syntax errors
 def p_error(p):
