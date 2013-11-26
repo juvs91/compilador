@@ -819,7 +819,7 @@ for func_name in sem.func_table:
     if(sem.var_table.get(func_name) != None and sem.var_table[func_name] != None):
         var_map = {}
         for var in sem.var_table[func_name].items():
-            var_map[var[0]] = [var[1][0], var[1][1], var[1][2][0]]  # {id: [type, address, size (bytes)]}
+            var_map[var[0]] = [var[1][0], var[1][1], var[1][2]]  # {id: [type, address, [size (bytes), dims]]}
         sem.func_table[func_name].append(var_map)
         sem.func_table[func_name][4] = sum(map(lambda x: x[1][2][0], sem.var_table[func_name].items()))
     else:

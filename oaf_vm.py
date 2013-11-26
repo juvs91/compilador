@@ -77,7 +77,7 @@ class VirtualMachine:
                     step = 4
                 else:
                     step = 1
-                for x in range(0, var[1][2], step):
+                for x in range(0, var[1][2][0], step):
                     self.mem_map[var[1][1] + x] = None
             else:
                 self.mem_map[var[1][1]] = None
@@ -192,7 +192,7 @@ class VirtualMachine:
                 var = self.functions[func_name][2][res]
                 type = self.functions[func_name][5][var][0]
                 dir = self.functions[func_name][5][var][1]
-                size = self.functions[func_name][5][var][2]
+                size = self.functions[func_name][5][var][2][0]
                 if (type[0] == "i" or type[0] == "f"):
                     bytes = 4
                 else:
