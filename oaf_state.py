@@ -21,6 +21,7 @@ arr_dim_stack = []  # Used for nested arrays
 arr_m_list = []  # M values for each dimension
 arr_r = 1  # R value
 arr_indices = []  # List that holds the calculated indices
+arr_parsing = False
 
 # Unresolved variables
 unresolved_vars = {}

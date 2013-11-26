@@ -265,6 +265,7 @@ def p_clear_dimensions(p):
 def p_clear_current_dimension(p):
     '''Clear_Current_Dimension : '''
     expr.add_operator("#")
+    state.arr_parsing = True
     state.arr_current_dim = 0
     p[0] = p[-1]
 
@@ -299,6 +300,7 @@ def p_update_offset(p):
 def p_generate_dir(p):
     '''Generate_Dir : '''
     var = sem.get_variable(p[-3])
+    state.arr_parsing = False
     # If size is zero variable is unresolved
     if(var[1][2][0] <= 0):
         state.unresolved_vars[sem.scope][var[0]].append(len(state.quads))
@@ -605,7 +607,7 @@ def p_seen_operand(p):
         var = sem.get_variable(p[-1])
         if(state.arr_current_dim == 0 or "[]" not in var[1][0]):
             expr.add_operand(var)
-            if(len(state.operator_stack) > 0 and state.operator_stack[-1] != "#"):
+            if(not state.arr_parsing):
                 state.assign_list.append(var[1][0])
 
 def p_seen_operand_1(p):
@@ -619,6 +621,7 @@ def p_seen_operand_1(p):
 def p_seen_operand_2(p):
     '''Seen_Operand2 : '''
     sem.is_declared(p[-1])
+    state.assign_list.append("int")
 
 def p_seen_unary_operator(p):
     '''Seen_Unary_Operator : '''
