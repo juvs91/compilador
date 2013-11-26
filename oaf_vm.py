@@ -233,28 +233,22 @@ class VirtualMachine:
                 turtle.forward(self.mem[op1])
                 self.grafic_used = True
             if (op == "rt"):
-                print "rt"
                 turtle.rt(self.mem[op1])
                 self.grafic_used = True
             if (op == "square"):
-                print "square"
                 self.square(self.mem[op1])
 
                 self.grafic_used = True
             if (op == "brush"):
-                print "brush"
                 turtle.pensize(self.mem[op1])
                 self.grafic_used = True
             if (op == "arc"):
-                print "arc"
 
                 self.grafic_used = True
             if (op == "pd"):
-                print "pd"
                 turtle.pd()
                 self.grafic_used = True
             if (op == "pu"):
-                print "pu"
                 turtle.pu()
                 self.grafic_used = True
             if (op == "color"):
@@ -269,8 +263,8 @@ class VirtualMachine:
             if (op == "goto"):
                 self.instr_ptr = res
             elif (op == "gotoFalse"): 
-                print self.mem[op1]
-                if (self.mem[op1] == 0):
+                #print self.mem[op1]
+                if (self.mem[op1] == "false"):
                     self.instr_ptr = res
                 else:
                     self.instr_ptr += 1
@@ -280,7 +274,7 @@ class VirtualMachine:
                 self.instr_ptr = res
                 self.copy_mem()
             elif (op == "return"):
-                if(op1):
+                if(op1 != None):
                     self.return_value_stack.append(self.mem[op1])
                 self.instr_ptr = self.functions[self.context[0]][3][1]
             elif (op == "end"):
