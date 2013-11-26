@@ -31,8 +31,8 @@ class Quad:
                 else:
                     size = 1
                 res = [res, [type, state.temp_dir, [size, 1], 't']]
-            self.result = res
             state.temp_dir -= size
+            self.result = res
 
     #def add_offset(self, g_offset, c_offset, l_offset, t_offset):
     #    if(isinstance(self.operand1, list)):

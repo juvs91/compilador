@@ -1,4 +1,4 @@
-import ply.yacc as yacc 
+import ply.yacc as yacc
 import oaf_vm as vm
 
 # Module to serialize objects
@@ -9,7 +9,7 @@ import oaf_yacc_func as func_parser
 
 import oaf_state as state
 
-import oaf_main as main      
+import oaf_main as main
 
 
 #all the grafic quads
@@ -107,7 +107,7 @@ def p_pop_label_stack(p):
 
 def p_else(p):
     '''Else : ELSE Push_Else Pop_Label_Stack Block Pop_Label_Stack
-            | Pop_Label_Stack empty'''  
+            | Pop_Label_Stack empty'''
 
 def p_push_else(p):
     '''Push_Else : '''
@@ -367,7 +367,7 @@ def p_pendown(p):
     '''PenDown : PD LPAREN RPAREN Pen_Home'''
 
 def p_penup(p):
-    '''PenUp : PU LPAREN RPAREN Pen_Home'''  
+    '''PenUp : PU LPAREN RPAREN Pen_Home'''
 
 def p_pen_home(p):
     '''Pen_Home : '''
@@ -393,6 +393,12 @@ def p_circle(p):
 
 def p_arc(p):
     '''Arc : ARC LPAREN SuperExpr COMMA SuperExpr RPAREN Seen_Arc'''
+
+def p_speed(p):
+    '''Speed : SPEED LPAREN SuperExpr RPAREN Seen_grafic_operation_requieres_name_expr '''
+
+def p_triangle(p):
+    '''Triangle : TRIANGLE LPAREN SuperExpr RPAREN Seen_grafic_operation_requieres_name_expr '''
 
 def p_seen_arc(p):
     '''Seen_Arc : '''
@@ -452,8 +458,10 @@ def p_instruction_1(p):
                     | Arc
                     | Square
                     | Length
+                    | Triangle
+                    | Speed
                     | Return'''
-    p[0] = p[1] 
+    p[0] = p[1]
 
 def p_length(p):
     '''Length : LENGTH LPAREN ID Seen_Operand2 Array1 RPAREN Generate_Length'''
@@ -465,7 +473,6 @@ def p_generate_length(p):
 
 def p_return(p):
     '''Return : RETURN RType '''
-    #print state.operand_stack[-1][1][0]
     if(p[2] != None):
         return_var = state.operand_stack.pop()
         func.generate_return(return_var)
@@ -847,7 +854,7 @@ for func_name in sem.func_table:
 for idx, quad in enumerate(state.quads):
     quad.transform(state.t_offset, state.l_offset)
     #quad.add_offset(0, state.global_dir, 9000, 43000)
-    #print idx, (quad.operator, quad.operand1, quad.operand2, quad.result)
+    print idx, (quad.operator, quad.operand1, quad.operand2, quad.result)
 
 # Updates unresolved variables
 for func_name in state.unresolved_vars:

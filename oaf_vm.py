@@ -3,6 +3,7 @@ import turtle
 
 class VirtualMachine:
     def __init__(self, filename, local_address, stack_address, heap_address):
+        self.constant_loop = 0 # the control variable if the loop is located 
         self.color_list = []#the list of colors
         self.instr_ptr = 0  # Current quad
         self.instr_ptr_stack = []  # Stack used when returning to previous instruction
@@ -30,7 +31,11 @@ class VirtualMachine:
     def square(self, size):
         for i in range(4):
             turtle.fd(size)
-            turtle.rt(90)
+            turtle.rt(90) 
+    def triangle(self,size):
+        for i in range(3):
+            turtle.fd(size)
+            turtle.rt(120)
 
     def load_obj(self, filename):
         f = open(filename, "rb")
@@ -241,28 +246,35 @@ class VirtualMachine:
                 turtle.forward(self.mem[op1])
                 self.grafic_used = True
             if (op == "rt"):
-                print "rt"
                 turtle.rt(self.mem[op1])
                 self.grafic_used = True
             if (op == "square"):
-                print "square"
                 self.square(self.mem[op1])
+
+            if (op =="triangle"):
+                self.triangle(self.mem[op1])
 
                 self.grafic_used = True
             if (op == "brush"):
-                print "brush"
                 turtle.pensize(self.mem[op1])
                 self.grafic_used = True
             if (op == "arc"):
-                print "arc"
+                a = self.mem[op1]
+                b = self.mem[op2]
+                c = a-b
+                if(c<0):
+                   c = c*-1
+                turtle.rt(270)
+                angle = 180/c 
+                for e in range(c*2):
+                    turtle.fd(1)
+                    turtle.rt(angle/2)
 
                 self.grafic_used = True
             if (op == "pd"):
-                print "pd"
                 turtle.pd()
                 self.grafic_used = True
             if (op == "pu"):
-                print "pu"
                 turtle.pu()
                 self.grafic_used = True
             if (op == "color"):
@@ -272,11 +284,14 @@ class VirtualMachine:
                     self.grafic_used = True
             if (op == "home"):
                 turtle.home()
+            if (op == "speed"):
+                turtle.speed(self.mem[op1])
 
             # Operators that change the instruction pointer
             if (op == "goto"):
                 self.instr_ptr = res
-            elif (op == "gotoFalse"):
+            elif (op == "gotoFalse"): 
+                #print self.mem[op1]
                 if (self.mem[op1] == "false"):
                     self.instr_ptr = res
                 else:

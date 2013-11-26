@@ -195,10 +195,16 @@ def p_circle(p):
     '''Circle : CIRCLE LPAREN SuperExpr RPAREN'''
 
 def p_arc(p):
-    '''Arc : ARC LPAREN SuperExpr COMMA SuperExpr RPAREN'''
+    '''Arc : ARC LPAREN SuperExpr COMMA SuperExpr RPAREN'''   
+
+def p_speed(p):
+    '''Speed : SPEED LPAREN SuperExpr RPAREN  '''
+
+def p_triangle(p):
+    '''Triangle : TRIANGLE LPAREN SuperExpr RPAREN  '''
 
 def p_square(p):
-    '''Square : SQUARE LPAREN SuperExpr RPAREN'''
+    '''Square : SQUARE LPAREN SuperExpr RPAREN '''
 
 def p_param(p):
     '''Param : Primitive ID Array1 Update_Signature'''
@@ -251,6 +257,8 @@ def p_instruction_1(p):
                     | Arc
                     | Square
                     | Length
+                    | Triangle
+                    | Speed
                     | Return'''
 
 def p_length(p):
