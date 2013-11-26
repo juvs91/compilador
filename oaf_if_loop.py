@@ -2,6 +2,8 @@ import oaf_state as state
 import oaf_quad as quad
 
 def generate_if_goto_f(exp):
+    if(exp[1][0][0] != "b"):
+        raise NameError("Boolean expected, '{0}' received".format(exp[1][0]))
     q = quad.Quad()
     q.set_quad("gotoFalse", None, exp, None)
     state.quads.append(q)

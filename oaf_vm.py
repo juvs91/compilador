@@ -20,8 +20,6 @@ class VirtualMachine:
         self.functions = self.obj["functions"]
         self.mem = self.obj["mem"]
 
-        turtle.speed(10)
-
         # List of memory addresses
         self.mem_map = {}
         self.grafic_used = False  # variable to seet main loop if any grafic comands are used
@@ -117,6 +115,8 @@ class VirtualMachine:
             elif (op == "*"):
                 self.mem[res] = self.mem[op1] * self.mem[op2]
             elif (op == "/"):
+                if(self.mem[op2] == 0):
+                    raise NameError("Division by zero")
                 self.mem[res] = self.mem[op1] / self.mem[op2]
             elif (op == "="):
                 self.mem[res] = self.mem[op1]

@@ -480,7 +480,7 @@ def is_signature_valid(func_name, signature):
     if(cmp(func_table.get(func_name)[1], signature) == 0):
         return True
     else:
-        raise NameError("Wrong signature '{0}', {1}".format(func_name, signature))     
+        raise NameError("Wrong signature '{0}'. '{1}' expected, '{2}' received".format(func_name, func_table.get(func_name)[1], signature))
 
 #validate if the return function returns a value if its not void  and if the type of return is equal to the var it returns
 def validate_return_funtion(var):

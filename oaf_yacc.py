@@ -378,10 +378,7 @@ def p_forward(p):
 
 def p_seen_grafic_operation_requieres_name_expr(p):
     '''Seen_grafic_operation_requieres_name_expr :'''
-    print p[-4]
     gq.generate_draw_quad(p[-4],state.operand_stack.pop())
-
-
 
 def p_rotate(p):
     '''Rotate : RT LPAREN SuperExpr RPAREN Seen_grafic_operation_requieres_name_expr'''
@@ -825,6 +822,9 @@ for func_name in sem.func_table:
             var_map[var[0]] = [var[1][0], var[1][1], var[1][2][0]]  # {id: [type, address, size (bytes)]}
         sem.func_table[func_name].append(var_map)
         sem.func_table[func_name][4] = sum(map(lambda x: x[1][2][0], sem.var_table[func_name].items()))
+    else:
+        sem.func_table[func_name].append({})
+        sem.func_table[func_name][4] = 0
 
 # Changes variables to memory addresses and adds temporal address offset
 for idx, quad in enumerate(state.quads):
