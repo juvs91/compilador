@@ -100,18 +100,20 @@ def p_term_1(p):
 
 def p_factor(p):
     '''Factor : LPAREN SuperExpr RPAREN
-              | Factor1
-              | Length'''
+              | Factor1'''
     p[0] = p[1]
 
 def p_factor_1(p):
     '''Factor1 : Factor2
-               | Factor3'''
+               | Factor3
+               | Length'''
     p[0] = p[1]
 
 def p_factor_2(p):
     '''Factor2 : MINUS Factor3
                | PLUS Factor3
+               | MINUS Length
+               | PLUS Length
                | NOT Not'''
     p[0] = p[2]
 
@@ -201,7 +203,7 @@ def p_circle(p):
     '''Circle : CIRCLE LPAREN SuperExpr RPAREN'''
 
 def p_fig(p):
-    '''Fig : FIG  LPAREN SuperExpr COMMA SuperExpr RPAREN'''
+    '''Figure : FIGURE LPAREN SuperExpr COMMA SuperExpr RPAREN'''
 
 def p_arc(p):
     '''Arc : ARC LPAREN SuperExpr COMMA SuperExpr RPAREN'''   
@@ -268,7 +270,7 @@ def p_instruction_1(p):
                     | Length
                     | Triangle
                     | Speed
-                    | Fig
+                    | Figure
                     | Return'''
 
 def p_length(p):

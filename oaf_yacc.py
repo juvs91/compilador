@@ -14,8 +14,8 @@ import oaf_state as state
 import oaf_main as main
 
 
-#all the grafic quads
-import oaf_grafic_quads as gq
+#all the graphic quads
+import oaf_graphics as gq
 
 # Expressions module
 import oaf_expr as expr
@@ -197,6 +197,8 @@ def p_factor(p):
 def p_factor_1(p):
     '''Factor1 : MINUS Seen_Unary_Operator Constant Seen_Operand Gen_Quad0
                | PLUS Seen_Unary_Operator Constant Seen_Operand Gen_Quad0
+               | MINUS Seen_Unary_Operator Length Gen_Quad0
+               | PLUS MINUS Seen_Unary_Operator Length Gen_Quad0
                | NOT Seen_Unary_Operator Not'''
     p[0] = p[3]
 
@@ -416,7 +418,7 @@ def p_print(p):
 
 
 def p_brush(p):
-    '''Brush : BRUSH LPAREN SuperExpr RPAREN Seen_grafic_operation_requieres_name_expr'''
+    '''Brush : BRUSH LPAREN SuperExpr RPAREN Seen_graphic_operation_requieres_name_expr'''
 
 
 def p_color(p):
@@ -449,47 +451,47 @@ def p_home(p):
 
 
 def p_forward(p):
-    '''Forward : FD LPAREN SuperExpr RPAREN Seen_grafic_operation_requieres_name_expr'''
+    '''Forward : FD LPAREN SuperExpr RPAREN Seen_graphic_operation_requieres_name_expr'''
 
 
-def p_seen_grafic_operation_requieres_name_expr(p):
-    '''Seen_grafic_operation_requieres_name_expr :'''
+def p_seen_graphic_operation_requieres_name_expr(p):
+    '''Seen_graphic_operation_requieres_name_expr :'''
     gq.generate_draw_quad(p[-4], state.operand_stack.pop())
 
 
 def p_rotate(p):
-    '''Rotate : RT LPAREN SuperExpr RPAREN Seen_grafic_operation_requieres_name_expr'''
+    '''Rotate : RT LPAREN SuperExpr RPAREN Seen_graphic_operation_requieres_name_expr'''
 
 
 def p_circle(p):
-    '''Circle : CIRCLE LPAREN SuperExpr RPAREN Seen_grafic_operation_requieres_name_expr'''
+    '''Circle : CIRCLE LPAREN SuperExpr RPAREN Seen_graphic_operation_requieres_name_expr'''
 
 
 def p_fig(p):
-    '''Fig : FIG  LPAREN SuperExpr COMMA SuperExpr RPAREN Seen_Grafic_Two_Attr'''
+    '''Figure : FIGURE LPAREN SuperExpr COMMA SuperExpr RPAREN Seen_Graphic_Two_Attr'''
 
 
 def p_arc(p):
-    '''Arc : ARC LPAREN SuperExpr COMMA SuperExpr RPAREN Seen_Grafic_Two_Attr'''
+    '''Arc : ARC LPAREN SuperExpr COMMA SuperExpr RPAREN Seen_Graphic_Two_Attr'''
 
 
 def p_speed(p):
-    '''Speed : SPEED LPAREN SuperExpr RPAREN Seen_grafic_operation_requieres_name_expr '''
+    '''Speed : SPEED LPAREN SuperExpr RPAREN Seen_graphic_operation_requieres_name_expr '''
 
 
 def p_triangle(p):
-    '''Triangle : TRIANGLE LPAREN SuperExpr RPAREN Seen_grafic_operation_requieres_name_expr '''
+    '''Triangle : TRIANGLE LPAREN SuperExpr RPAREN Seen_graphic_operation_requieres_name_expr '''
 
 
-def p_seen_grafic_two_attr(p):
-    '''Seen_Grafic_Two_Attr : '''
+def p_seen_graphic_two_attr(p):
+    '''Seen_Graphic_Two_Attr : '''
     p2 = state.operand_stack.pop()
     p1 = state.operand_stack.pop()
     gq.generate_arc_quad(p[-6],p1, p2)
 
 
 def p_square(p):
-    '''Square : SQUARE LPAREN SuperExpr RPAREN Seen_grafic_operation_requieres_name_expr'''
+    '''Square : SQUARE LPAREN SuperExpr RPAREN Seen_graphic_operation_requieres_name_expr'''
 
 
 def p_param(p):
@@ -549,7 +551,7 @@ def p_instruction_1(p):
                     | Length
                     | Triangle
                     | Speed 
-                    | Fig
+                    | Figure
                     | Return'''
     p[0] = p[1]
     state.assign_list = []
@@ -557,7 +559,7 @@ def p_instruction_1(p):
 
 def p_length(p):
     '''Length : LENGTH LPAREN ID Seen_Operand2 Array1 RPAREN Generate_Length'''
-
+    p[0] = p[3]
 
 def p_generate_length(p):
     '''Generate_Length : '''
@@ -952,6 +954,10 @@ for func_name in sem.func_table:
     else:
         sem.func_table[func_name].append({})
         sem.func_table[func_name][4] = 0
+# Creates an index entry in function table for global variables
+sem.func_table[sem.global_str] = [[], [], [], [], 0, {}]
+for var in sem.var_table[sem.global_str].items():
+    sem.func_table[sem.global_str][5][var[0]] = [var[1][0], var[1][1], var[1][2]]
 
 # Changes variables to memory addresses and adds temporal address offset
 for idx, quad in enumerate(state.quads):
