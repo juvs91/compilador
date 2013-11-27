@@ -15,7 +15,7 @@ import oaf_main as main
 
 
 #all the graphic quads
-import oaf_graphic_quads as gq
+import oaf_graphics as gq
 
 # Expressions module
 import oaf_expr as expr
