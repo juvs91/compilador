@@ -100,6 +100,7 @@ def p_conditional(p):
 
 def p_push_label_stack(p):
     '''Push_Label_Stack : '''
+    state.assign_list = []
     state.label_stack.append(len(state.quads))
     il.generate_if_goto_f(state.operand_stack.pop())
 
@@ -268,6 +269,7 @@ def p_clear_current_dimension(p):
     '''Clear_Current_Dimension : '''
     expr.add_operator("#")
     state.arr_parsing = True
+    #state.assign_list = []
     state.arr_current_dim = 0
     p[0] = p[-1]
 
@@ -466,6 +468,7 @@ def p_instruction_1(p):
                     | Speed
                     | Return'''
     p[0] = p[1]
+    state.assign_list = []
 
 def p_length(p):
     '''Length : LENGTH LPAREN ID Seen_Operand2 Array1 RPAREN Generate_Length'''
@@ -484,10 +487,7 @@ def p_return(p):
     else:
         func.generate_return(None)
         sem.validate_return_funtion("void")
-    #if(p[2] != None):
-    #    sem.validate_return_funtion(return_var[1][0])
-    #else:
-    #    sem.validate_return_funtion("void")
+    state.assign_list = []
 
 def p_rtype(p):
     '''RType : SuperExpr
@@ -500,6 +500,7 @@ def p_seen_char_operand(p):
 
 def p_seen_call(p):
     '''Seen_Call : '''
+    state.func_parsing = True
     expr.add_operator("#")
     state.return_dir_stack.append(state.temp_dir)
     func_name = p[-2]
@@ -515,9 +516,11 @@ def p_seen_call(p):
         state.temp_dir -= size
     else:
         func.generate_era(func_name, None)
+    state.assign_list.append(type)
 
 def p_seen_call_end(p):
     '''Seen_Call_End : '''
+    state.func_parsing = False
     expr.pop_operator()
     func_name = p[-6]
     func.generate_gosub(func_name, sem.get_function(func_name)[3])
@@ -609,7 +612,7 @@ def p_seen_operand(p):
         var = sem.get_variable(p[-1])
         if(state.arr_current_dim == 0 or "[]" not in var[1][0]):
             expr.add_operand(var)
-            if(not state.arr_parsing):
+            if(not state.arr_parsing and not state.func_parsing):
                 state.assign_list.append(var[1][0])
 
 def p_seen_operand_1(p):

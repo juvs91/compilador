@@ -32,7 +32,7 @@ def pop_expr():
         state.last_operator = None
 
 def set_assign_type(type, ops):
-    if(not state.arr_parsing):
+    if(not state.arr_parsing and not state.func_parsing):
         for x in range(ops):
             state.assign_list.pop()
         state.assign_list.append(type)
@@ -69,7 +69,7 @@ def generate_quad(hierarchy):
     elif(hierarchy == 5):
         if(state.last_operator == '='):
             q.set_quad(state.operator_stack.pop(), None, state.operand_stack.pop(), state.operand_stack.pop())
-            set_assign_type(sem.get_type("=", ["var", [state.assign_list[0]]], ["var", [q.result[1][0]]]), 1)
+            set_assign_type(sem.get_type("=", ["", [state.assign_list[0]]], ["", [q.result[1][0]]]), 1)
     if(q.operator != None):
         state.quads.append(q)
         if(q.operator != "="):

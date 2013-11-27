@@ -12,6 +12,7 @@ assign_list = []
 # Return values of functions
 return_dir_stack = []
 return_var_stack = []
+func_parsing = False
 
 # Array information, used when parsing arrays
 arr_dim = []  # Used to get dimension size
