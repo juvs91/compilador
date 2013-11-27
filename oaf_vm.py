@@ -35,6 +35,11 @@ class VirtualMachine:
         for i in range(3):
             turtle.fd(size)
             turtle.rt(120)
+    def fig(self,n,size):
+        angle = 360/n
+        for i in range(n):
+            turtle.fd(size)
+            turtle.rt(angle)
 
     def load_obj(self, filename):
         f = open(filename, "rb")
@@ -288,8 +293,14 @@ class VirtualMachine:
                     self.grafic_used = True
             if (op == "home"):
                 turtle.home()
+                self.grafic_used = True
             if (op == "speed"):
                 turtle.speed(self.mem[op1])
+                self.grafic_used = True
+
+            if (op == "fig"):
+                self.grafic_used = True
+                self.fig(self.mem[op1],self.mem[op2])
 
             # Operators that change the instruction pointer
             if (op == "goto"):
