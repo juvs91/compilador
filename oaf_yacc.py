@@ -422,7 +422,10 @@ def p_brush(p):
 
 
 def p_color(p):
-    '''Color : COLOR LPAREN SuperExpr COMMA SuperExpr COMMA SuperExpr RPAREN Seen_Color'''
+    '''Color : COLOR LPAREN SuperExpr COMMA SuperExpr COMMA SuperExpr RPAREN Seen_Color'''   
+
+def p_clear(p):
+	'''Clear : CLEAR LPAREN RPAREN Pen_Home '''
 
 
 def p_seen_color(p):
@@ -552,6 +555,7 @@ def p_instruction_1(p):
                     | Triangle
                     | Speed 
                     | Figure
+                    | Clear
                     | Return'''
     p[0] = p[1]
     state.assign_list = []

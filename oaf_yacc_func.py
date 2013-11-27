@@ -188,7 +188,9 @@ def p_pendown(p):
     '''PenDown : PD LPAREN RPAREN'''
 
 def p_penup(p):
-    '''PenUp : PU LPAREN RPAREN'''
+    '''PenUp : PU LPAREN RPAREN''' 
+def p_clear(p):
+	'''Clear : CLEAR LPAREN RPAREN  '''
 
 def p_home(p):
     '''Home : HOME LPAREN RPAREN'''
@@ -271,6 +273,7 @@ def p_instruction_1(p):
                     | Triangle
                     | Speed
                     | Figure
+                    | Clear
                     | Return'''
 
 def p_length(p):
