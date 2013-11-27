@@ -355,13 +355,17 @@ semantic_cube = {
 }
 
 
-def fill_symbol_table_function(symbol, attributes): 
+def fill_symbol_table_function(symbol, attributes):
+    if(symbol == global_str or symbol == constant_str):
+        raise NameError("Using reserved word '{0}' as an identifier".format(symbol))
     if(func_table.get(symbol) == None): 
         func_table[symbol] = attributes
     else: 
         raise NameError("Function redeclaration, '{0}' already exists".format(symbol))
 
 def fill_local_variables_table(var, type, attrs, m_list):
+    if(var == global_str or var == constant_str):
+        raise NameError("Using reserved word '{0}' as an identifier".format(var))
     #verifica si existe el scope dado
     if(var_table.get(scope) == None):
         var_table[scope] = {}
@@ -378,6 +382,8 @@ def fill_local_variables_table(var, type, attrs, m_list):
         state.local_dir += attrs[0]
 
 def fill_global_variables_table(var, type, attrs, m_list):
+    if(var == global_str or var == constant_str):
+        raise NameError("Using reserved word '{0}' as an identifier".format(var))
     # attrs = [size of variable,{each dimension size}]
     # verifica si existe el scope dado
     if(var_table.get(scope) == None):
