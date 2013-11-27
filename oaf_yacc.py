@@ -559,7 +559,7 @@ def p_instruction_1(p):
 
 def p_length(p):
     '''Length : LENGTH LPAREN ID Seen_Operand2 Array1 RPAREN Generate_Length'''
-
+    p[0] = p[3]
 
 def p_generate_length(p):
     '''Generate_Length : '''

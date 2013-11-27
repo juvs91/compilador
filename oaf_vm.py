@@ -178,7 +178,10 @@ class VirtualMachine:
             # Special functions
             if(op == "len"):
                 if(op2 == 0):
-                    length = reduce(lambda x, y: x * y, self.functions[self.context[0]][5][op1][2][1:])
+                    if(self.functions[self.context[0]][5].get(op1) != None):
+                        length = reduce(lambda x, y: x * y, self.functions[self.context[0]][5][op1][2][1:])
+                    else:
+                        length = reduce(lambda x, y: x * y, self.functions["global"][5][op1][2][1:])
                 else:
                     if(self.functions[self.context[0]][5].get(op1) != None):
                         length = self.functions[self.context[0]][5][op1][2][op2]
