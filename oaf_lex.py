@@ -11,6 +11,7 @@ reserved = {
     'else': 'ELSE',
     'false': 'FALSE',
     'fd': 'FD',
+    'figure': 'FIGURE',
     'float': 'FLOAT',
     'home': 'HOME',
     'if': 'IF',
@@ -25,11 +26,10 @@ reserved = {
     'return': 'RETURN',
     'rt': 'RT',
     'square': 'SQUARE',
+    'triangle': 'TRIANGLE',
     'true': 'TRUE',
     'void': 'VOID',
     'speed': 'SPEED',
-    'triangle':'TRIANGLE',
-    'fig': 'FIG'
 }
 
 # List of token names

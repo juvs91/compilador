@@ -22,7 +22,7 @@ class VirtualMachine:
 
         # List of memory addresses
         self.mem_map = {}
-        self.grafic_used = False  # variable to seet main loop if any grafic comands are used
+        self.graphic_used = False  # variable to seet main loop if any graphic comands are used
 
         # Operators list
         self.op_list = ["u+", "u-", "u!", "=", "+", "-", "*", "/", "<", ">", "<=", ">=", "<>", "==", "||", "&&", "print", "param", "return"]
@@ -31,12 +31,12 @@ class VirtualMachine:
         for i in range(4):
             turtle.fd(size)
             turtle.rt(90) 
-    def triangle(self,size):
+    def triangle(self, size):
         for i in range(3):
             turtle.fd(size)
             turtle.rt(120)
-    def fig(self,n,size):
-        angle = 360/n
+    def figure(self, n, size):
+        angle = 360 / n
         for i in range(n):
             turtle.fd(size)
             turtle.rt(angle)
@@ -247,26 +247,26 @@ class VirtualMachine:
                     raise NameError("Incompatible types '{0}' and '{1}'".format("char", op1))
                 self.mem[res] = response
 
-                #all the grafic quads traductions
+                #all the graphic quads traductions
             if (op == "circle"):
                 turtle.circle(self.mem[op1])
-                self.grafic_used = True
+                self.graphic_used = True
             if (op == "fd"):
                 turtle.forward(self.mem[op1])
-                self.grafic_used = True
+                self.graphic_used = True
             if (op == "rt"):
                 turtle.rt(self.mem[op1])
-                self.grafic_used = True
+                self.graphic_used = True
             if (op == "square"):
                 self.square(self.mem[op1])
 
             if (op =="triangle"):
                 self.triangle(self.mem[op1])
 
-                self.grafic_used = True
+                self.graphic_used = True
             if (op == "brush"):
                 turtle.pensize(self.mem[op1])
-                self.grafic_used = True
+                self.graphic_used = True
             if (op == "arc"):
                 a = self.mem[op1]
                 b = self.mem[op2]
@@ -279,28 +279,28 @@ class VirtualMachine:
                     turtle.fd(1)
                     turtle.rt(angle/2)
 
-                self.grafic_used = True
+                self.graphic_used = True
             if (op == "pd"):
                 turtle.pd()
-                self.grafic_used = True
+                self.graphic_used = True
             if (op == "pu"):
                 turtle.pu()
-                self.grafic_used = True
+                self.graphic_used = True
             if (op == "color"):
                 self.color_list.append(self.mem[op2])
                 if (len(self.color_list) == 3):
                     turtle.pencolor(self.color_list[0], self.color_list[1], self.color_list[2])
-                    self.grafic_used = True
+                    self.graphic_used = True
             if (op == "home"):
                 turtle.home()
-                self.grafic_used = True
+                self.graphic_used = True
             if (op == "speed"):
                 turtle.speed(self.mem[op1])
-                self.grafic_used = True
+                self.graphic_used = True
 
-            if (op == "fig"):
-                self.grafic_used = True
-                self.fig(self.mem[op1],self.mem[op2])
+            if (op == "figure"):
+                self.graphic_used = True
+                self.figure(self.mem[op1], self.mem[op2])
 
             # Operators that change the instruction pointer
             if (op == "goto"):
@@ -343,6 +343,6 @@ class VirtualMachine:
             op1 = quad.operand1
             op2 = quad.operand2
             res = quad.result
-        if (self.grafic_used):
+        if (self.graphic_used):
             turtle.mainloop()
         print "Program finished"
