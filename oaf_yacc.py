@@ -197,6 +197,8 @@ def p_factor(p):
 def p_factor_1(p):
     '''Factor1 : MINUS Seen_Unary_Operator Constant Seen_Operand Gen_Quad0
                | PLUS Seen_Unary_Operator Constant Seen_Operand Gen_Quad0
+               | MINUS Seen_Unary_Operator Length Gen_Quad0
+               | PLUS MINUS Seen_Unary_Operator Length Gen_Quad0
                | NOT Seen_Unary_Operator Not'''
     p[0] = p[3]
 
