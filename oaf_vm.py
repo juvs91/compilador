@@ -3,7 +3,6 @@ import turtle
 
 class VirtualMachine:
     def __init__(self, filename, local_address, stack_address, heap_address):
-        self.constant_loop = 0 # the control variable if the loop is located 
         self.color_list = []#the list of colors
         self.instr_ptr = 0  # Current quad
         self.instr_ptr_stack = []  # Stack used when returning to previous instruction
@@ -156,12 +155,12 @@ class VirtualMachine:
                 else:
                     self.mem[res] = "false"
             elif (op == "&&"):
-                if (self.mem[op1] and self.mem[op2]):
+                if (self.mem[op1]== "true" and self.mem[op2] == "true"):
                     self.mem[res] = "true"
                 else:
                     self.mem[res] = "false"
             elif (op == "||"):
-                if (self.mem[op1] or self.mem[op2]):
+                if (self.mem[op1] =="true" or self.mem[op2] == "true"):
                     self.mem[res] = "true"
                 else:
                     self.mem[res] = "false"
