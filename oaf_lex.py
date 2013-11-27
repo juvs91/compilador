@@ -28,7 +28,8 @@ reserved = {
     'true': 'TRUE',
     'void': 'VOID',
     'speed': 'SPEED',
-    'triangle':'TRIANGLE'
+    'triangle':'TRIANGLE',
+    'fig': 'FIG'
 }
 
 # List of token names

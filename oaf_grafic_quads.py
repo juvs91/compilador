@@ -26,7 +26,7 @@ def generate_color_quad(red, green, blue):
     state.quads.append(q3)
 
 
-def generate_arc_quad(p1, p2):
+def generate_arc_quad(type,p1, p2):
     q = quad.Quad()
-    q.set_quad("arc", p2, p1, None)
+    q.set_quad(type, p2, p1, None)
     state.quads.append(q)
