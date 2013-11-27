@@ -41,7 +41,7 @@ def set_assign_type(type, ops):
 def generate_quad(hierarchy):
     q = quad.Quad()
     if(hierarchy == 0):
-        if(state.last_operator == 'u+' or state.last_operator == 'u-'):
+        if(state.last_operator == 'u+' or state.last_operator == 'u-' or state.last_operator == 'u!'):
             q.set_quad(state.operator_stack.pop(), None, state.operand_stack.pop(), "t" + str(state.temp_counter))
             set_assign_type(q.result[1][0], 1)
             state.temp_counter += 1

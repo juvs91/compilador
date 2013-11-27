@@ -25,7 +25,7 @@ class VirtualMachine:
         self.grafic_used = False  # variable to seet main loop if any grafic comands are used
 
         # Operators list
-        self.op_list = ["u+", "u-", "=", "+", "-", "*", "/", "<", ">", "<=", ">=", "<>", "==", "||", "&&", "print", "param", "return"]
+        self.op_list = ["u+", "u-", "u!", "=", "+", "-", "*", "/", "<", ">", "<=", ">=", "<>", "==", "||", "&&", "print", "param", "return"]
 
     def square(self, size):
         for i in range(4):
@@ -112,6 +112,11 @@ class VirtualMachine:
                 self.mem[res] = self.mem[op1]
             elif(op == "u-"):
                 self.mem[res] = -self.mem[op1]
+            elif(op == "u!"):
+                if (self.mem[op1] == "true"):
+                    self.mem[res] = "false"
+                else:
+                    self.mem[res] = "true"
             elif (op == "+"):
                 self.mem[res] = self.mem[op1] + self.mem[op2]
             elif (op == "-"):

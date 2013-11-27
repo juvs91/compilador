@@ -111,12 +111,18 @@ def p_factor_1(p):
 
 def p_factor_2(p):
     '''Factor2 : MINUS Factor3
-               | PLUS Factor3'''
+               | PLUS Factor3
+               | NOT Not'''
     p[0] = p[2]
 
 def p_factor_3(p):
     '''Factor3 : Constant
                | Call'''
+    p[0] = p[1]
+
+def p_not(p):
+    '''Not : Factor3
+           | LPAREN SuperExpr RPAREN'''
     p[0] = p[1]
 
 # Agregar tipo STRING para variables y funciones

@@ -16,7 +16,15 @@ class Quad:
             if(op == "="):
                 res[1][0] = sem.get_type(op, op1, res)
             elif(op == "u+" or op == "u-"):
+                if(op1[1][0][0] != "i" or op1[1][0][0] != "f"):
+                    raise NameError("Number expected, '{0}' received".format(op1[1][0]))
                 size = 4
+                res = [res, [op1[1][0], state.temp_dir, [size, 1], 't']]
+                state.temp_dir -= size
+            elif(op == "u!"):
+                if(op1[1][0][0] != "b"):
+                    raise NameError("Boolean expected, '{0}' received".format(op1[1][0]))
+                size = 1
                 res = [res, [op1[1][0], state.temp_dir, [size, 1], 't']]
                 state.temp_dir -= size
             self.result = res

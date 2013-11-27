@@ -42,7 +42,7 @@ tokens = [
     # Comparison
     'LESSTHAN', 'GREATHAN', 'GREATEQUAL', 'LESSEQUAL', 'DIFFERENT', 'TWOEQUAL',
     # Logical
-    'AND', 'OR',
+    'AND', 'OR', 'NOT',
     # Assignment
     'EQUAL',
 ] + list(reserved.values())
@@ -100,6 +100,7 @@ t_TWOEQUAL   = r'=='
 # Logical
 t_AND        = r'&&'
 t_OR         = r'\|\|'
+t_NOT        = r'!'
 # Assignment
 t_EQUAL      = r'='
 
