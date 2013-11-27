@@ -34,37 +34,6 @@ class Quad:
             state.temp_dir -= size
             self.result = res
 
-    #def add_offset(self, g_offset, c_offset, l_offset, t_offset):
-    #    if(isinstance(self.operand1, list)):
-    #        if(self.operand1[1][3] == 'g'):
-    #            self.operand1[1][1] += g_offset
-    #        elif(self.operand1[1][3] == 'c'):
-    #            self.operand1[1][1] += c_offset
-    #        elif(self.operand1[1][3] == 'l'):
-    #            self.operand1[1][1] += l_offset
-    #        else:
-    #            self.operand1[1][1] += t_offset
-    #
-    #    if(isinstance(self.operand2, list)):
-    #        if(self.operand2[1][3] == 'g'):
-    #            self.operand2[1][1] += g_offset
-    #        elif(self.operand2[1][3] == 'c'):
-    #            self.operand2[1][1] += c_offset
-    #        elif(self.operand2[1][3] == 'l'):
-    #            self.operand2[1][1] += l_offset
-    #        else:
-    #            self.operand1[1][1] += t_offset
-    #
-    #    if(isinstance(self.result, list)):
-    #        if(self.result[1][3] == 'g'):
-    #            self.result[1][1] += g_offset
-    #        elif(self.result[1][3] == 'c'):
-    #            self.result[1][1] += c_offset
-    #        elif(self.result[1][3] == 'l'):
-    #            self.result[1][1] += l_offset
-    #        else:
-    #            self.result[1][1] += t_offset
-
     # Transforms variables to memory addresses
     def transform(self, t_offset, l_offset):
         if(self.operator == "add" and self.operand2[1][3][1] == "l"):
