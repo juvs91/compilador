@@ -22,7 +22,7 @@ class VirtualMachine:
 
         # List of memory addresses
         self.mem_map = {}
-        self.graphic_used = False  # variable to seet main loop if any graphic comands are used
+        self.graphic_used = False  # variable to set main loop if any graphic commands are used
 
         # Operators list
         self.op_list = ["u+", "u-", "u!", "=", "+", "-", "*", "/", "<", ">", "<=", ">=", "<>", "==", "||", "&&", "print", "param", "return"]
@@ -180,7 +180,10 @@ class VirtualMachine:
                 if(op2 == 0):
                     length = reduce(lambda x, y: x * y, self.functions[self.context[0]][5][op1][2][1:])
                 else:
-                    length = self.functions[self.context[0]][5][op1][2][op2]
+                    if(self.functions[self.context[0]][5].get(op1) != None):
+                        length = self.functions[self.context[0]][5][op1][2][op2]
+                    else:
+                        length = self.functions["global"][5][op1][2][op2]
                 self.mem[res] = length
 
             # Array operations

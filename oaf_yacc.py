@@ -952,12 +952,16 @@ for func_name in sem.func_table:
     else:
         sem.func_table[func_name].append({})
         sem.func_table[func_name][4] = 0
+# Creates an index entry in function table for global variables
+sem.func_table[sem.global_str] = [[], [], [], [], 0, {}]
+for var in sem.var_table[sem.global_str].items():
+    sem.func_table[sem.global_str][5][var[0]] = [var[1][0], var[1][1], var[1][2]]
 
 # Changes variables to memory addresses and adds temporal address offset
 for idx, quad in enumerate(state.quads):
     quad.transform(state.t_offset, state.l_offset)
     #quad.add_offset(0, state.global_dir, 9000, 43000)
-    print idx, (quad.operator, quad.operand1, quad.operand2, quad.result)
+    #print idx, (quad.operator, quad.operand1, quad.operand2, quad.result)
 
 # Updates unresolved variables
 for func_name in state.unresolved_vars:
