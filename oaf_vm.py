@@ -235,8 +235,9 @@ class VirtualMachine:
                     print self.mem[op1]
                 #read a variable in a memory addres
             if (op == "read"):
-            #if(op1 == "int"):
-                response = input("data:")
+            #if(op1 == "int"):                            
+                print op,op1,op2,res
+                response = input("inserte el valor para :")
                 if (isinstance(response, int) and op1 != "int" ):
                     raise NameError("Incompatible types '{0}' and '{1}'".format("int", op1))
                 if (isinstance(response, float) and op1 != "float"):
