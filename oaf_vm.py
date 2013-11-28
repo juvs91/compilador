@@ -131,9 +131,20 @@ class VirtualMachine:
             elif (op == "/"):
                 if(self.mem[op2] == 0):
                     raise NameError("Division by zero")
-                self.mem[res] = self.mem[op1] / self.mem[op2]
+                self.mem[res] = float(self.mem[op1]) / self.mem[op2]
             elif (op == "="):
-                self.mem[res] = self.mem[op1]
+                if(len(self.functions[self.context[0]][5]) > 0):
+                    for var, attr in self.functions[self.context[0]][5].items():
+                        if(attr[1] == res):
+                            type = attr[0]
+                            if(type == "float"):
+                                self.mem[res] = float(self.mem[op1])
+                            elif(type == "int"):
+                                self.mem[res] = int(self.mem[op1])
+                        else:
+                            self.mem[res] = self.mem[op1]
+                else:
+                    self.mem[res] = self.mem[op1]
             elif (op == ">"):
                 if (self.mem[op1] > self.mem[op2]):
                     self.mem[res] = "true"
@@ -170,7 +181,7 @@ class VirtualMachine:
                 else:
                     self.mem[res] = "false"
             elif (op == "||"):
-                if (self.mem[op1] =="true" or self.mem[op2] == "true"):
+                if (self.mem[op1] == "true" or self.mem[op2] == "true"):
                     self.mem[res] = "true"
                 else:
                     self.mem[res] = "false"
@@ -297,6 +308,7 @@ class VirtualMachine:
                 if (len(self.color_list) == 3):
                     turtle.pencolor(self.color_list[0], self.color_list[1], self.color_list[2])
                     self.graphic_used = True
+                    self.color_list = []
             if (op == "home"):
                 turtle.home()
                 self.graphic_used = True

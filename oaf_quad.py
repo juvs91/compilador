@@ -14,7 +14,7 @@ class Quad:
         self.operand1 = op1
         if(op2 == None):
             if(op == "="):
-                res[1][0] = sem.get_type(op, op1, res)
+                res[1][0] = sem.get_type(op, res, op1)
             elif(op == "u+" or op == "u-"):
                 if(op1[1][0][0] != "i" and op1[1][0][0] != "f"):
                     raise NameError("Number expected, '{0}' received".format(op1[1][0]))
